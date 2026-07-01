@@ -17,7 +17,12 @@ export async function getUserSession() {
     .single()
   
   if (dbError) {
-    console.error('getUserSession Database Error:', dbError)
+    console.error('getUserSession Database Error:', {
+      message: dbError.message,
+      details: dbError.details,
+      hint: dbError.hint,
+      code: dbError.code
+    })
   }
   
   if (dbError || !dbUser) {
