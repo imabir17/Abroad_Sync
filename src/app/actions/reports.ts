@@ -1,20 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import { getUserSession } from '@/lib/auth'
-
-const FILE_OPENED_STAGES = [
-  "In progress",
-  "Waiting for offer letter",
-  "Offer issued",
-  "Payment expected",
-  "Paid tuition fees",
-  "Waiting for interview",
-  "Visa application",
-  "Visa granted",
-  "Course In Progress",
-  "Course Completed"
-]
 
 export interface CounselorReport {
   counselorId: string;
@@ -35,92 +22,91 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
   const isCounselor = user.role === 'Counselor'
   const targetCounselorId = isCounselor ? user.id : counselorId
 
-  // Fetch counselors to report on, restricted to the user's company
-  const counselors = await prisma.user.findMany({
-    where: {
-      companyId: user.companyId,
-      ...(targetCounselorId ? { id: targetCounselorId } : {}),
-      role: { in: ['Counselor', 'Manager', 'Super Admin'] } 
-    },
-    select: { id: true, fullName: true, role: true }
-  });
+  const supabase = await createClient()
 
-  const reports: CounselorReport[] = [];
+  // Fetch counselors to report on, restricted to the user's company
+  let counselorQuery = supabase
+    .from('User')
+    .select('id, fullName, role')
+    .eq('companyId', user.companyId)
+    .in('role', ['Counselor', 'Manager', 'Super Admin'])
+
+  if (targetCounselorId) {
+    counselorQuery = counselorQuery.eq('id', targetCounselorId)
+  }
+
+  const { data: counselors, error: counselorsError } = await counselorQuery
+  if (counselorsError || !counselors) {
+    throw new Error('Failed to fetch counselors: ' + (counselorsError?.message || 'Unknown error'))
+  }
+
+  // Fetch all leads in the company to compute stats in memory (optimizes network roundtrips)
+  const { data: allLeads, error: leadsError } = await supabase
+    .from('Lead')
+    .select('id, stage, rating, isFileOpened, fileOpenedAt, contactedAt, assignedAt, createdAt, createdById, assignedCounselorId')
+    .eq('companyId', user.companyId)
+
+  if (leadsError || !allLeads) {
+    throw new Error('Failed to fetch leads: ' + (leadsError?.message || 'Unknown error'))
+  }
+
+  const startMs = new Date(startDate).getTime()
+  const endMs = new Date(endDate).getTime()
+
+  const reports: CounselorReport[] = []
 
   for (const counselor of counselors) {
-    // 1. Leads Handed (Assigned in timeframe)
-    const leadsHanded = await prisma.lead.count({
-      where: {
-        companyId: user.companyId,
-        assignedCounselorId: counselor.id,
-        OR: [
-          { assignedAt: { gte: startDate, lte: endDate } },
-          { assignedAt: null, createdAt: { gte: startDate, lte: endDate } } // Fallback for old leads
-        ]
-      }
-    });
+    // Filter leads related to this counselor
+    const counselorHandedLeads = allLeads.filter(lead => {
+      if (lead.assignedCounselorId !== counselor.id) return false
+      const assignedTime = lead.assignedAt ? new Date(lead.assignedAt).getTime() : null
+      const createdTime = new Date(lead.createdAt).getTime()
+      
+      return (assignedTime && assignedTime >= startMs && assignedTime <= endMs) ||
+             (!assignedTime && createdTime >= startMs && createdTime <= endMs)
+    })
 
-    // 2. Leads Contacted (Stage != "New" contacted in timeframe)
-    const leadsContacted = await prisma.lead.count({
-      where: {
-        companyId: user.companyId,
-        assignedCounselorId: counselor.id,
-        OR: [
-          { contactedAt: { gte: startDate, lte: endDate } },
-          { contactedAt: null, createdAt: { gte: startDate, lte: endDate }, stage: { not: "New" } } // Fallback
-        ]
-      }
-    });
+    const counselorContactedLeads = allLeads.filter(lead => {
+      if (lead.assignedCounselorId !== counselor.id) return false
+      const contactedTime = lead.contactedAt ? new Date(lead.contactedAt).getTime() : null
+      const createdTime = new Date(lead.createdAt).getTime()
 
-    // 3. Files Opened
-    const filesOpened = await prisma.lead.count({
-      where: {
-        companyId: user.companyId,
-        assignedCounselorId: counselor.id,
-        isFileOpened: true,
-        fileOpenedAt: {
-          gte: startDate,
-          lte: endDate
-        }
-      }
-    });
+      return (contactedTime && contactedTime >= startMs && contactedTime <= endMs) ||
+             (!contactedTime && createdTime >= startMs && createdTime <= endMs && lead.stage !== 'New')
+    })
 
-    // 4. Leads Created
-    const leadsCreated = await prisma.lead.count({
-      where: {
-        companyId: user.companyId,
-        createdById: counselor.id,
-        createdAt: {
-          gte: startDate,
-          lte: endDate
-        }
-      }
-    });
+    const counselorFilesOpened = allLeads.filter(lead => {
+      if (lead.assignedCounselorId !== counselor.id) return false
+      if (!lead.isFileOpened || !lead.fileOpenedAt) return false
+      const openedTime = new Date(lead.fileOpenedAt).getTime()
+      return openedTime >= startMs && openedTime <= endMs
+    })
 
-    // 5. Active Pipeline (All leads currently assigned, no date filter)
-    const activePipeline = await prisma.lead.count({
-      where: {
-        companyId: user.companyId,
-        assignedCounselorId: counselor.id
-      }
-    });
+    const counselorLeadsCreated = allLeads.filter(lead => {
+      if (lead.createdById !== counselor.id) return false
+      const createdTime = new Date(lead.createdAt).getTime()
+      return createdTime >= startMs && createdTime <= endMs
+    })
 
-    // 6. Stage-by-Stage Breakdown (for currently assigned active pipeline)
-    const stageGroups = await prisma.lead.groupBy({
-      by: ['stage'],
-      where: {
-        companyId: user.companyId,
-        assignedCounselorId: counselor.id,
-      },
-      _count: {
-        id: true
-      }
-    });
+    const counselorActivePipeline = allLeads.filter(lead => lead.assignedCounselorId === counselor.id)
 
-    const stageBreakdown = stageGroups.map(g => ({
-      stage: g.stage,
-      count: g._count.id
-    }));
+    // Compute stage breakdown
+    const stageCounts: Record<string, number> = {}
+    counselorActivePipeline.forEach(lead => {
+      const stage = lead.stage || 'New'
+      stageCounts[stage] = (stageCounts[stage] || 0) + 1
+    })
+
+    const stageBreakdown = Object.entries(stageCounts).map(([stage, count]) => ({
+      stage,
+      count
+    }))
+
+    const leadsHanded = counselorHandedLeads.length
+    const leadsContacted = counselorContactedLeads.length
+    const filesOpened = counselorFilesOpened.length
+    const leadsCreated = counselorLeadsCreated.length
+    const activePipeline = counselorActivePipeline.length
 
     // Only add to report if they actually had activity or if we are filtering for a specific counselor
     if (leadsHanded > 0 || activePipeline > 0 || leadsCreated > 0 || filesOpened > 0 || targetCounselorId) {
@@ -133,24 +119,26 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
         leadsCreated,
         activePipeline,
         stageBreakdown
-      });
+      })
     }
   }
 
   // Sort by most leads handed
-  return reports.sort((a, b) => b.leadsHanded - a.leadsHanded);
+  return reports.sort((a, b) => b.leadsHanded - a.leadsHanded)
 }
 
 export async function getAllCounselors() {
   const user = await getUserSession()
   if (!user || user.role === 'Counselor') return []
 
-  return await prisma.user.findMany({
-    where: {
-      companyId: user.companyId,
-      role: { in: ['Counselor', 'Manager', 'Super Admin'] }
-    },
-    select: { id: true, fullName: true },
-    orderBy: { fullName: 'asc' }
-  });
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('User')
+    .select('id, fullName')
+    .eq('companyId', user.companyId)
+    .in('role', ['Counselor', 'Manager', 'Super Admin'])
+    .order('fullName', { ascending: true })
+
+  if (error) return []
+  return data
 }

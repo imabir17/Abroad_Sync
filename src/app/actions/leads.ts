@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import { getUserSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -62,14 +62,23 @@ export async function createLead(prevState: any, formData: FormData) {
     return { error: 'Full name is required' }
   }
 
+  const supabase = await createClient()
+
   // Ensure assigned counselor is in the same company
   if (assignedCounselorId) {
-    const counselor = await prisma.user.findFirst({ where: { id: assignedCounselorId, companyId: user.companyId } })
+    const { data: counselor } = await supabase
+      .from('User')
+      .select('id')
+      .eq('id', assignedCounselorId)
+      .eq('companyId', user.companyId)
+      .maybeSingle()
+
     if (!counselor) return { error: 'Counselor not found in your company' }
   }
 
-  const newLead = await prisma.lead.create({
-    data: {
+  const { data: newLead, error: createError } = await supabase
+    .from('Lead')
+    .insert({
       companyId: user.companyId, // Ensure it's scoped to company
       fullName,
       email: email || null,
@@ -89,7 +98,7 @@ export async function createLead(prevState: any, formData: FormData) {
       rating,
       createdById: user.id,
       assignedCounselorId: assignedCounselorId || null,
-      assignedAt: assignedCounselorId ? new Date() : null,
+      assignedAt: assignedCounselorId ? new Date().toISOString() : null,
       
       sscGroup: sscGroup || null,
       sscYear: sscYear || null,
@@ -110,8 +119,13 @@ export async function createLead(prevState: any, formData: FormData) {
       workExperience: workExperience || null,
       source: source || null,
       budget: budget || null
-    }
-  })
+    })
+    .select()
+    .single()
+
+  if (createError || !newLead) {
+    return { error: 'Failed to create lead: ' + createError?.message }
+  }
 
   revalidatePath('/dashboard/leads')
   redirect(`/dashboard/leads/${newLead.id}`)
@@ -122,18 +136,18 @@ export async function checkLeadDuplicate(email: string, phone: string) {
   if (!user) return { duplicate: false }
 
   const OR = []
-  if (email) OR.push({ email })
-  if (phone) OR.push({ phone })
+  if (email) OR.push(`email.eq.${email}`)
+  if (phone) OR.push(`phone.eq.${phone}`)
 
   if (OR.length === 0) return { duplicate: false }
 
-  const existingLead = await prisma.lead.findFirst({
-    where: { 
-      companyId: user.companyId, // Search only within company
-      OR 
-    },
-    select: { id: true, email: true, phone: true }
-  })
+  const supabase = await createClient()
+  const { data: existingLead } = await supabase
+    .from('Lead')
+    .select('id, email, phone')
+    .eq('companyId', user.companyId)
+    .or(OR.join(','))
+    .maybeSingle()
 
   if (existingLead) {
     let msg = 'A lead with this '
@@ -151,7 +165,14 @@ export async function updateLeadStatus(leadId: string, stage: string, rating: st
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('stage, assignedCounselorId')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
   if (user.role === 'Counselor' && lead.assignedCounselorId !== user.id) {
@@ -160,13 +181,15 @@ export async function updateLeadStatus(leadId: string, stage: string, rating: st
 
   const updateData: any = { stage, rating }
   if (lead.stage === 'New' && stage !== 'New') {
-    updateData.contactedAt = new Date()
+    updateData.contactedAt = new Date().toISOString()
   }
 
-  await prisma.lead.update({
-    where: { id: leadId },
-    data: updateData
-  })
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update(updateData)
+    .eq('id', leadId)
+
+  if (updateError) throw new Error('Failed to update status: ' + updateError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   revalidatePath('/dashboard/leads')
@@ -177,17 +200,26 @@ export async function updateLeadDetails(leadId: string, data: any) {
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('assignedCounselorId')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
   if (user.role === 'Counselor' && lead.assignedCounselorId !== user.id) {
     throw new Error('Unauthorized')
   }
 
-  await prisma.lead.update({
-    where: { id: leadId },
-    data
-  })
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update(data)
+    .eq('id', leadId)
+
+  if (updateError) throw new Error('Failed to update details: ' + updateError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }
@@ -197,18 +229,27 @@ export async function createApplication(leadId: string, country: string, univers
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('id')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
-  await prisma.application.create({
-    data: {
+  const { error: insertError } = await supabase
+    .from('Application')
+    .insert({
       leadId,
       country,
       university,
       courseName,
       status: 'Pending'
-    }
-  })
+    })
+
+  if (insertError) throw new Error('Failed to create application: ' + insertError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }
@@ -218,17 +259,26 @@ export async function createInteraction(leadId: string, content: string) {
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('id')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
-  await prisma.interaction.create({
-    data: {
+  const { error: insertError } = await supabase
+    .from('Interaction')
+    .insert({
       leadId,
       counselorId: user.id,
       type: 'Note',
       content
-    }
-  })
+    })
+
+  if (insertError) throw new Error('Failed to create interaction: ' + insertError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }
@@ -238,23 +288,38 @@ export async function transferLead(leadId: string, newCounselorId: string) {
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('assignedCounselorId')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
   if (user.role === 'Counselor' && lead.assignedCounselorId !== user.id) {
     throw new Error('Unauthorized to transfer this lead')
   }
 
-  const counselor = await prisma.user.findFirst({ where: { id: newCounselorId, companyId: user.companyId } })
+  const { data: counselor } = await supabase
+    .from('User')
+    .select('id')
+    .eq('id', newCounselorId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!counselor) throw new Error('Counselor not found in your company')
 
-  await prisma.lead.update({
-    where: { id: leadId },
-    data: { 
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update({ 
       assignedCounselorId: newCounselorId,
-      assignedAt: new Date()
-    }
-  })
+      assignedAt: new Date().toISOString()
+    })
+    .eq('id', leadId)
+
+  if (updateError) throw new Error('Failed to transfer lead: ' + updateError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   revalidatePath('/dashboard/leads')
@@ -269,19 +334,26 @@ export async function bulkTransferLeads(leadIds: string[], newCounselorId: strin
     throw new Error('Only Manager or Super Admin can perform bulk transfers')
   }
 
-  const counselor = await prisma.user.findFirst({ where: { id: newCounselorId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: counselor } = await supabase
+    .from('User')
+    .select('id')
+    .eq('id', newCounselorId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!counselor) throw new Error('Counselor not found in your company')
 
-  await prisma.lead.updateMany({
-    where: { 
-      id: { in: leadIds },
-      companyId: user.companyId
-    },
-    data: { 
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update({ 
       assignedCounselorId: newCounselorId,
-      assignedAt: new Date()
-    }
-  })
+      assignedAt: new Date().toISOString()
+    })
+    .in('id', leadIds)
+    .eq('companyId', user.companyId)
+
+  if (updateError) throw new Error('Failed bulk transfer: ' + updateError.message)
 
   revalidatePath('/dashboard/leads')
   return { success: true }
@@ -291,20 +363,29 @@ export async function toggleFileOpened(leadId: string, isOpened: boolean) {
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
 
-  const lead = await prisma.lead.findFirst({ where: { id: leadId, companyId: user.companyId } })
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('assignedCounselorId')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
   if (!lead) throw new Error('Lead not found')
 
   if (user.role === 'Counselor' && lead.assignedCounselorId !== user.id) {
     throw new Error('Unauthorized')
   }
 
-  await prisma.lead.update({
-    where: { id: leadId },
-    data: {
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update({
       isFileOpened: isOpened,
-      fileOpenedAt: isOpened ? new Date() : null
-    }
-  })
+      fileOpenedAt: isOpened ? new Date().toISOString() : null
+    })
+    .eq('id', leadId)
+
+  if (updateError) throw new Error('Failed to toggle file opened state: ' + updateError.message)
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   revalidatePath('/dashboard/reports') // So reports recalculate immediately if needed

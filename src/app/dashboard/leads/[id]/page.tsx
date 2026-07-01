@@ -1,5 +1,5 @@
 import { getUserSession } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone } from 'lucide-react'
@@ -11,35 +11,41 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   const user = await getUserSession()
   if (!user) return null
   
-  // Await params if Next.js 15+ (where params is a promise)
   const resolvedParams = await params
-  
-  const lead = await prisma.lead.findFirst({
-    where: { id: resolvedParams.id, companyId: user.companyId },
-    include: {
-      interactions: { 
-        orderBy: { createdAt: 'asc' },
-        include: { counselor: true }
-      },
-      tasks: { 
-        orderBy: { dueDate: 'asc' },
-        include: { counselor: true }
-      },
-      applications: { orderBy: { createdAt: 'desc' } },
-      assignedCounselor: true
-    }
-  })
+  const supabase = await createClient()
+
+  // Fetch the lead along with its related interactions, tasks, applications, and assigned counselor
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('*, assignedCounselor:User(*), interactions:Interaction(*, counselor:User(*)), tasks:Task(*, counselor:User(*)), applications:Application(*)')
+    .eq('id', resolvedParams.id)
+    .eq('companyId', user.companyId)
+    .maybeSingle()
 
   if (!lead) notFound()
+
+  // Sort relations in memory to maintain order consistency
+  if (lead.interactions) {
+    lead.interactions.sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+  }
+  if (lead.tasks) {
+    lead.tasks.sort((a: any, b: any) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+  }
+  if (lead.applications) {
+    lead.applications.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  }
 
   const canEdit = user.role === 'Super Admin' || user.role === 'Manager' || lead.assignedCounselorId === user.id
 
   let counselors: any[] = []
   if (canEdit) {
-    counselors = await prisma.user.findMany({
-      where: { role: 'Counselor', companyId: user.companyId },
-      select: { id: true, fullName: true }
-    })
+    const { data: counselorsData } = await supabase
+      .from('User')
+      .select('id, fullName')
+      .eq('role', 'Counselor')
+      .eq('companyId', user.companyId)
+    
+    counselors = counselorsData || []
   }
 
   return (

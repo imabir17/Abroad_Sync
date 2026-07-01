@@ -1,10 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { createClient as createServerClient } from '@/utils/supabase/server'
 import { getUserSession } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
-
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
 export async function createStaff(formData: FormData) {
   const user = await getUserSession()
@@ -20,18 +19,24 @@ export async function createStaff(formData: FormData) {
     return { error: 'All fields are required' }
   }
 
-  const existingUser = await prisma.user.findUnique({ where: { email } })
+  const supabase = await createServerClient()
+
+  const { data: existingUser } = await supabase
+    .from('User')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle()
+
   if (existingUser) {
     return { error: 'User with this email already exists' }
   }
 
-  // 1. Create User in Supabase Auth and SEND INVITE EMAIL
-  const supabaseAdmin = createClient(
+  // 1. Create User in Supabase Auth and SEND INVITE EMAIL using Admin Client
+  const supabaseAdmin = createSupabaseAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // inviteUserByEmail is the only way to officially trigger the Supabase "Invite" email from the backend.
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000'
   siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
   siteUrl = siteUrl.replace(/\/$/, '')
@@ -45,16 +50,20 @@ export async function createStaff(formData: FormData) {
     return { error: 'Failed to create user in Supabase: ' + (authError?.message || 'Unknown error') }
   }
 
-  await prisma.user.create({
-    data: {
+  const { error: userError } = await supabase
+    .from('User')
+    .insert({
       id: authData.user.id,
       fullName,
       email,
       password: 'pending-invite', // Placeholder until they set it
       role,
       companyId: user.companyId
-    }
-  })
+    })
+
+  if (userError) {
+    return { error: 'Failed to create user profile in database: ' + userError.message }
+  }
 
   revalidatePath('/dashboard/staff')
   return { success: true }
@@ -74,16 +83,26 @@ export async function updateStaff(id: string, formData: FormData) {
     return { error: 'Name, email, and role are required' }
   }
 
+  const supabase = await createServerClient()
+
   // Ensure the staff belongs to the same company
-  const staff = await prisma.user.findFirst({ where: { id, companyId: user.companyId } })
+  const { data: staff } = await supabase
+    .from('User')
+    .select('id')
+    .eq('id', id)
+    .eq('companyId', user.companyId)
+    .maybeSingle()
+
   if (!staff) throw new Error('Staff not found in your company')
 
-  const updateData: any = { fullName, email, role }
+  const { error: updateError } = await supabase
+    .from('User')
+    .update({ fullName, email, role })
+    .eq('id', id)
 
-  await prisma.user.update({
-    where: { id },
-    data: updateData
-  })
+  if (updateError) {
+    return { error: 'Failed to update staff: ' + updateError.message }
+  }
 
   revalidatePath('/dashboard/staff')
   return { success: true }
@@ -100,12 +119,26 @@ export async function deleteStaff(id: string) {
     return { error: 'Cannot delete your own account' }
   }
 
-  const staff = await prisma.user.findFirst({ where: { id, companyId: user.companyId } })
+  const supabase = await createServerClient()
+
+  // Ensure the staff belongs to the same company
+  const { data: staff } = await supabase
+    .from('User')
+    .select('id')
+    .eq('id', id)
+    .eq('companyId', user.companyId)
+    .maybeSingle()
+
   if (!staff) throw new Error('Staff not found in your company')
 
-  await prisma.user.delete({
-    where: { id }
-  })
+  const { error: deleteError } = await supabase
+    .from('User')
+    .delete()
+    .eq('id', id)
+
+  if (deleteError) {
+    return { error: 'Failed to delete staff: ' + deleteError.message }
+  }
 
   revalidatePath('/dashboard/staff')
   return { success: true }

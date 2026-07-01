@@ -1,5 +1,5 @@
 import { getUserSession } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { LeadForm } from '@/components/LeadForm'
@@ -12,10 +12,14 @@ export default async function NewLeadPage() {
   
   let counselors: {id: string, fullName: string}[] = []
   if (isAdminOrManager) {
-    counselors = await prisma.user.findMany({
-      where: { role: 'Counselor' },
-      select: { id: true, fullName: true }
-    })
+    const supabase = await createClient()
+    const { data: counselorsData } = await supabase
+      .from('User')
+      .select('id, fullName')
+      .eq('role', 'Counselor')
+      .eq('companyId', user.companyId)
+    
+    counselors = counselorsData || []
   }
 
   return (

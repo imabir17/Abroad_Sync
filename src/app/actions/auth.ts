@@ -2,7 +2,6 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { prisma } from '@/lib/prisma'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -23,27 +22,40 @@ export async function login(prevState: any, formData: FormData) {
     return { error: error.message }
   }
 
-  // Auto-provision Super Admin if missing from Prisma
+  // Auto-provision Super Admin if missing from the User table
   if (authData?.user) {
-    const existingUser = await prisma.user.findUnique({ where: { email } })
-    if (!existingUser) {
-      // User doesn't exist in Prisma, so they were added via Supabase Dashboard. Create Company and User.
-      const company = await prisma.company.create({
-        data: {
-          name: 'My Company',
-        }
-      })
+    const { data: existingUser } = await supabase
+      .from('User')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
 
-      await prisma.user.create({
-        data: {
+    if (!existingUser) {
+      // Create Company and User using the Supabase client
+      const { data: company, error: companyError } = await supabase
+        .from('Company')
+        .insert({ name: 'My Company' })
+        .select()
+        .single()
+
+      if (companyError || !company) {
+        return { error: 'Failed to create company profile: ' + (companyError?.message || 'Unknown error') }
+      }
+
+      const { error: userError } = await supabase
+        .from('User')
+        .insert({
           id: authData.user.id,
           email,
           fullName: authData.user.user_metadata?.full_name || 'Admin User',
           role: 'Super Admin',
           password: 'set-by-supabase-auth',
           companyId: company.id
-        }
-      })
+        })
+
+      if (userError) {
+        return { error: 'Failed to create user profile: ' + userError.message }
+      }
     }
   }
 
@@ -66,7 +78,6 @@ export async function resetPassword(prevState: any, formData: FormData) {
   const supabase = await createClient()
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000'
   siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
-  // Remove trailing slash if present
   siteUrl = siteUrl.replace(/\/$/, '')
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -106,13 +117,12 @@ export async function updatePassword(prevState: any, formData: FormData) {
     return { error: error.message }
   }
   
-  // Update in Prisma as well just for fallback if needed, but not strictly required
   const { data: { user } } = await supabase.auth.getUser()
   if (user && user.email) {
-    await prisma.user.update({
-      where: { email: user.email },
-      data: { password: password }
-    })
+    await supabase
+      .from('User')
+      .update({ password: password })
+      .eq('email', user.email)
   }
 
   // Force re-login with new credentials for clean session

@@ -1,9 +1,10 @@
 import { getUserSession } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { LeadFilters } from '@/components/LeadFilters'
 import LeadsTableClient from './LeadsTableClient'
+
 export default async function LeadsPage({ 
   searchParams 
 }: { 
@@ -22,69 +23,66 @@ export default async function LeadsPage({
   const source = resolvedSearchParams.source as string | undefined
 
   const isAdminOrManager = user.role === 'Super Admin' || user.role === 'Manager'
+  const supabase = await createClient()
   
-  let counselors: {id: string, fullName: string}[] = []
-  // Fetch counselors for filtering and transfer
-  counselors = await prisma.user.findMany({
-    where: { role: 'Counselor', companyId: user.companyId },
-    select: { id: true, fullName: true }
-  })
+  // 1. Fetch counselors for filtering and transfer
+  const { data: counselorsData } = await supabase
+    .from('User')
+    .select('id, fullName')
+    .eq('role', 'Counselor')
+    .eq('companyId', user.companyId)
+  
+  const counselors = counselorsData || []
 
-  const rawSources = await prisma.lead.findMany({
-    where: { companyId: user.companyId },
-    select: { source: true },
-    distinct: ['source']
-  })
-  const dbSources = rawSources.map(s => s.source).filter(Boolean) as string[]
+  // 2. Fetch distinct sources from database (filtered in memory for simplicity)
+  const { data: rawSources } = await supabase
+    .from('Lead')
+    .select('source')
+    .eq('companyId', user.companyId)
+
+  const dbSources = rawSources ? (rawSources.map(s => s.source).filter(Boolean) as string[]) : []
   const predefinedSources = ['Facebook', 'Google', 'Instagram', 'Word of Mouth', 'Walk-in', 'Agent', 'Event/Seminar', 'Other']
   const allSources = Array.from(new Set([...predefinedSources, ...dbSources])).sort()
 
-  // Build the where clause based on search and filters
-  const whereClause: any = {
-    companyId: user.companyId
-  }
+  // 3. Build the Supabase query based on search and filters
+  let query = supabase
+    .from('Lead')
+    .select('*, assignedCounselor:User(*)')
+    .eq('companyId', user.companyId)
+    .order('createdAt', { ascending: false })
   
   if (!isAdminOrManager) {
-    whereClause.assignedCounselorId = user.id
+    query = query.eq('assignedCounselorId', user.id)
   } else if (counselorId) {
-    whereClause.assignedCounselorId = counselorId
+    query = query.eq('assignedCounselorId', counselorId)
   }
 
   if (q) {
-    whereClause.OR = [
-      { fullName: { contains: q } },
-      { email: { contains: q } },
-      { phone: { contains: q } }
-    ]
+    query = query.or(`fullName.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`)
   }
 
   if (stage) {
-    whereClause.stage = stage
+    query = query.eq('stage', stage)
   }
   
   if (rating) {
-    whereClause.rating = rating
+    query = query.eq('rating', rating)
   }
 
   if (country) {
-    whereClause.preferredCountry = country
+    query = query.eq('preferredCountry', country)
   }
 
   if (englishTest) {
-    whereClause.englishTestType = englishTest
+    query = query.eq('englishTestType', englishTest)
   }
 
   if (source) {
-    whereClause.source = source
+    query = query.eq('source', source)
   }
 
-  const leads = await prisma.lead.findMany({
-    where: whereClause,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      assignedCounselor: true
-    }
-  })
+  const { data: leadsData } = await query
+  const leads = leadsData || []
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">

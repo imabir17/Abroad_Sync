@@ -1,5 +1,5 @@
 import { getUserSession } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import StaffClient from './StaffClient'
 
@@ -11,16 +11,15 @@ export default async function StaffManagementPage() {
     redirect('/dashboard')
   }
 
-  const users = await prisma.user.findMany({
-    where: { companyId: user.companyId },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      role: true
-    }
-  })
+  const supabase = await createClient()
+
+  const { data: usersData } = await supabase
+    .from('User')
+    .select('id, fullName, email, role')
+    .eq('companyId', user.companyId)
+    .order('createdAt', { ascending: false })
+
+  const users = usersData || []
 
   return (
     <>

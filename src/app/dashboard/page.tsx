@@ -1,5 +1,5 @@
 import { getUserSession } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/utils/supabase/server'
 import { Users, UserCheck, TrendingUp, AlertCircle, Clock, Activity, BarChart2 } from 'lucide-react'
 import DashboardTasks from '@/components/DashboardTasks'
 import DashboardCharts from '@/components/DashboardCharts'
@@ -25,35 +25,48 @@ export default async function DashboardPage() {
   if (!user) return null
 
   const isAdminOrManager = user.role === 'Super Admin' || user.role === 'Manager'
-  const whereClause = isAdminOrManager ? undefined : { assignedCounselorId: user.id }
+  const supabase = await createClient()
 
-  // Execute all database queries concurrently to avoid sequential network latency (waterfall)
-  const [totalLeads, allTasks, rawRatings, rawStages] = await Promise.all([
-    prisma.lead.count({ where: whereClause }),
-    prisma.task.findMany({
-      where: isAdminOrManager ? undefined : { counselorId: user.id },
-      include: { lead: { select: { fullName: true } } },
-      orderBy: { dueDate: 'desc' } // fetch all tasks for history
-    }),
-    prisma.lead.groupBy({
-      by: ['rating'],
-      _count: true,
-      where: whereClause
-    }),
-    prisma.lead.groupBy({
-      by: ['stage'],
-      _count: true,
-      where: whereClause
-    })
-  ])
+  // 1. Fetch leads for statistics (calculating count and groupings in memory to save network overhead)
+  let leadsQuery = supabase
+    .from('Lead')
+    .select('rating, stage')
+    .eq('companyId', user.companyId)
 
+  if (!isAdminOrManager) {
+    leadsQuery = leadsQuery.eq('assignedCounselorId', user.id)
+  }
+
+  // 2. Fetch tasks concurrently
+  let tasksQuery = supabase
+    .from('Task')
+    .select('*, lead:Lead(fullName), counselor:User!inner(companyId)')
+    .order('dueDate', { ascending: false })
+
+  if (!isAdminOrManager) {
+    tasksQuery = tasksQuery.eq('counselorId', user.id)
+  } else {
+    tasksQuery = tasksQuery.eq('counselor.companyId', user.companyId)
+  }
+
+  const [leadsRes, tasksRes] = await Promise.all([leadsQuery, tasksQuery])
+
+  const leadsForStats = leadsRes.data || []
+  const allTasks = tasksRes.data || []
+
+  const totalLeads = leadsForStats.length
   const pendingCount = allTasks.filter(t => t.status === 'Pending').length
 
-  // 4. Process Ratings Data
-  const ratingsMap = new Map(rawRatings.map(r => [r.rating || 'Unrated', r._count]))
+  // 3. Process Ratings Data in memory
+  const ratingsCounts: Record<string, number> = {}
+  leadsForStats.forEach(lead => {
+    const rating = lead.rating || 'Unrated'
+    ratingsCounts[rating] = (ratingsCounts[rating] || 0) + 1
+  })
+
   const ratingsCards = LEAD_RATINGS.map(rating => ({
     name: rating,
-    count: ratingsMap.get(rating) || 0,
+    count: ratingsCounts[rating] || 0,
     color: RATING_COLORS[rating] || '#737373'
   }))
   
@@ -63,15 +76,20 @@ export default async function DashboardPage() {
     fill: r.color
   }))
 
-  const veryGoodCount = ratingsMap.get('Very Good') || 0
-  const goodCount = ratingsMap.get('Good') || 0
+  const veryGoodCount = ratingsCounts['Very Good'] || 0
+  const goodCount = ratingsCounts['Good'] || 0
   const conversionRate = totalLeads > 0 ? Math.round(((veryGoodCount + goodCount) / totalLeads) * 100) : 0
 
-  // 5. Process Stages Data
-  const stagesMap = new Map(rawStages.map(s => [s.stage, s._count]))
+  // 4. Process Stages Data in memory
+  const stagesCounts: Record<string, number> = {}
+  leadsForStats.forEach(lead => {
+    const stage = lead.stage || 'New'
+    stagesCounts[stage] = (stagesCounts[stage] || 0) + 1
+  })
+
   const stagesCards = LEAD_STAGES.map((stage, i) => ({
     name: stage,
-    count: stagesMap.get(stage) || 0,
+    count: stagesCounts[stage] || 0,
     color: STAGE_COLORS[i % STAGE_COLORS.length]
   }))
 
@@ -81,7 +99,7 @@ export default async function DashboardPage() {
     fill: s.color
   }))
 
-  // 6. Agenda Tasks (Due today and Pending)
+  // 5. Agenda Tasks (Due today and Pending)
   const startOfToday = new Date()
   startOfToday.setHours(0, 0, 0, 0)
   const endOfToday = new Date()
@@ -117,7 +135,7 @@ export default async function DashboardPage() {
           <p className="text-xs text-indigo-400 mt-1">High potential leads (Very Good + Good)</p>
         </div>
 
-        {/* Pending Tasks Modal Trigger replaces the static card */}
+        {/* Pending Tasks Modal Trigger */}
         <TasksModalClient tasks={allTasks} pendingCount={pendingCount} />
       </div>
 
