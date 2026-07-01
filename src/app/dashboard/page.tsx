@@ -99,14 +99,12 @@ export default async function DashboardPage() {
     fill: s.color
   }))
 
-  // 5. Agenda Tasks (Due today and Pending)
-  const startOfToday = new Date()
-  startOfToday.setHours(0, 0, 0, 0)
+  // 5. Agenda Tasks (Due today or overdue, and Pending)
   const endOfToday = new Date()
   endOfToday.setHours(23, 59, 59, 999)
 
   const agendaTasks = allTasks
-    .filter(t => t.status === 'Pending' && new Date(t.dueDate) >= startOfToday && new Date(t.dueDate) <= endOfToday)
+    .filter(t => t.status === 'Pending' && new Date(t.dueDate) <= endOfToday)
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
 
   return (

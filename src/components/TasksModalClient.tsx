@@ -77,13 +77,17 @@ export default function TasksModalClient({ tasks, pendingCount }: { tasks: any[]
                           className="mt-1 h-5 w-5 rounded border-neutral-700 bg-neutral-900 text-blue-600 focus:ring-blue-500 cursor-pointer" 
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-neutral-200">
-                            <Link href={`/dashboard/leads/${task.leadId}`} onClick={() => setIsOpen(false)} className="hover:text-blue-400">
-                              {task.description}
-                            </Link>
+                           <p className="text-sm font-medium text-neutral-200">
+                            {task.leadId ? (
+                              <Link href={`/dashboard/leads/${task.leadId}`} onClick={() => setIsOpen(false)} className="hover:text-blue-400">
+                                {task.description}
+                              </Link>
+                            ) : (
+                              <span>{task.description}</span>
+                            )}
                           </p>
                           <p className="text-xs text-amber-500 mt-1 flex items-center">
-                            <Clock className="h-3 w-3 mr-1" /> Due: {new Date(task.dueDate).toLocaleString()} - {task.lead.fullName}
+                            <Clock className="h-3 w-3 mr-1" /> Due: {new Date(task.dueDate).toLocaleString()}{task.lead ? ` - ${task.lead.fullName}` : ''}
                           </p>
                         </div>
                       </div>
@@ -91,7 +95,7 @@ export default function TasksModalClient({ tasks, pendingCount }: { tasks: any[]
                   )}
                 </div>
               )}
-
+ 
               {activeTab === 'completed' && (
                 <div className="space-y-3">
                   {completedTasks.length === 0 ? (
@@ -102,12 +106,16 @@ export default function TasksModalClient({ tasks, pendingCount }: { tasks: any[]
                         <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-500" />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-neutral-400 line-through">
-                            <Link href={`/dashboard/leads/${task.leadId}`} onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
-                              {task.description}
-                            </Link>
+                            {task.leadId ? (
+                              <Link href={`/dashboard/leads/${task.leadId}`} onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
+                                {task.description}
+                              </Link>
+                            ) : (
+                              <span>{task.description}</span>
+                            )}
                           </p>
                           <p className="text-xs text-neutral-500 mt-1">
-                            Completed: {new Date(task.updatedAt).toLocaleString()} - {task.lead.fullName}
+                            Completed: {new Date(task.updatedAt).toLocaleString()}{task.lead ? ` - ${task.lead.fullName}` : ''}
                           </p>
                         </div>
                       </div>
