@@ -1,19 +1,42 @@
--- SQL script to enable RLS and set up multi-tenant policies (fully optimized with SECURITY DEFINER functions to eliminate all recursion)
+-- SQL script to enable RLS and set up multi-tenant policies (High Performance JWT-first version)
 
--- 1. Create a helper function to get the current user's companyId bypassing RLS
+-- 1. Create a helper function to get the current user's companyId (JWT-first, fallback to DB)
 CREATE OR REPLACE FUNCTION get_my_company_id()
 RETURNS text AS $$
-    SELECT "companyId" FROM "User" WHERE id = auth.uid()::text;
-$$ LANGUAGE sql SECURITY DEFINER;
+    DECLARE
+        cid text;
+    BEGIN
+        -- Try to read from JWT app_metadata (O(1) in-memory check)
+        cid := (auth.jwt() -> 'app_metadata'::text ->> 'companyId')::text;
+        IF cid IS NOT NULL THEN
+            RETURN cid;
+        END IF;
 
--- 2. Create a helper function to verify if the current user is a Super Admin bypassing RLS
+        -- Fall back to database query if JWT is missing the claim
+        SELECT "companyId" INTO cid FROM "User" WHERE id = auth.uid()::text;
+        RETURN cid;
+    END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 2. Create a helper function to verify if the current user is a Super Admin (JWT-first, fallback to DB)
 CREATE OR REPLACE FUNCTION is_super_admin()
 RETURNS boolean AS $$
-    SELECT EXISTS (
-        SELECT 1 FROM "User" 
-        WHERE id = auth.uid()::text AND role = 'Super Admin'
-    );
-$$ LANGUAGE sql SECURITY DEFINER;
+    DECLARE
+        u_role text;
+    BEGIN
+        -- Try to read from JWT app_metadata (O(1) in-memory check)
+        u_role := (auth.jwt() -> 'app_metadata'::text ->> 'role')::text;
+        IF u_role IS NOT NULL THEN
+            RETURN u_role = 'Super Admin';
+        END IF;
+
+        -- Fall back to database query
+        RETURN EXISTS (
+            SELECT 1 FROM "User" 
+            WHERE id = auth.uid()::text AND role = 'Super Admin'
+        );
+    END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 3. Enable Row-Level Security on all tables
 ALTER TABLE "Company" ENABLE ROW LEVEL SECURITY;
