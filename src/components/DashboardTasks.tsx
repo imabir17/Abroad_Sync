@@ -1,11 +1,34 @@
 'use client'
 
-import { Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Clock, AlertCircle } from 'lucide-react'
 import { updateTaskStatus } from '@/app/actions/tasks'
 import Link from 'next/link'
 
 export default function DashboardTasks({ tasks }: { tasks: any[] }) {
-  if (tasks.length === 0) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="text-sm text-neutral-500 py-4 animate-pulse">
+        Loading agenda...
+      </div>
+    )
+  }
+
+  // Filter tasks due today or overdue in the user's browser local time
+  const localEndOfToday = new Date()
+  localEndOfToday.setHours(23, 59, 59, 999)
+
+  const agendaTasks = tasks
+    .filter(t => t.status === 'Pending' && new Date(t.dueDate) <= localEndOfToday)
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+
+  if (agendaTasks.length === 0) {
     return (
       <div className="text-sm text-neutral-500 py-4">
         No pending tasks for today.
@@ -19,7 +42,7 @@ export default function DashboardTasks({ tasks }: { tasks: any[] }) {
 
   return (
     <div className="space-y-4">
-      {tasks.map(task => (
+      {agendaTasks.map(task => (
         <div key={task.id} className="flex items-start space-x-3 group">
           <input 
             type="checkbox" 
@@ -28,12 +51,18 @@ export default function DashboardTasks({ tasks }: { tasks: any[] }) {
           />
           <div className="flex-1">
             <p className="text-sm font-medium text-neutral-200">
-              <Link href={`/dashboard/leads/${task.leadId}`} className="hover:text-blue-400">
-                {task.description}
-              </Link>
+              {task.leadId ? (
+                <Link href={`/dashboard/leads/${task.leadId}`} className="hover:text-blue-400">
+                  {task.description}
+                </Link>
+              ) : (
+                <span>{task.description}</span>
+              )}
             </p>
             <p className="text-xs text-neutral-500 mt-1 flex items-center">
-              <Clock className="h-3 w-3 mr-1 text-amber-500/70" /> {new Date(task.dueDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {task.lead.fullName}
+              <Clock className="h-3 w-3 mr-1 text-amber-500/70" /> 
+              {new Date(task.dueDate).toLocaleString()} 
+              {task.lead ? ` - ${task.lead.fullName}` : ''}
             </p>
           </div>
         </div>

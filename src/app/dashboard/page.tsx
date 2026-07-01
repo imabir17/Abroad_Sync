@@ -139,7 +139,7 @@ export default async function DashboardPage() {
       {user.role !== 'Super Admin' && (
         <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm shadow-black/20 p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Today's Agenda</h3>
-          <DashboardTasks tasks={agendaTasks} />
+          <DashboardTasks tasks={allTasks} />
         </div>
       )}
 
