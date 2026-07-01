@@ -45,9 +45,21 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isLoginPage) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    // Only query database when visiting the login page with an active auth session
+    const { data: dbUser } = await supabase
+      .from('User')
+      .select('id')
+      .eq('email', user.email)
+      .maybeSingle()
+
+    if (dbUser) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    } else {
+      // Logged in via Supabase Auth but no DB profile exists. Force sign-out to clean the session.
+      await supabase.auth.signOut()
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
