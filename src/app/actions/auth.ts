@@ -32,10 +32,14 @@ export async function login(prevState: any, formData: FormData) {
       .maybeSingle()
 
     if (!existingUser) {
+      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return { error: 'Failed to create company profile: SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.' }
+      }
+
       // Use Admin Client with service role key to bypass RLS during registration/provisioning
       const supabaseAdmin = createSupabaseAdminClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.SUPABASE_SERVICE_ROLE_KEY
       )
 
       const { data: company, error: companyError } = await supabaseAdmin
