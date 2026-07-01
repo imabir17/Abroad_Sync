@@ -81,7 +81,15 @@ export default async function LeadsPage({
     query = query.eq('source', source)
   }
 
-  const { data: leadsData } = await query
+  const { data: leadsData, error: queryError } = await query
+  if (queryError) {
+    console.error('Leads Query Error:', {
+      message: queryError.message,
+      details: queryError.details,
+      hint: queryError.hint,
+      code: queryError.code
+    })
+  }
   const leads = leadsData || []
 
   return (
