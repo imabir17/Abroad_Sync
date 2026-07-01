@@ -38,7 +38,7 @@ export async function createStaff(formData: FormData) {
 
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName, role },
-    redirectTo: `${siteUrl}/auth/confirm?next=/update-password`
+    redirectTo: `${siteUrl}/update-password`
   })
 
   if (authError || !authData.user) {
