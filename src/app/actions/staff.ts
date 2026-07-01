@@ -50,6 +50,12 @@ export async function createStaff(formData: FormData) {
     return { error: 'Failed to create user in Supabase: ' + (authError?.message || 'Unknown error') }
   }
 
+  // Update user's app_metadata for lightning-fast O(1) RLS checks
+  await supabaseAdmin.auth.admin.updateUserById(
+    authData.user.id,
+    { app_metadata: { companyId: user.companyId, role } }
+  )
+
   const { error: userError } = await supabase
     .from('User')
     .insert({

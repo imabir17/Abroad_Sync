@@ -84,6 +84,12 @@ export async function login(prevState: any, formData: FormData) {
       if (userError) {
         return { error: 'Failed to create user profile: ' + userError.message }
       }
+
+      // Update auth user's app_metadata for lightning-fast O(1) RLS checks
+      await supabaseAdmin.auth.admin.updateUserById(
+        authData.user.id,
+        { app_metadata: { companyId: company.id, role: 'Super Admin' } }
+      )
     }
   }
 
