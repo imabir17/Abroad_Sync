@@ -14,10 +14,9 @@ export async function createStaff(formData: FormData) {
 
   const fullName = formData.get('fullName') as string
   const email = formData.get('email') as string
-  const password = formData.get('password') as string
   const role = formData.get('role') as string
 
-  if (!fullName || !email || !password || !role) {
+  if (!fullName || !email || !role) {
     return { error: 'All fields are required' }
   }
 
@@ -34,27 +33,20 @@ export async function createStaff(formData: FormData) {
 
   // inviteUserByEmail is the only way to officially trigger the Supabase "Invite" email from the backend.
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-    data: { full_name: fullName, role }
+    data: { full_name: fullName, role },
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/confirm?next=/update-password`
   })
 
-  if (authError) {
-    return { error: 'Failed to create user in Supabase: ' + authError.message }
-  }
-
-  // Since we use an invite email, their password isn't set yet. 
-  // We'll instantly update their Supabase account with the password the admin provided!
-  if (authData.user) {
-    await supabaseAdmin.auth.admin.updateUserById(authData.user.id, {
-      password: password,
-      user_metadata: { full_name: fullName, role }
-    })
+  if (authError || !authData.user) {
+    return { error: 'Failed to create user in Supabase: ' + (authError?.message || 'Unknown error') }
   }
 
   await prisma.user.create({
     data: {
+      id: authData.user.id,
       fullName,
       email,
-      password,
+      password: 'pending-invite', // Placeholder until they set it
       role,
       companyId: user.companyId
     }
@@ -72,7 +64,6 @@ export async function updateStaff(id: string, formData: FormData) {
 
   const fullName = formData.get('fullName') as string
   const email = formData.get('email') as string
-  const password = formData.get('password') as string
   const role = formData.get('role') as string
 
   if (!fullName || !email || !role) {
@@ -84,9 +75,6 @@ export async function updateStaff(id: string, formData: FormData) {
   if (!staff) throw new Error('Staff not found in your company')
 
   const updateData: any = { fullName, email, role }
-  if (password) {
-    updateData.password = password
-  }
 
   await prisma.user.update({
     where: { id },

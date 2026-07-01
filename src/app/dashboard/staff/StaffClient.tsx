@@ -8,7 +8,7 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
   const [users, setUsers] = useState(initialUsers)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '', role: 'Counselor' })
+  const [formData, setFormData] = useState({ fullName: '', email: '', role: 'Counselor' })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -16,10 +16,10 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
     setError('')
     if (user) {
       setEditingUser(user)
-      setFormData({ fullName: user.fullName, email: user.email, password: '', role: user.role })
+      setFormData({ fullName: user.fullName, email: user.email, role: user.role })
     } else {
       setEditingUser(null)
-      setFormData({ fullName: '', email: '', password: '', role: 'Counselor' })
+      setFormData({ fullName: '', email: '', role: 'Counselor' })
     }
     setIsModalOpen(true)
   }
@@ -37,7 +37,6 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
     const data = new FormData()
     data.append('fullName', formData.fullName)
     data.append('email', formData.email)
-    data.append('password', formData.password)
     data.append('role', formData.role)
 
     let res
@@ -132,10 +131,6 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
                 <div>
                   <label className="block text-sm font-medium text-neutral-300 mb-1">Email</label>
                   <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1">{editingUser ? 'New Password (leave blank to keep current)' : 'Password'}</label>
-                  <input required={!editingUser} type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-neutral-300 mb-1">Role</label>
