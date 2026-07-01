@@ -7,12 +7,16 @@ import { revalidatePath } from 'next/cache'
 export async function createTask(formData: FormData) {
   const user = await getUserSession()
   if (!user) throw new Error('Unauthorized')
-  if (user.role === 'Counselor') throw new Error('Unauthorized')
 
   const description = formData.get('description') as string
   const dueDate = formData.get('dueDate') as string
-  const counselorId = formData.get('counselorId') as string
+  let counselorId = formData.get('counselorId') as string
   const leadId = formData.get('leadId') as string | null
+
+  // Counselors can only assign tasks to themselves
+  if (user.role === 'Counselor') {
+    counselorId = user.id
+  }
 
   if (!description || !dueDate || !counselorId) {
     return { error: 'Missing required fields' }

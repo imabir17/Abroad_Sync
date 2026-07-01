@@ -7,7 +7,11 @@ import Link from 'next/link'
 
 export default function TasksClient({ tasks, counselors, isAdminOrManager, currentUser }: { tasks: any[], counselors: any[], isAdminOrManager: boolean, currentUser: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [formData, setFormData] = useState({ description: '', dueDate: '', counselorId: currentUser.id })
+  const [formData, setFormData] = useState({ 
+    description: '', 
+    dueDate: '', 
+    counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +25,11 @@ export default function TasksClient({ tasks, counselors, isAdminOrManager, curre
 
     await createTask(data)
     
-    setFormData({ description: '', dueDate: '', counselorId: currentUser.id })
+    setFormData({ 
+      description: '', 
+      dueDate: '', 
+      counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
+    })
     setIsModalOpen(false)
     setIsSubmitting(false)
   }
