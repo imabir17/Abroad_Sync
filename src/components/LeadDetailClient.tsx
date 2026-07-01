@@ -35,7 +35,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
   // Timeline State
   const [noteContent, setNoteContent] = useState('')
   const [isPostingNote, setIsPostingNote] = useState(false)
-  const [localInteractions, setLocalInteractions] = useState(lead.interactions || [])
+  const [localInteractions, setLocalInteractions] = useState<any[]>(lead.interactions || [])
   const timelineContainerRef = useRef<HTMLDivElement>(null)
 
   // Sync interactions from props
