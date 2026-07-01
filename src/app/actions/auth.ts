@@ -29,6 +29,19 @@ export async function login(prevState: any, formData: FormData) {
       return { error: 'Failed to authenticate admin client: SUPABASE_SERVICE_ROLE_KEY is not defined.' }
     }
 
+    // Validate that the key provided is indeed the service_role key to prevent RLS failures
+    try {
+      const parts = process.env.SUPABASE_SERVICE_ROLE_KEY.split('.')
+      if (parts.length >= 2) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString())
+        if (payload.role !== 'service_role') {
+          return { error: `Invalid SUPABASE_SERVICE_ROLE_KEY: The key provided has the role '${payload.role}' instead of 'service_role'. Please check your Vercel environment variables.` }
+        }
+      }
+    } catch (e) {
+      return { error: 'Failed to validate SUPABASE_SERVICE_ROLE_KEY format. Please ensure it is copy-pasted correctly.' }
+    }
+
     // Initialize Admin Client to bypass RLS during existence checks and provisioning
     const supabaseAdmin = createSupabaseAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
