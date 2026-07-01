@@ -16,6 +16,10 @@ export async function getUserSession() {
     .eq('email', user.email)
     .single()
   
+  if (dbError) {
+    console.error('getUserSession Database Error:', dbError)
+  }
+  
   if (dbError || !dbUser) {
     return null
   }
