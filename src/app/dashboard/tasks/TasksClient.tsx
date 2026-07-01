@@ -1,11 +1,61 @@
 'use client'
 
 import { useState } from 'react'
+import useSWR from 'swr'
+import { createClient } from '@/utils/supabase/client'
 import { createTask, updateTaskStatus, deleteTask } from '@/app/actions/tasks'
 import { CheckSquare, Clock, Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 
-export default function TasksClient({ tasks, counselors, isAdminOrManager, currentUser }: { tasks: any[], counselors: any[], isAdminOrManager: boolean, currentUser: any }) {
+// SWR Tasks Fetcher
+const tasksFetcher = async () => {
+  const supabase = createClient()
+
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return []
+
+  // Fetch current user details to inspect role & companyId
+  const { data: user } = await supabase
+    .from('User')
+    .select('id, role, companyId')
+    .eq('id', session.user.id)
+    .single()
+
+  if (!user) return []
+
+  const isAdminOrManager = user.role === 'Super Admin' || user.role === 'Manager'
+
+  let query = supabase
+    .from('Task')
+    .select('*, counselor:User!inner(fullName, role, companyId), lead:Lead(id, fullName)')
+    .order('status', { ascending: false })
+    .order('dueDate', { ascending: true })
+
+  if (!isAdminOrManager) {
+    query = query.eq('counselorId', user.id)
+  } else {
+    query = query.eq('counselor.companyId', user.companyId)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('SWR Tasks Fetch Error:', error)
+    return []
+  }
+  return data || []
+}
+
+export default function TasksClient({ 
+  tasks, 
+  counselors, 
+  isAdminOrManager, 
+  currentUser 
+}: { 
+  tasks: any[], 
+  counselors: any[], 
+  isAdminOrManager: boolean, 
+  currentUser: any 
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({ 
     description: '', 
@@ -13,6 +63,20 @@ export default function TasksClient({ tasks, counselors, isAdminOrManager, curre
     counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Integrate SWR Caching
+  const { data: clientTasks, mutate } = useSWR(
+    'tasks',
+    tasksFetcher,
+    {
+      fallbackData: tasks,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000
+    }
+  )
+
+  const activeTasks = clientTasks || tasks
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,6 +88,7 @@ export default function TasksClient({ tasks, counselors, isAdminOrManager, curre
     data.append('counselorId', formData.counselorId)
 
     await createTask(data)
+    mutate() // trigger background revalidation
     
     setFormData({ 
       description: '', 
@@ -36,16 +101,40 @@ export default function TasksClient({ tasks, counselors, isAdminOrManager, curre
 
   const handleStatusChange = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'Pending' ? 'Completed' : 'Pending'
-    await updateTaskStatus(taskId, newStatus)
+    
+    // Optimistic cache update
+    mutate(
+      activeTasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t),
+      false
+    )
+
+    try {
+      await updateTaskStatus(taskId, newStatus)
+      mutate()
+    } catch (err) {
+      mutate() // rollback on error
+    }
   }
 
   const handleDelete = async (taskId: string) => {
     if (!confirm('Are you sure you want to delete this task?')) return
-    await deleteTask(taskId)
+    
+    // Optimistic delete
+    mutate(
+      activeTasks.filter(t => t.id !== taskId),
+      false
+    )
+
+    try {
+      await deleteTask(taskId)
+      mutate()
+    } catch (err) {
+      mutate()
+    }
   }
 
-  const pendingTasks = tasks.filter(t => t.status === 'Pending')
-  const completedTasks = tasks.filter(t => t.status === 'Completed')
+  const pendingTasks = activeTasks.filter(t => t.status === 'Pending')
+  const completedTasks = activeTasks.filter(t => t.status === 'Completed')
 
   return (
     <div className="space-y-6">

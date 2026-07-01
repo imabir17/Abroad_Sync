@@ -1,24 +1,106 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import useSWR from 'swr'
+import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
 import { Users } from 'lucide-react'
+
+// SWR Client Fetcher
+const leadsFetcher = async ([, paramsString]: [string, string]) => {
+  const params = new URLSearchParams(paramsString)
+  const q = params.get('q') || ''
+  const stage = params.get('stage') || ''
+  const rating = params.get('rating') || ''
+  const counselorId = params.get('counselorId') || ''
+  const country = params.get('country') || ''
+  const englishTest = params.get('englishTest') || ''
+  const source = params.get('source') || ''
+
+  const supabase = createClient()
+  
+  // Read session to get active companyId scope
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return []
+
+  // Read user profile from database to get companyId
+  const { data: userProfile } = await supabase
+    .from('User')
+    .select('companyId')
+    .eq('id', session.user.id)
+    .single()
+
+  if (!userProfile) return []
+
+  let query = supabase
+    .from('Lead')
+    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
+    .eq('companyId', userProfile.companyId)
+    .order('createdAt', { ascending: false })
+
+  if (counselorId) {
+    query = query.eq('assignedCounselorId', counselorId)
+  }
+  if (stage) {
+    query = query.eq('stage', stage)
+  }
+  if (rating) {
+    query = query.eq('rating', rating)
+  }
+  if (country) {
+    query = query.eq('preferredCountry', country)
+  }
+  if (englishTest) {
+    query = query.eq('englishTestType', englishTest)
+  }
+  if (source) {
+    query = query.eq('source', source)
+  }
+  
+  if (q) {
+    query = query.or(`fullName.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`)
+  }
+
+  const { data, error } = await query
+  if (error) {
+    console.error('SWR Lead Fetch Error:', error)
+    return []
+  }
+  return data || []
+}
 
 export default function LeadsTableClient({ leads, isAdminOrManager, counselors }: { leads: any[], isAdminOrManager: boolean, counselors: any[] }) {
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [transferCounselorId, setTransferCounselorId] = useState('')
   const [isTransferring, setIsTransferring] = useState(false)
 
+  const searchParams = useSearchParams()
+  const paramsString = searchParams.toString()
+
+  const { data: clientLeads, mutate } = useSWR(
+    ['leads', paramsString],
+    leadsFetcher,
+    {
+      fallbackData: leads,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000
+    }
+  )
+
+  const activeLeads = clientLeads || leads
+
   const toggleLead = (id: string) => {
     setSelectedLeadIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
 
   const toggleAll = () => {
-    if (selectedLeadIds.length === leads.length) {
+    if (selectedLeadIds.length === activeLeads.length) {
       setSelectedLeadIds([])
     } else {
-      setSelectedLeadIds(leads.map(l => l.id))
+      setSelectedLeadIds(activeLeads.map(l => l.id))
     }
   }
 
@@ -26,6 +108,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
     if (!transferCounselorId || selectedLeadIds.length === 0) return
     setIsTransferring(true)
     await bulkTransferLeads(selectedLeadIds, transferCounselorId)
+    mutate()
     setSelectedLeadIds([])
     setTransferCounselorId('')
     setIsTransferring(false)
@@ -65,7 +148,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
             <tr className="bg-neutral-950/50 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
               {isAdminOrManager && (
                 <th className="px-6 py-4 font-medium w-10">
-                  <input type="checkbox" checked={leads.length > 0 && selectedLeadIds.length === leads.length} onChange={toggleAll} className="rounded border-neutral-700 bg-neutral-900 text-blue-600" />
+                  <input type="checkbox" checked={activeLeads.length > 0 && selectedLeadIds.length === activeLeads.length} onChange={toggleAll} className="rounded border-neutral-700 bg-neutral-900 text-blue-600" />
                 </th>
               )}
               <th className="px-6 py-4 font-medium">Name</th>
@@ -77,7 +160,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-800">
-            {leads.map((lead) => (
+            {activeLeads.map((lead) => (
               <tr key={lead.id} className="hover:bg-neutral-800/50 transition-colors group">
                 {isAdminOrManager && (
                   <td className="px-6 py-4">
@@ -119,7 +202,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
               </tr>
             ))}
             
-            {leads.length === 0 && (
+            {activeLeads.length === 0 && (
               <tr>
                 <td colSpan={isAdminOrManager ? 7 : 6} className="px-6 py-12 text-center text-neutral-500">
                   No leads found matching your search and filters.
