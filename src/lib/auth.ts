@@ -1,7 +1,8 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient as createServerClient } from '@/utils/supabase/server'
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
 export async function getUserSession() {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { data: { user }, error } = await supabase.auth.getUser()
   
@@ -9,8 +10,19 @@ export async function getUserSession() {
     return null
   }
   
-  // Link the Supabase user to our User table via email, including company details
-  const { data: dbUser, error: dbError } = await supabase
+  // Use Admin Client with service role key to securely fetch the user profile & company
+  // This bypasses RLS for the auth check, preventing any recursive policy issues on the User profile.
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('getUserSession: SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.')
+    return null
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  )
+
+  const { data: dbUser, error: dbError } = await supabaseAdmin
     .from('User')
     .select('*, company:Company(*)')
     .eq('email', user.email)
