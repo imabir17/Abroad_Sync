@@ -25,23 +25,28 @@ export async function login(prevState: any, formData: FormData) {
 
   // Auto-provision Super Admin if missing from the User table
   if (authData?.user) {
-    const { data: existingUser } = await supabase
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return { error: 'Failed to authenticate admin client: SUPABASE_SERVICE_ROLE_KEY is not defined.' }
+    }
+
+    // Initialize Admin Client to bypass RLS during existence checks and provisioning
+    const supabaseAdmin = createSupabaseAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    // Check existence using admin client to prevent RLS from hiding the row
+    const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('User')
       .select('id')
       .eq('email', email)
       .maybeSingle()
 
+    if (checkError) {
+      return { error: 'Failed to verify user profile: ' + checkError.message }
+    }
+
     if (!existingUser) {
-      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        return { error: 'Failed to create company profile: SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.' }
-      }
-
-      // Use Admin Client with service role key to bypass RLS during registration/provisioning
-      const supabaseAdmin = createSupabaseAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      )
-
       const { data: company, error: companyError } = await supabaseAdmin
         .from('Company')
         .insert({ name: 'My Company' })
