@@ -47,7 +47,7 @@ export default async function LeadsPage({
   // 3. Build the Supabase query based on search and filters
   let query = supabase
     .from('Lead')
-    .select('*, assignedCounselor:User(*)')
+    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
     .eq('companyId', user.companyId)
     .order('createdAt', { ascending: false })
   

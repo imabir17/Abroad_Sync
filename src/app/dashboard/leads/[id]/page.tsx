@@ -17,7 +17,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   // Fetch the lead along with its related interactions, tasks, applications, and assigned counselor
   const { data: lead } = await supabase
     .from('Lead')
-    .select('*, assignedCounselor:User(*), interactions:Interaction(*, counselor:User(*)), tasks:Task(*, counselor:User(*)), applications:Application(*)')
+    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*), interactions:Interaction(*, counselor:User(*)), tasks:Task(*, counselor:User(*)), applications:Application(*)')
     .eq('id', resolvedParams.id)
     .eq('companyId', user.companyId)
     .maybeSingle()
