@@ -1,4 +1,4 @@
--- SQL migration script to set up schema in Supabase
+-- SQL migration script to set up schema in Supabase (idempotent/re-runnable version)
 
 -- 1. Create triggers for automatically updating "updatedAt"
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS "Company" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_company_updated_at ON "Company";
 CREATE TRIGGER update_company_updated_at
     BEFORE UPDATE ON "Company"
     FOR EACH ROW
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS "User" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_user_updated_at ON "User";
 CREATE TRIGGER update_user_updated_at
     BEFORE UPDATE ON "User"
     FOR EACH ROW
@@ -89,6 +91,7 @@ CREATE TABLE IF NOT EXISTS "Lead" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_lead_updated_at ON "Lead";
 CREATE TRIGGER update_lead_updated_at
     BEFORE UPDATE ON "Lead"
     FOR EACH ROW
@@ -105,6 +108,7 @@ CREATE TABLE IF NOT EXISTS "Interaction" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_interaction_updated_at ON "Interaction";
 CREATE TRIGGER update_interaction_updated_at
     BEFORE UPDATE ON "Interaction"
     FOR EACH ROW
@@ -122,6 +126,7 @@ CREATE TABLE IF NOT EXISTS "Task" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_task_updated_at ON "Task";
 CREATE TRIGGER update_task_updated_at
     BEFORE UPDATE ON "Task"
     FOR EACH ROW
@@ -139,6 +144,7 @@ CREATE TABLE IF NOT EXISTS "Application" (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DROP TRIGGER IF EXISTS update_application_updated_at ON "Application";
 CREATE TRIGGER update_application_updated_at
     BEFORE UPDATE ON "Application"
     FOR EACH ROW
