@@ -51,9 +51,7 @@ export default async function LeadsPage({
     .eq('companyId', user.companyId)
     .order('createdAt', { ascending: false })
   
-  if (!isAdminOrManager) {
-    query = query.eq('assignedCounselorId', user.id)
-  } else if (counselorId) {
+  if (counselorId) {
     query = query.eq('assignedCounselorId', counselorId)
   }
 

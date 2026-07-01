@@ -496,74 +496,74 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             )}
           </div>
 
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white flex items-center">
-                <Clock className="h-5 w-5 mr-2 text-amber-400" /> Follow-Up Tasks
-              </h3>
-              {canEdit && (
+          {canEdit && (
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white flex items-center">
+                  <Clock className="h-5 w-5 mr-2 text-amber-400" /> Follow-Up Tasks
+                </h3>
                 <button 
                   onClick={() => setIsAddingTask(!isAddingTask)} 
                   className="text-sm text-blue-400 hover:text-blue-300 font-medium"
                 >
                   {isAddingTask ? 'Cancel' : '+ Add Task'}
                 </button>
-              )}
-            </div>
-            
-            {isAddingTask && (
-              <div className="mb-4 bg-neutral-950 p-4 rounded-lg border border-neutral-800 space-y-3">
-                <input 
-                  value={taskDescription}
-                  onChange={e => setTaskDescription(e.target.value)}
-                  placeholder="Task description..."
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-sm text-white"
-                />
-                <div className="flex items-center space-x-3">
-                  <input 
-                    type="datetime-local" 
-                    value={taskDueDate}
-                    onChange={e => setTaskDueDate(e.target.value)}
-                    className="bg-neutral-900 border border-neutral-700 rounded p-2 text-sm text-white flex-1"
-                  />
-                  <button onClick={handleAddTask} className="bg-blue-600 text-white px-4 py-2 rounded text-sm">Save</button>
-                </div>
               </div>
-            )}
-            
-            <div className="space-y-3">
-              {lead.tasks?.length === 0 ? (
-                <div className="text-center text-neutral-500 py-6 border border-dashed border-neutral-800 rounded-lg">
-                  No upcoming tasks.
-                </div>
-              ) : (
-                lead.tasks?.map((task: any) => (
-                  <div key={task.id} className={`flex items-start space-x-3 bg-neutral-950 p-3 rounded-lg border border-neutral-800 transition-colors ${task.status === 'Completed' ? 'opacity-50' : 'group hover:border-neutral-700'}`}>
+              
+              {isAddingTask && (
+                <div className="mb-4 bg-neutral-950 p-4 rounded-lg border border-neutral-800 space-y-3">
+                  <input 
+                    value={taskDescription}
+                    onChange={e => setTaskDescription(e.target.value)}
+                    placeholder="Task description..."
+                    className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-sm text-white"
+                  />
+                  <div className="flex items-center space-x-3">
                     <input 
-                      type="checkbox" 
-                      disabled={!canEdit}
-                      checked={task.status === 'Completed'}
-                      onChange={() => handleTaskStatus(task.id, task.status)}
-                      className="mt-1 h-4 w-4 rounded border-neutral-700 bg-neutral-900 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50" 
+                      type="datetime-local" 
+                      value={taskDueDate}
+                      onChange={e => setTaskDueDate(e.target.value)}
+                      className="bg-neutral-900 border border-neutral-700 rounded p-2 text-sm text-white flex-1"
                     />
-                    <div className="flex-1">
-                      <p className={`text-sm font-medium ${task.status === 'Completed' ? 'line-through text-neutral-400' : 'text-neutral-200'}`}>{task.description}</p>
-                      <div className="flex items-center flex-wrap gap-2 mt-1">
-                        <p className="text-xs text-amber-500 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" /> {new Date(task.dueDate).toLocaleString()} {task.status === 'Completed' && ' (Completed)'}
-                        </p>
-                        {task.counselor && (
-                          <span className="text-xs text-neutral-500">
-                            • Added by {task.counselor.fullName} ({task.counselor.role})
-                          </span>
-                        )}
+                    <button onClick={handleAddTask} className="bg-blue-600 text-white px-4 py-2 rounded text-sm">Save</button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="space-y-3">
+                {lead.tasks?.length === 0 ? (
+                  <div className="text-center text-neutral-500 py-6 border border-dashed border-neutral-800 rounded-lg">
+                    No upcoming tasks.
+                  </div>
+                ) : (
+                  lead.tasks?.map((task: any) => (
+                    <div key={task.id} className={`flex items-start space-x-3 bg-neutral-950 p-3 rounded-lg border border-neutral-800 transition-colors ${task.status === 'Completed' ? 'opacity-50' : 'group hover:border-neutral-700'}`}>
+                      <input 
+                        type="checkbox" 
+                        disabled={!canEdit}
+                        checked={task.status === 'Completed'}
+                        onChange={() => handleTaskStatus(task.id, task.status)}
+                        className="mt-1 h-4 w-4 rounded border-neutral-700 bg-neutral-900 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50" 
+                      />
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${task.status === 'Completed' ? 'line-through text-neutral-400' : 'text-neutral-200'}`}>{task.description}</p>
+                        <div className="flex items-center flex-wrap gap-2 mt-1">
+                          <p className="text-xs text-amber-500 flex items-center">
+                            <Clock className="h-3 w-3 mr-1" /> {new Date(task.dueDate).toLocaleString()} {task.status === 'Completed' && ' (Completed)'}
+                          </p>
+                          {task.counselor && (
+                            <span className="text-xs text-neutral-500">
+                              • Added by {task.counselor.fullName} ({task.counselor.role})
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       

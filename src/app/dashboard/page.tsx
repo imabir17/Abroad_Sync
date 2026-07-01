@@ -33,9 +33,7 @@ export default async function DashboardPage() {
     .select('rating, stage')
     .eq('companyId', user.companyId)
 
-  if (!isAdminOrManager) {
-    leadsQuery = leadsQuery.eq('assignedCounselorId', user.id)
-  }
+  // No counselor-level filter: all users in the company see all leads.
 
   // 2. Fetch tasks concurrently
   let tasksQuery = supabase
