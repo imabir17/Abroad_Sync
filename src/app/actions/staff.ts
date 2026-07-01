@@ -32,9 +32,13 @@ export async function createStaff(formData: FormData) {
   )
 
   // inviteUserByEmail is the only way to officially trigger the Supabase "Invite" email from the backend.
+  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000'
+  siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
+  siteUrl = siteUrl.replace(/\/$/, '')
+
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName, role },
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/confirm?next=/update-password`
+    redirectTo: `${siteUrl}/auth/confirm?next=/update-password`
   })
 
   if (authError || !authData.user) {

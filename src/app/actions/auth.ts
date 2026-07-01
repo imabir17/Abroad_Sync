@@ -64,8 +64,13 @@ export async function resetPassword(prevState: any, formData: FormData) {
   }
 
   const supabase = await createClient()
+  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000'
+  siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
+  // Remove trailing slash if present
+  siteUrl = siteUrl.replace(/\/$/, '')
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/confirm?next=/update-password`,
+    redirectTo: `${siteUrl}/auth/confirm?next=/update-password`,
   })
 
   if (error) {
