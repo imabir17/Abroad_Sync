@@ -82,6 +82,13 @@ export default async function LeadsPage({
   }
 
   const { data: leadsData, error: queryError } = await query
+  console.log('Leads Page Debug:', {
+    userId: user.id,
+    userRole: user.role,
+    userCompanyId: user.companyId,
+    leadsCount: leadsData ? leadsData.length : null,
+    searchParams: resolvedSearchParams
+  })
   if (queryError) {
     console.error('Leads Query Error:', {
       message: queryError.message,
