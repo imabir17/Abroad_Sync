@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateLeadStatus } from '@/app/actions/leads'
 import { LEAD_STAGES, LEAD_RATINGS } from '@/lib/constants'
 
@@ -16,21 +16,52 @@ export function LeadStatusDropdowns({
   canEdit?: boolean
 }) {
   const [isPending, setIsPending] = useState(false)
+  const [localStage, setLocalStage] = useState(currentStage)
+  const [localRating, setLocalRating] = useState(currentRating || 'Unrated')
+
+  // Keep state synced with parent props
+  useEffect(() => {
+    setLocalStage(currentStage)
+  }, [currentStage])
+
+  useEffect(() => {
+    setLocalRating(currentRating || 'Unrated')
+  }, [currentRating])
 
   const handleStageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!canEdit) return
     const newStage = e.target.value
+    const rollbackStage = localStage
+    
+    // Optimistic update
+    setLocalStage(newStage)
     setIsPending(true)
-    await updateLeadStatus(leadId, newStage, currentRating || 'Unrated')
-    setIsPending(false)
+    
+    try {
+      await updateLeadStatus(leadId, newStage, localRating)
+    } catch (err) {
+      setLocalStage(rollbackStage) // Rollback on error
+    } finally {
+      setIsPending(false)
+    }
   }
 
   const handleRatingChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!canEdit) return
     const newRating = e.target.value
+    const rollbackRating = localRating
+    
+    // Optimistic update
+    setLocalRating(newRating)
     setIsPending(true)
-    await updateLeadStatus(leadId, currentStage, newRating)
-    setIsPending(false)
+    
+    try {
+      await updateLeadStatus(leadId, localStage, newRating)
+    } catch (err) {
+      setLocalRating(rollbackRating) // Rollback on error
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -43,7 +74,7 @@ export function LeadStatusDropdowns({
           onChange={handleStageChange}
           disabled={isPending || !canEdit}
           className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer disabled:opacity-50" 
-          value={currentStage}
+          value={localStage}
         >
           {LEAD_STAGES.map(stage => (
             <option key={stage} value={stage}>{stage}</option>
@@ -57,11 +88,11 @@ export function LeadStatusDropdowns({
           onChange={handleRatingChange}
           disabled={isPending || !canEdit}
           className={`bg-neutral-950 border border-neutral-800 text-sm font-medium rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer disabled:opacity-50
-            ${currentRating === 'Very Good' ? 'text-emerald-400' : 
-              currentRating === 'Good' ? 'text-blue-400' : 
-              currentRating === 'Moderate' ? 'text-amber-400' : 
-              currentRating === 'Bad' ? 'text-red-400' : 'text-neutral-400'}`} 
-          value={currentRating || 'Unrated'}
+            ${localRating === 'Very Good' ? 'text-emerald-400' : 
+              localRating === 'Good' ? 'text-blue-400' : 
+              localRating === 'Moderate' ? 'text-amber-400' : 
+              localRating === 'Bad' ? 'text-red-400' : 'text-neutral-400'}`} 
+          value={localRating}
         >
           {LEAD_RATINGS.map(rating => (
             <option key={rating} value={rating}>{rating}</option>

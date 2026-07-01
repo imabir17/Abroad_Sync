@@ -35,7 +35,13 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
   // Timeline State
   const [noteContent, setNoteContent] = useState('')
   const [isPostingNote, setIsPostingNote] = useState(false)
+  const [localInteractions, setLocalInteractions] = useState(lead.interactions || [])
   const timelineContainerRef = useRef<HTMLDivElement>(null)
+
+  // Sync interactions from props
+  useEffect(() => {
+    setLocalInteractions(lead.interactions || [])
+  }, [lead.interactions])
 
   // File Opened State
   const [isFileOpened, setIsFileOpened] = useState(lead.isFileOpened || false)
@@ -48,7 +54,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
         behavior: 'smooth'
       })
     }
-  }, [lead.interactions, lead.initialNote])
+  }, [localInteractions, lead.initialNote])
 
   // Task State
   const [isAddingTask, setIsAddingTask] = useState(false)
@@ -78,10 +84,32 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
   const handlePostNote = async () => {
     if (!noteContent.trim()) return
-    setIsPostingNote(true)
-    await createInteraction(lead.id, noteContent)
+    const content = noteContent
     setNoteContent('')
-    setIsPostingNote(false)
+    setIsPostingNote(true)
+
+    // Add optimistic note
+    const optimisticNote = {
+      id: 'optimistic-' + Date.now(),
+      content: content,
+      createdAt: new Date().toISOString(),
+      counselor: {
+        fullName: 'Posting...',
+        role: ''
+      }
+    }
+
+    setLocalInteractions(prev => [...prev, optimisticNote])
+
+    try {
+      await createInteraction(lead.id, content)
+    } catch (err) {
+      // Rollback on error
+      setLocalInteractions(prev => prev.filter(n => n.id !== optimisticNote.id))
+      setNoteContent(content)
+    } finally {
+      setIsPostingNote(false)
+    }
   }
 
   const handleAddTask = async () => {
@@ -446,7 +474,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 </div>
               )}
               
-              {lead.interactions?.map((interaction: any) => (
+              {localInteractions.map((interaction: any) => (
                 <div key={interaction.id} className="flex space-x-3">
                   <div className="flex-shrink-0 mt-1">
                     <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
@@ -457,7 +485,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     <div className="bg-neutral-950 border border-neutral-800 p-3 rounded-lg text-sm text-neutral-300">
                       <div className="flex justify-between items-start mb-2">
                         <p className="text-xs font-medium text-neutral-400">
-                          {interaction.counselor ? `${interaction.counselor.fullName} (${interaction.counselor.role})` : 'System'}
+                          {interaction.counselor ? `${interaction.counselor.fullName} ${interaction.counselor.role ? `(${interaction.counselor.role})` : ''}` : 'System'}
                         </p>
                         <p className="text-xs text-neutral-500">
                           {new Date(interaction.createdAt).toLocaleString()}
@@ -469,7 +497,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 </div>
               ))}
               
-              {lead.interactions?.length === 0 && !lead.initialNote && (
+              {localInteractions.length === 0 && !lead.initialNote && (
                 <div className="text-center text-neutral-500 py-8">
                   No activity recorded yet.
                 </div>
