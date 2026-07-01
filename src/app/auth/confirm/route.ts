@@ -20,6 +20,11 @@ export async function GET(request: NextRequest) {
     if (!error) {
       // redirect user to specified redirect URL or update password page
       redirect(next)
+    } else {
+      console.error('Verify OTP Error:', {
+        message: error.message,
+        status: error.status
+      })
     }
   }
 
