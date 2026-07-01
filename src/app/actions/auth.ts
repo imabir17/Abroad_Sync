@@ -1,7 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
+import { createClient as createServerClient } from '@/utils/supabase/server'
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -11,7 +12,7 @@ export async function login(prevState: any, formData: FormData) {
     return { error: 'Email and password are required' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
 
   const { data: authData, error } = await supabase.auth.signInWithPassword({
     email,
@@ -31,8 +32,13 @@ export async function login(prevState: any, formData: FormData) {
       .maybeSingle()
 
     if (!existingUser) {
-      // Create Company and User using the Supabase client
-      const { data: company, error: companyError } = await supabase
+      // Use Admin Client with service role key to bypass RLS during registration/provisioning
+      const supabaseAdmin = createSupabaseAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+
+      const { data: company, error: companyError } = await supabaseAdmin
         .from('Company')
         .insert({ name: 'My Company' })
         .select()
@@ -42,7 +48,7 @@ export async function login(prevState: any, formData: FormData) {
         return { error: 'Failed to create company profile: ' + (companyError?.message || 'Unknown error') }
       }
 
-      const { error: userError } = await supabase
+      const { error: userError } = await supabaseAdmin
         .from('User')
         .insert({
           id: authData.user.id,
@@ -63,7 +69,7 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   await supabase.auth.signOut()
   redirect('/login')
 }
@@ -75,7 +81,7 @@ export async function resetPassword(prevState: any, formData: FormData) {
     return { error: 'Email is required' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000'
   siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
   siteUrl = siteUrl.replace(/\/$/, '')
@@ -107,7 +113,7 @@ export async function updatePassword(prevState: any, formData: FormData) {
     return { error: 'Password must be at least 6 characters' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { error } = await supabase.auth.updateUser({
     password: password
@@ -119,7 +125,12 @@ export async function updatePassword(prevState: any, formData: FormData) {
   
   const { data: { user } } = await supabase.auth.getUser()
   if (user && user.email) {
-    await supabase
+    const supabaseAdmin = createSupabaseAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    
+    await supabaseAdmin
       .from('User')
       .update({ password: password })
       .eq('email', user.email)
