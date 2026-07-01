@@ -5,7 +5,7 @@ import { useActionState } from 'react'
 import Link from 'next/link'
 
 export default function ForgotPasswordPage() {
-  const [state, formAction] = useActionState(resetPassword, { error: '', success: '' })
+  const [state, formAction] = useActionState(resetPassword, { error: '' } as any)
 
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-neutral-100">
