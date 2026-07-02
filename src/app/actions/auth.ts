@@ -23,13 +23,13 @@ export async function login(prevState: any, formData: FormData) {
     return { error: error.message }
   }
 
-  // Auto-provision Super Admin if missing from the User table
+  // Provision Super Admin profile in database if missing
   if (authData?.user) {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return { error: 'Failed to authenticate admin client: SUPABASE_SERVICE_ROLE_KEY is not defined.' }
     }
 
-    // Validate that the key provided is indeed the service_role key to prevent RLS failures
+    // Verify key format to prevent silent RLS blockages
     try {
       const parts = process.env.SUPABASE_SERVICE_ROLE_KEY.split('.')
       if (parts.length >= 2) {
@@ -42,13 +42,13 @@ export async function login(prevState: any, formData: FormData) {
       return { error: 'Failed to validate SUPABASE_SERVICE_ROLE_KEY format. Please ensure it is copy-pasted correctly.' }
     }
 
-    // Initialize Admin Client to bypass RLS during existence checks and provisioning
+    // Use admin client to bypass RLS for profile verification and insertion
     const supabaseAdmin = createSupabaseAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    // Check existence using admin client to prevent RLS from hiding the row
+    // Verify profile existence safely
     const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('User')
       .select('id')
@@ -85,7 +85,7 @@ export async function login(prevState: any, formData: FormData) {
         return { error: 'Failed to create user profile: ' + userError.message }
       }
 
-      // Update auth user's app_metadata for lightning-fast O(1) RLS checks
+      // Store tenant context in JWT app_metadata to enable high-performance RLS check paths
       await supabaseAdmin.auth.admin.updateUserById(
         authData.user.id,
         { app_metadata: { companyId: company.id, role: 'Super Admin' } }
@@ -164,7 +164,7 @@ export async function updatePassword(prevState: any, formData: FormData) {
       .eq('email', user.email)
   }
 
-  // Force re-login with new credentials for clean session
+  // Clear active session to enforce a clean re-login with the new password
   await supabase.auth.signOut()
   redirect('/login?message=Password updated. Please log in.')
 }

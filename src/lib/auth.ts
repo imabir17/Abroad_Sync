@@ -10,8 +10,7 @@ export async function getUserSession() {
     return null
   }
   
-  // Use Admin Client with service role key to securely fetch the user profile & company
-  // This bypasses RLS for the auth check, preventing any recursive policy issues on the User profile.
+  // Fetch profile via admin client to bypass RLS and avoid recursive policy check overhead
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error('getUserSession: SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.')
     return null

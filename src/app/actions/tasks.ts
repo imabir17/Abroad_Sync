@@ -13,7 +13,7 @@ export async function createTask(formData: FormData) {
   let counselorId = formData.get('counselorId') as string
   const leadId = formData.get('leadId') as string | null
 
-  // Counselors can only assign tasks to themselves
+  // Restrict counselors to self-assignment
   if (user.role === 'Counselor') {
     counselorId = user.id
   }
@@ -24,7 +24,7 @@ export async function createTask(formData: FormData) {
 
   const supabase = await createClient()
 
-  // Ensure assigned counselor is in same company
+  // Verify counselor company tenancy
   const { data: assignedCounselor } = await supabase
     .from('User')
     .select('id')
@@ -59,7 +59,7 @@ export async function updateTaskStatus(taskId: string, status: string) {
 
   const supabase = await createClient()
   
-  // Fetch task and counselor's companyId
+  // Verify tenancy scope of target task
   const { data: task, error: fetchError } = await supabase
     .from('Task')
     .select('id, counselorId, leadId, counselor:User(companyId)')
@@ -95,7 +95,7 @@ export async function deleteTask(taskId: string) {
 
   const supabase = await createClient()
 
-  // Fetch task and counselor's companyId
+  // Verify tenancy scope of target task
   const { data: task } = await supabase
     .from('Task')
     .select('id, counselorId, leadId, counselor:User(companyId)')

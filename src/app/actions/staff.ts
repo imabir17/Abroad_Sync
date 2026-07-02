@@ -31,7 +31,7 @@ export async function createStaff(formData: FormData) {
     return { error: 'User with this email already exists' }
   }
 
-  // 1. Create User in Supabase Auth and SEND INVITE EMAIL using Admin Client
+  // Create Auth user and send invitation email
   const supabaseAdmin = createSupabaseAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -50,7 +50,7 @@ export async function createStaff(formData: FormData) {
     return { error: 'Failed to create user in Supabase: ' + (authError?.message || 'Unknown error') }
   }
 
-  // Update user's app_metadata for lightning-fast O(1) RLS checks
+  // Store companyId and role in app_metadata to enable high-performance RLS check paths
   await supabaseAdmin.auth.admin.updateUserById(
     authData.user.id,
     { app_metadata: { companyId: user.companyId, role } }
@@ -62,7 +62,7 @@ export async function createStaff(formData: FormData) {
       id: authData.user.id,
       fullName,
       email,
-      password: 'pending-invite', // Placeholder until they set it
+      password: 'pending-invite', // Placeholder until user configures password
       role,
       companyId: user.companyId
     })
@@ -91,7 +91,7 @@ export async function updateStaff(id: string, formData: FormData) {
 
   const supabase = await createServerClient()
 
-  // Ensure the staff belongs to the same company
+  // Verify company scope
   const { data: staff } = await supabase
     .from('User')
     .select('id')
@@ -120,14 +120,14 @@ export async function deleteStaff(id: string) {
     throw new Error('Unauthorized')
   }
 
-  // Prevent deleting oneself
+  // Prevent self-deletion
   if (user.id === id) {
     return { error: 'Cannot delete your own account' }
   }
 
   const supabase = await createServerClient()
 
-  // Ensure the staff belongs to the same company
+  // Verify company scope
   const { data: staff } = await supabase
     .from('User')
     .select('id')
