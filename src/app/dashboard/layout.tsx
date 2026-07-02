@@ -24,7 +24,4 @@ export default async function DashboardLayout({
     >
       {children}
     </DashboardNavClient>
-  )
-}
-  )
 }
