@@ -192,18 +192,18 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {(formData.sscGroup || formData.sscYear || formData.sscResult || isEditing) && (
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
                   <h4 className="text-sm font-medium text-neutral-200 mb-3 border-b border-neutral-800 pb-2">SSC / O-Levels</h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Group</p>
-                      {isEditing ? <input name="sscGroup" value={formData.sscGroup} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscGroup || '-'}</p>}
+                      {isEditing ? <input name="sscGroup" value={formData.sscGroup} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscGroup || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Year</p>
-                      {isEditing ? <input name="sscYear" value={formData.sscYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscYear || '-'}</p>}
+                      {isEditing ? <input name="sscYear" value={formData.sscYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscYear || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Result</p>
-                      {isEditing ? <input name="sscResult" value={formData.sscResult} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscResult || '-'}</p>}
+                      {isEditing ? <input name="sscResult" value={formData.sscResult} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.sscResult || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -213,18 +213,18 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {(formData.hscGroup || formData.hscYear || formData.hscResult || isEditing) && (
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
                   <h4 className="text-sm font-medium text-neutral-200 mb-3 border-b border-neutral-800 pb-2">HSC / A-Levels</h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Group</p>
-                      {isEditing ? <input name="hscGroup" value={formData.hscGroup} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscGroup || '-'}</p>}
+                      {isEditing ? <input name="hscGroup" value={formData.hscGroup} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscGroup || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Year</p>
-                      {isEditing ? <input name="hscYear" value={formData.hscYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscYear || '-'}</p>}
+                      {isEditing ? <input name="hscYear" value={formData.hscYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscYear || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Result</p>
-                      {isEditing ? <input name="hscResult" value={formData.hscResult} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscResult || '-'}</p>}
+                      {isEditing ? <input name="hscResult" value={formData.hscResult} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.hscResult || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -234,18 +234,18 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {(formData.bachelorsMajor || formData.bachelorsYear || formData.bachelorsCgpa || isEditing) && (
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
                   <h4 className="text-sm font-medium text-neutral-200 mb-3 border-b border-neutral-800 pb-2">Bachelor's Degree</h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Major</p>
-                      {isEditing ? <input name="bachelorsMajor" value={formData.bachelorsMajor} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsMajor || '-'}</p>}
+                      {isEditing ? <input name="bachelorsMajor" value={formData.bachelorsMajor} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsMajor || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Year</p>
-                      {isEditing ? <input name="bachelorsYear" value={formData.bachelorsYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsYear || '-'}</p>}
+                      {isEditing ? <input name="bachelorsYear" value={formData.bachelorsYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsYear || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">CGPA</p>
-                      {isEditing ? <input name="bachelorsCgpa" value={formData.bachelorsCgpa} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsCgpa || '-'}</p>}
+                      {isEditing ? <input name="bachelorsCgpa" value={formData.bachelorsCgpa} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.bachelorsCgpa || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -255,18 +255,18 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {(formData.mastersMajor || formData.mastersYear || formData.mastersCgpa || isEditing) && (
                 <div className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
                   <h4 className="text-sm font-medium text-neutral-200 mb-3 border-b border-neutral-800 pb-2">Master's Degree</h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Major</p>
-                      {isEditing ? <input name="mastersMajor" value={formData.mastersMajor} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersMajor || '-'}</p>}
+                      {isEditing ? <input name="mastersMajor" value={formData.mastersMajor} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersMajor || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">Year</p>
-                      {isEditing ? <input name="mastersYear" value={formData.mastersYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersYear || '-'}</p>}
+                      {isEditing ? <input name="mastersYear" value={formData.mastersYear} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersYear || '-'}</p>}
                     </div>
                     <div>
                       <p className="text-xs text-neutral-500 mb-1">CGPA</p>
-                      {isEditing ? <input name="mastersCgpa" value={formData.mastersCgpa} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded p-1 text-sm text-white" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersCgpa || '-'}</p>}
+                      {isEditing ? <input name="mastersCgpa" value={formData.mastersCgpa} onChange={handleEditChange} className="w-full bg-neutral-900 border border-neutral-700 rounded py-1.5 px-2 text-sm text-white focus:outline-none focus:border-blue-500" /> : <p className="text-sm text-neutral-300 font-medium">{formData.mastersCgpa || '-'}</p>}
                     </div>
                   </div>
                 </div>

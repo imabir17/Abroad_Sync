@@ -143,7 +143,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-neutral-950/50 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
               {isAdminOrManager && (

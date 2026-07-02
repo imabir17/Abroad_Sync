@@ -68,7 +68,7 @@ export function LeadFilters({ isAdminOrManager, counselors, sources = [] }: { is
           className="w-full pl-9 pr-4 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-sm text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
         />
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center gap-2">
         {isAdminOrManager && (
           <div className="flex items-center space-x-2 mr-2">
             <Users className="h-4 w-4 text-neutral-500" />
