@@ -49,19 +49,23 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <Link href="/dashboard/leads" className="p-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors">
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/dashboard/leads" 
+            className="p-2.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] hover:text-[#202638] transition-all"
+            aria-label="Back to leads list"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h2 className="text-2xl font-bold text-white">{lead.fullName}</h2>
-            <div className="flex items-center space-x-3 mt-1 text-sm text-neutral-400">
-              <span className="flex items-center"><Mail className="h-3.5 w-3.5 mr-1" /> {lead.email || 'N/A'}</span>
-              <span>•</span>
-              <span className="flex items-center"><Phone className="h-3.5 w-3.5 mr-1" /> {lead.phone || 'N/A'}</span>
+            <h2 className="text-2xl font-bold text-[#202638] font-display">{lead.fullName}</h2>
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-[#5C6478] font-semibold">
+              <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-[#4855E4]" /> {lead.email || 'N/A'}</span>
+              <span className="opacity-40">•</span>
+              <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-[#12A8B5]" /> {lead.phone || 'N/A'}</span>
             </div>
           </div>
         </div>
