@@ -48,10 +48,10 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
 
     if (res.error) {
       setError(res.error)
+      setIsLoading(false)
     } else {
       window.location.reload()
     }
-    setIsLoading(false)
   }
 
   const handleDelete = async (id: string) => {
@@ -64,91 +64,133 @@ export default function StaffClient({ initialUsers }: { initialUsers: any[] }) {
     }
   }
 
+  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-3 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-3 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+
   return (
     <>
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+      <div className="space-y-8 pb-12">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Staff Management</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-[#202638] font-display">Staff Management</h2>
+            <p className="text-xs text-[#5C6478]">Manage counselor accounts, administrative permissions, and roles.</p>
+          </div>
           <button 
             onClick={() => openModal()} 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
+            className="flex items-center gap-1.5 px-5 py-3 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[9px_9px_20px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
           >
-            <Plus className="h-4 w-4 mr-2" /> Add Staff
+            <Plus className="h-4.5 w-4.5" /> Add Staff
           </button>
         </div>
 
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-          <table className="min-w-full divide-y divide-neutral-800">
-            <thead className="bg-neutral-950/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-neutral-400 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-800">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-neutral-800/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{user.fullName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-400">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-400">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'Super Admin' ? 'bg-red-500/10 text-red-400' : user.role === 'Manager' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => openModal(user)} className="text-blue-400 hover:text-blue-300 mr-4">
-                      <Edit2 className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => handleDelete(user.id)} className="text-red-400 hover:text-red-300">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </td>
+        {/* Staff Table Container */}
+        <div className="neo-raised overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-[#AEB9C9]/20">
+              <thead className="bg-[#DCE3ED]">
+                <tr className="text-[#5C6478] text-[10px] font-bold uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left">Name</th>
+                  <th className="px-6 py-4 text-left">Email</th>
+                  <th className="px-6 py-4 text-left">Role</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#AEB9C9]/20 bg-[#E7ECF3]">
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-[#DCE3ED]/25 transition-colors group">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-[#202638]">{user.fullName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-[#5C6478]">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">
+                      <span className={`px-2.5 py-0.5 inline-flex text-[10px] font-bold leading-5 rounded-full border ${
+                        user.role === 'Super Admin' 
+                          ? 'bg-red-500/10 text-red-600 border-red-500/20' 
+                          : user.role === 'Manager' 
+                            ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' 
+                            : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-xs font-bold space-x-2">
+                      <button 
+                        onClick={() => openModal(user)} 
+                        className="inline-flex p-2 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                        aria-label="Edit staff member details"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(user.id)} 
+                        className="inline-flex p-2 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-red-500 hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                        aria-label="Delete staff member"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      {/* Staff Editor Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center p-6 border-b border-neutral-800 shrink-0">
-              <h3 className="text-lg font-bold text-white">{editingUser ? 'Edit Staff' : 'Add Staff'}</h3>
-              <button onClick={closeModal} className="text-neutral-400 hover:text-white transition-colors"><X className="h-5 w-5" /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="neo-raised-lg max-w-md w-full p-8 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-base font-bold text-[#202638]">{editingUser ? 'Edit Staff Details' : 'Add New Counselor'}</h3>
+              <button 
+                onClick={closeModal} 
+                className="p-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] transition-all"
+                aria-label="Close editing details dialog"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
             
-            <div className="overflow-y-auto p-6 flex-1">
-              {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">{error}</div>}
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-bold rounded-xl shadow-sm">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Full Name</label>
+                <input required type="text" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className={inputClass} placeholder="E.g. Tanvir Ahmed" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Email</label>
+                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className={inputClass} placeholder="tanvir@agency.com" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Role</label>
+                <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className={selectClass}>
+                  <option value="Counselor">Counselor</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Super Admin">Super Admin</option>
+                </select>
+              </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1">Full Name</label>
-                  <input required type="text" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1">Email</label>
-                  <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1">Role</label>
-                  <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="Counselor">Counselor</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Super Admin">Super Admin</option>
-                  </select>
-                </div>
-                
-                <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors">Cancel</button>
-                  <button type="submit" disabled={isLoading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50">
-                    {isLoading ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="pt-4 flex justify-end gap-3">
+                <button 
+                  type="button" 
+                  onClick={closeModal} 
+                  className="px-5 py-2.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isLoading} 
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all"
+                >
+                  {isLoading ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

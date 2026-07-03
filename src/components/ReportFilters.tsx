@@ -3,7 +3,13 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
-export function ReportFilters({ counselors, isAdmin }: { counselors: { id: string, fullName: string }[], isAdmin: boolean }) {
+export function ReportFilters({ 
+  counselors, 
+  isAdmin 
+}: { 
+  counselors: { id: string, fullName: string }[]
+  isAdmin: boolean 
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -29,14 +35,17 @@ export function ReportFilters({ counselors, isAdmin }: { counselors: { id: strin
     router.push(`/dashboard/reports?${params.toString()}`)
   }
 
+  const selectClass = "px-3 py-2.5 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] hover:text-[#202638] rounded-xl outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+  const inputClass = "px-3 py-2 bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] border-none rounded-xl text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
+
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-end">
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm text-neutral-400">Time Range</label>
+    <div className="neo-raised p-5 mb-8 flex flex-wrap gap-5 items-end">
+      <div className="flex flex-col gap-2">
+        <label className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider">Time Range</label>
         <select 
           value={dateRange}
           onChange={(e) => setDateRange(e.target.value)}
-          className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className={selectClass}
         >
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
@@ -47,34 +56,34 @@ export function ReportFilters({ counselors, isAdmin }: { counselors: { id: strin
 
       {dateRange === 'custom' && (
         <>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-neutral-400">Start Date</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider">Start Date</label>
             <input 
               type="date"
               value={customStart}
               onChange={(e) => setCustomStart(e.target.value)}
-              className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className={inputClass}
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-neutral-400">End Date</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider">End Date</label>
             <input 
               type="date"
               value={customEnd}
               onChange={(e) => setCustomEnd(e.target.value)}
-              className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className={inputClass}
             />
           </div>
         </>
       )}
 
       {isAdmin && (
-        <div className="flex flex-col gap-1.5 min-w-[200px]">
-          <label className="text-sm text-neutral-400">Counselor</label>
+        <div className="flex flex-col gap-2 min-w-[200px]">
+          <label className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider">Counselor</label>
           <select 
             value={selectedCounselor}
             onChange={(e) => setSelectedCounselor(e.target.value)}
-            className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className={selectClass}
           >
             <option value="">All Counselors</option>
             {counselors.map(c => (
@@ -86,7 +95,7 @@ export function ReportFilters({ counselors, isAdmin }: { counselors: { id: strin
 
       <button 
         onClick={applyFilters}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        className="px-5 py-3 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[5px_5px_12px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150 cursor-pointer"
       >
         Apply Filters
       </button>

@@ -33,8 +33,6 @@ export default async function DashboardPage() {
     .select('rating, stage')
     .eq('companyId', user.companyId)
 
-  // No counselor-level filter: all users in the company see all leads.
-
   // 2. Fetch tasks concurrently
   let tasksQuery = supabase
     .from('Task')
@@ -97,66 +95,66 @@ export default async function DashboardPage() {
     fill: s.color
   }))
 
-  // 5. Agenda Tasks (Due today or overdue, and Pending)
-  const endOfToday = new Date()
-  endOfToday.setHours(23, 59, 59, 999)
-
-  const agendaTasks = allTasks
-    .filter(t => t.status === 'Pending' && new Date(t.dueDate) <= endOfToday)
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
+      {/* Title */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-1">Overview</h2>
-        <p className="text-neutral-400">Comprehensive breakdown of your leads pipeline.</p>
+        <h2 className="text-2xl font-bold text-[#202638] font-display">Overview</h2>
+        <p className="text-xs text-[#5C6478] mt-1">Comprehensive real-time breakdown of student lead pipelines.</p>
       </div>
 
-      {/* Top Main Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20 hover:border-neutral-700 transition-all hover:shadow-lg hover:-translate-y-1">
+      {/* Top Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
-            <h3 className="text-neutral-400 font-medium">Total Leads</h3>
-            <Users className="text-blue-500 h-5 w-5" />
+            <h3 className="text-xs font-bold text-[#5C6478]">Total Leads</h3>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
+              <Users className="h-4.5 w-4.5" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-white mt-4">{totalLeads}</p>
+          <p className="text-3xl font-black text-[#202638] font-display mt-4">{totalLeads}</p>
         </div>
 
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20 hover:border-neutral-700 transition-all hover:shadow-lg hover:-translate-y-1">
+        <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
-            <h3 className="text-neutral-400 font-medium">Pipeline Health</h3>
-            <Activity className="text-indigo-500 h-5 w-5" />
+            <h3 className="text-xs font-bold text-[#5C6478]">Pipeline Health</h3>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3FC7CE] to-[#0F8A94] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
+              <Activity className="h-4.5 w-4.5" />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-white mt-4">{conversionRate}%</p>
-          <p className="text-xs text-indigo-400 mt-1">High potential leads (Very Good + Good)</p>
+          <p className="text-3xl font-black text-[#202638] font-display mt-4">{conversionRate}%</p>
+          <p className="text-[10px] text-[#8891A3] mt-2 font-medium">Ratio of high potential leads (Very Good + Good)</p>
         </div>
 
-        {/* Pending Tasks Modal Trigger */}
+        {/* Tasks trigger */}
         <TasksModalClient tasks={allTasks} pendingCount={pendingCount} />
       </div>
 
-      {/* Due Tasks - Hidden for Super Admin */}
+      {/* Agenda list for non Super Admins */}
       {user.role !== 'Super Admin' && (
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm shadow-black/20 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Today's Agenda</h3>
+        <div className="neo-raised p-8">
+          <h3 className="text-base font-bold text-[#202638] mb-6 flex items-center gap-2">
+            <Clock className="w-4.5 h-4.5 text-[#FF7A52]" />
+            Today's Agenda
+          </h3>
           <DashboardTasks tasks={allTasks} />
         </div>
       )}
 
-      {/* Ratings Grid */}
+      {/* Ratings Cards List */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <UserCheck className="h-5 w-5 mr-2 text-emerald-400" /> Lead Ratings
+        <h3 className="text-base font-bold text-[#202638] mb-5 flex items-center gap-2">
+          <UserCheck className="h-5 w-5 text-[#21C285]" /> Lead Ratings
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {ratingsCards.map(rating => (
             <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.name)}`}>
-              <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-sm hover:bg-neutral-800 transition-colors h-full flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-neutral-400">{rating.name}</span>
-                  <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]" style={{ backgroundColor: rating.color, boxShadow: `0 0 10px ${rating.color}40` }}></span>
+              <div className="neo-raised p-5 hover:shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] transition-all flex flex-col justify-between h-28">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#5C6478]">{rating.name}</span>
+                  <span className="w-2.5 h-2.5 rounded-full border border-white" style={{ backgroundColor: rating.color, boxShadow: `0 0 10px ${rating.color}40` }}></span>
                 </div>
-                <p className="text-2xl font-bold text-white">{rating.count}</p>
+                <p className="text-2xl font-black text-[#202638] font-display">{rating.count}</p>
               </div>
             </Link>
           ))}
@@ -165,18 +163,17 @@ export default async function DashboardPage() {
 
       {/* Stages Grid */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <BarChart2 className="h-5 w-5 mr-2 text-purple-400" /> Pipeline Stages
+        <h3 className="text-base font-bold text-[#202638] mb-5 flex items-center gap-2">
+          <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Stages
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
           {stagesCards.map(stage => (
             <Link key={stage.name} href={`/dashboard/leads?stage=${encodeURIComponent(stage.name)}`}>
-              <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-3 hover:border-neutral-700 transition-colors flex flex-col justify-between h-24 relative overflow-hidden group">
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{ backgroundColor: stage.color }}></div>
-                <span className="text-xs font-medium text-neutral-400 line-clamp-2 leading-tight relative z-10 group-hover:text-white transition-colors">{stage.name}</span>
-                <div className="flex items-end justify-between mt-2 relative z-10">
-                  <p className="text-xl font-bold text-white">{stage.count}</p>
-                  <span className="w-1.5 h-1.5 rounded-full mb-1.5 shadow-[0_0_6px_rgba(0,0,0,0.8)]" style={{ backgroundColor: stage.color, boxShadow: `0 0 8px ${stage.color}60` }}></span>
+              <div className="neo-raised p-4 hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all flex flex-col justify-between h-28 relative overflow-hidden group">
+                <span className="text-xs font-bold text-[#5C6478] leading-tight group-hover:text-[#202638] transition-colors">{stage.name}</span>
+                <div className="flex items-end justify-between">
+                  <p className="text-xl font-black text-[#202638] font-display">{stage.count}</p>
+                  <span className="w-2 h-2 rounded-full border border-white" style={{ backgroundColor: stage.color }}></span>
                 </div>
               </div>
             </Link>
@@ -184,9 +181,12 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Charts Panel */}
       {totalLeads > 0 && (
-        <DashboardCharts ratingsData={ratingsChartData} stagesData={stagesChartData} />
+        <div className="neo-raised p-8">
+          <h3 className="text-base font-bold text-[#202638] mb-6 font-display">Analytics Charts</h3>
+          <DashboardCharts ratingsData={ratingsChartData} stagesData={stagesChartData} />
+        </div>
       )}
     </div>
   )

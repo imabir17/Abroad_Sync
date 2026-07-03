@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
-import { Users } from 'lucide-react'
+import { Users, ExternalLink } from 'lucide-react'
 
 // SWR Client Fetcher
 const leadsFetcher = async ([, paramsString]: [string, string]) => {
@@ -71,7 +71,15 @@ const leadsFetcher = async ([, paramsString]: [string, string]) => {
   return data || []
 }
 
-export default function LeadsTableClient({ leads, isAdminOrManager, counselors }: { leads: any[], isAdminOrManager: boolean, counselors: any[] }) {
+export default function LeadsTableClient({ 
+  leads, 
+  isAdminOrManager, 
+  counselors 
+}: { 
+  leads: any[]
+  isAdminOrManager: boolean
+  counselors: any[] 
+}) {
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [transferCounselorId, setTransferCounselorId] = useState('')
   const [isTransferring, setIsTransferring] = useState(false)
@@ -107,23 +115,29 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
   const handleBulkTransfer = async () => {
     if (!transferCounselorId || selectedLeadIds.length === 0) return
     setIsTransferring(true)
-    await bulkTransferLeads(selectedLeadIds, transferCounselorId)
-    mutate()
-    setSelectedLeadIds([])
-    setTransferCounselorId('')
-    setIsTransferring(false)
+    try {
+      await bulkTransferLeads(selectedLeadIds, transferCounselorId)
+      mutate()
+      setSelectedLeadIds([])
+      setTransferCounselorId('')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsTransferring(false)
+    }
   }
 
   return (
-    <div>
+    <div className="neo-raised overflow-hidden">
+      {/* Bulk Transfer Action Bar */}
       {isAdminOrManager && selectedLeadIds.length > 0 && (
-        <div className="bg-neutral-900 border-b border-neutral-800 p-4 flex items-center justify-between">
-          <span className="text-sm font-medium text-white">{selectedLeadIds.length} leads selected</span>
-          <div className="flex items-center space-x-3">
+        <div className="bg-[#DCE3ED] px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#AEB9C9]/20 animate-in fade-in duration-300">
+          <span className="text-xs font-bold text-[#202638]">{selectedLeadIds.length} leads selected</span>
+          <div className="flex items-center gap-3">
             <select 
               value={transferCounselorId} 
               onChange={e => setTransferCounselorId(e.target.value)}
-              className="bg-neutral-950 border border-neutral-700 rounded-lg p-2 text-sm text-white"
+              className="px-3 py-2 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
             >
               <option value="">Select Counselor</option>
               {counselors.map(c => (
@@ -133,70 +147,84 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
             <button 
               onClick={handleBulkTransfer} 
               disabled={!transferCounselorId || isTransferring}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[9px_9px_20px_rgba(51,63,194,0.35)] active:translate-y-0.5 disabled:opacity-50 transition-all duration-150 flex items-center gap-1.5"
             >
-              <Users className="h-4 w-4 mr-2" />
+              <Users className="h-4 w-4" />
               Transfer
             </button>
           </div>
         </div>
       )}
 
+      {/* Leads Table Grid wrapper */}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
-            <tr className="bg-neutral-950/50 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
+            <tr className="bg-[#DCE3ED] border-b border-[#AEB9C9]/20 text-[#5C6478] text-[10px] font-bold uppercase tracking-wider">
               {isAdminOrManager && (
-                <th className="px-6 py-4 font-medium w-10">
-                  <input type="checkbox" checked={activeLeads.length > 0 && selectedLeadIds.length === activeLeads.length} onChange={toggleAll} className="rounded border-neutral-700 bg-neutral-900 text-blue-600" />
+                <th className="px-6 py-4 w-12 text-center">
+                  <input 
+                    type="checkbox" 
+                    checked={activeLeads.length > 0 && selectedLeadIds.length === activeLeads.length} 
+                    onChange={toggleAll} 
+                    className="w-4 h-4 rounded text-[#4855E4] cursor-pointer accent-[#4855E4]" 
+                  />
                 </th>
               )}
-              <th className="px-6 py-4 font-medium">Name</th>
-              <th className="px-6 py-4 font-medium">Rating</th>
-              <th className="px-6 py-4 font-medium">Stage</th>
-              <th className="px-6 py-4 font-medium">English Test</th>
-              <th className="px-6 py-4 font-medium">Counselor</th>
-              <th className="px-6 py-4 font-medium text-right">Actions</th>
+              <th className="px-6 py-4">Name</th>
+              <th className="px-6 py-4">Rating</th>
+              <th className="px-6 py-4">Stage</th>
+              <th className="px-6 py-4">English Test</th>
+              <th className="px-6 py-4">Counselor</th>
+              <th className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800">
+          <tbody className="divide-y divide-[#AEB9C9]/20">
             {activeLeads.map((lead) => (
-              <tr key={lead.id} className="hover:bg-neutral-800/50 transition-colors group">
+              <tr key={lead.id} className="hover:bg-[#DCE3ED]/20 transition-colors group">
                 {isAdminOrManager && (
-                  <td className="px-6 py-4">
-                    <input type="checkbox" checked={selectedLeadIds.includes(lead.id)} onChange={() => toggleLead(lead.id)} className="rounded border-neutral-700 bg-neutral-900 text-blue-600" />
+                  <td className="px-6 py-4 text-center">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedLeadIds.includes(lead.id)} 
+                      onChange={() => toggleLead(lead.id)} 
+                      className="w-4 h-4 rounded text-[#4855E4] cursor-pointer accent-[#4855E4]" 
+                    />
                   </td>
                 )}
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-white">{lead.fullName}</span>
-                    <span className="text-xs text-neutral-500">{lead.phone ? lead.phone : lead.email}</span>
+                    <span className="text-xs font-bold text-[#202638]">{lead.fullName}</span>
+                    <span className="text-[10px] text-[#8891A3] mt-0.5">{lead.phone ? lead.phone : lead.email}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
-                    ${lead.rating === 'Very Good' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
-                      lead.rating === 'Good' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 
-                      lead.rating === 'Moderate' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
-                      lead.rating === 'Bad' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                      'bg-neutral-500/10 text-neutral-400 border-neutral-500/20'}`}>
+                  <span className={`inline-flex items-center px-2.5 py-1.0 rounded-full text-[10px] font-bold border
+                    ${lead.rating === 'Very Good' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                      lead.rating === 'Good' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 
+                      lead.rating === 'Moderate' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
+                      lead.rating === 'Bad' ? 'bg-red-500/10 text-red-600 border-red-500/20' :
+                      'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'}`}>
                     {lead.rating || 'Unrated'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-neutral-300">
+                <td className="px-6 py-4 text-xs font-semibold text-[#5C6478]">
                   {lead.stage}
                 </td>
-                <td className="px-6 py-4 text-sm text-neutral-300">
+                <td className="px-6 py-4 text-xs font-semibold text-[#5C6478]">
                   {lead.englishTestStatus === 'Appeared' 
                     ? `${lead.englishTestType} (${lead.englishTestScore})`
                     : lead.englishTestStatus || '-'}
                 </td>
-                <td className="px-6 py-4 text-sm text-neutral-300">
+                <td className="px-6 py-4 text-xs font-semibold text-[#5C6478]">
                   {lead.assignedCounselor?.fullName || 'Unassigned'}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <Link href={`/dashboard/leads/${lead.id}`} className="text-sm text-blue-400 hover:text-blue-300 font-medium">
-                    View Profile
+                  <Link 
+                    href={`/dashboard/leads/${lead.id}`} 
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  >
+                    View Profile <ExternalLink className="w-3 h-3" />
                   </Link>
                 </td>
               </tr>
@@ -204,7 +232,7 @@ export default function LeadsTableClient({ leads, isAdminOrManager, counselors }
             
             {activeLeads.length === 0 && (
               <tr>
-                <td colSpan={isAdminOrManager ? 7 : 6} className="px-6 py-12 text-center text-neutral-500">
+                <td colSpan={isAdminOrManager ? 7 : 6} className="px-6 py-12 text-center text-xs font-bold text-[#8891A3]">
                   No leads found matching your search and filters.
                 </td>
               </tr>

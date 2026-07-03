@@ -59,22 +59,31 @@ export default function DashboardNavClient({
     },
   ]
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-neutral-900 text-neutral-100">
-      <div className="h-16 flex items-center justify-between px-6 border-b border-neutral-800 shrink-0">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-          AbroadSync
-        </h1>
+  // Render function to avoid unmounting/remounting subtree performance issues
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full bg-[#E7ECF3] text-[#202638]">
+      {/* Brand area */}
+      <div className="h-20 flex items-center justify-between px-6 border-b border-[#AEB9C9]/20 shrink-0">
+        <div className="flex items-center gap-2.5 font-bold text-base">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <path d="M2 12L22 4L14 22L11 14L2 12Z" fill="white"/>
+            </svg>
+          </div>
+          <span className="font-bold tracking-tight text-lg text-[#202638] font-display">AbroadSync</span>
+        </div>
         <button
           onClick={() => setIsMobileOpen(false)}
-          className="lg:hidden p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+          className="lg:hidden p-2 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] hover:text-[#202638] transition-all"
+          aria-label="Close sidebar menu"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-4">
-        <nav className="px-3 space-y-1">
+      {/* Nav links */}
+      <div className="flex-1 overflow-y-auto py-6 px-4">
+        <nav className="space-y-3">
           {navItems
             .filter((item) => item.show)
             .map((item) => {
@@ -85,15 +94,15 @@ export default function DashboardNavClient({
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileOpen(false)}
-                  className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors group ${
+                  className={`flex items-center px-4 py-3 text-xs font-bold rounded-xl transition-all duration-200 group ${
                     isActive
-                      ? 'text-white bg-neutral-800'
-                      : 'text-neutral-300 hover:text-white hover:bg-neutral-800'
+                      ? 'text-[#202638] bg-[#E7ECF3] shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF]'
+                      : 'text-[#5C6478] hover:text-[#202638] hover:shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF]'
                   }`}
                 >
                   <Icon
-                    className={`mr-3 h-5 w-5 transition-colors ${
-                      isActive ? 'text-blue-400' : 'text-neutral-500 group-hover:text-blue-400'
+                    className={`mr-3 h-4.5 w-4.5 transition-colors ${
+                      isActive ? 'text-[#4855E4]' : 'text-[#8891A3] group-hover:text-[#4855E4]'
                     }`}
                   />
                   {item.label}
@@ -103,24 +112,25 @@ export default function DashboardNavClient({
         </nav>
       </div>
       
-      <div className="p-4 border-t border-neutral-800 shrink-0">
-        <div className="flex items-center px-3 mb-4">
+      {/* Profile & Logout card */}
+      <div className="p-4 border-t border-[#AEB9C9]/20 shrink-0">
+        <div className="flex items-center p-3 rounded-2xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] mb-4">
           <div className="flex-shrink-0">
-            <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] shadow-sm flex items-center justify-center text-white font-bold text-sm">
               {user.fullName.charAt(0)}
             </div>
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{user.fullName}</p>
-            <p className="text-xs font-medium text-neutral-400 truncate">{user.role}</p>
+            <p className="text-xs font-bold text-[#202638] truncate">{user.fullName}</p>
+            <p className="text-[10px] font-semibold text-[#8891A3] truncate">{user.role}</p>
           </div>
         </div>
         <form action={logoutAction}>
           <button
             type="submit"
-            className="flex w-full items-center px-3 py-2 text-sm font-medium rounded-lg text-red-400 hover:text-white hover:bg-red-500/10 transition-colors"
+            className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-bold rounded-xl text-red-500 bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] active:translate-y-0.5 transition-all duration-150"
           >
-            <LogOut className="mr-3 h-5 w-5" />
+            <LogOut className="h-4.5 w-4.5" />
             Sign out
           </button>
         </form>
@@ -129,10 +139,10 @@ export default function DashboardNavClient({
   )
 
   return (
-    <div className="flex h-screen bg-neutral-950 text-neutral-100 overflow-hidden w-full">
+    <div className="flex h-screen bg-[#E7ECF3] text-[#202638] overflow-hidden w-full">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 shrink-0 border-r border-neutral-800">
-        <SidebarContent />
+      <aside className="hidden lg:block w-64 shrink-0 border-r border-[#AEB9C9]/20 bg-[#E7ECF3] shadow-[8px_0_16px_-8px_rgba(32,38,56,0.08)]">
+        {renderSidebarContent()}
       </aside>
 
       {/* Mobile Drawer Navigation (Overlay) */}
@@ -141,28 +151,29 @@ export default function DashboardNavClient({
           {/* Overlay Background */}
           <div
             onClick={() => setIsMobileOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
           />
           {/* Drawer Panel */}
-          <aside className="relative w-64 max-w-xs flex flex-col bg-neutral-900 border-r border-neutral-800 animate-in slide-in-from-left duration-200">
-            <SidebarContent />
+          <aside className="relative w-64 max-w-xs flex flex-col bg-[#E7ECF3] border-r border-[#AEB9C9]/20 shadow-2xl animate-in slide-in-from-left duration-200">
+            {renderSidebarContent()}
           </aside>
         </div>
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-neutral-950">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#E7ECF3]">
         {/* Header */}
-        <header className="h-16 border-b border-neutral-800 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-neutral-950/50 backdrop-blur-md shrink-0">
+        <header className="h-16 border-b border-[#AEB9C9]/20 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-[#E7ECF3]/80 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-850 transition-colors"
+              className="lg:hidden p-2.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] hover:text-[#202638] transition-all"
+              aria-label="Open sidebar menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
-            <h2 className="text-base sm:text-lg font-semibold text-neutral-200 truncate">
-              Welcome back, {user.fullName.split(' ')[0]}
+            <h2 className="text-sm sm:text-base font-bold text-[#5C6478] truncate">
+              Welcome back, <span className="text-[#202638]">{user.fullName.split(' ')[0]}</span>
             </h2>
           </div>
         </header>

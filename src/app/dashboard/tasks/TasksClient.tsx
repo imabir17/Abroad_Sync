@@ -51,9 +51,9 @@ export default function TasksClient({
   isAdminOrManager, 
   currentUser 
 }: { 
-  tasks: any[], 
-  counselors: any[], 
-  isAdminOrManager: boolean, 
+  tasks: any[]
+  counselors: any[]
+  isAdminOrManager: boolean
   currentUser: any 
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -87,16 +87,21 @@ export default function TasksClient({
     data.append('dueDate', formData.dueDate)
     data.append('counselorId', formData.counselorId)
 
-    await createTask(data)
-    mutate() // trigger background revalidation
-    
-    setFormData({ 
-      description: '', 
-      dueDate: '', 
-      counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
-    })
-    setIsModalOpen(false)
-    setIsSubmitting(false)
+    try {
+      await createTask(data)
+      mutate() // trigger background revalidation
+      
+      setFormData({ 
+        description: '', 
+        dueDate: '', 
+        counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
+      })
+      setIsModalOpen(false)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleStatusChange = async (taskId: string, currentStatus: string) => {
@@ -136,62 +141,69 @@ export default function TasksClient({
   const pendingTasks = activeTasks.filter(t => t.status === 'Pending')
   const completedTasks = activeTasks.filter(t => t.status === 'Completed')
 
+  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-3 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-3 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">Tasks & Reminders</h2>
-          <p className="text-neutral-400">Manage your follow-ups and assignments.</p>
+          <h2 className="text-2xl font-bold text-[#202638] font-display">Tasks & Reminders</h2>
+          <p className="text-xs text-[#5C6478]">Manage your follow-ups and student assignments.</p>
         </div>
         {isAdminOrManager && (
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-5 py-3 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[9px_9px_20px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4.5 w-4.5" />
             Assign Task
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Pending Tasks */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20">
-          <h3 className="text-lg font-semibold text-white flex items-center mb-4">
-            <Clock className="h-5 w-5 mr-2 text-amber-400" /> Pending ({pendingTasks.length})
+        <div className="neo-raised p-6">
+          <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2 mb-5">
+            <Clock className="h-4.5 w-4.5 text-[#FF7A52]" /> Pending ({pendingTasks.length})
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {pendingTasks.length === 0 ? (
-              <p className="text-neutral-500 text-sm text-center py-4">No pending tasks.</p>
+              <p className="text-[#8891A3] text-xs font-bold text-center py-6">No pending tasks.</p>
             ) : (
               pendingTasks.map(task => (
-                <div key={task.id} className="bg-neutral-950 p-4 rounded-lg border border-neutral-800 group transition-colors hover:border-neutral-700">
-                  <div className="flex items-start">
+                <div key={task.id} className="bg-[#E7ECF3] p-4 rounded-xl shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] border border-[#AEB9C9]/10 group transition-all">
+                  <div className="flex items-start gap-3">
                     <input 
                       type="checkbox" 
                       checked={false}
                       onChange={() => handleStatusChange(task.id, task.status)}
                       disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
-                      className="mt-1 h-4 w-4 rounded border-neutral-700 bg-neutral-900 text-blue-600 cursor-pointer disabled:opacity-50"
+                      className="mt-1 w-4 h-4 rounded cursor-pointer accent-[#4855E4] disabled:opacity-50 shrink-0"
                     />
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-white mb-1">{task.description}</p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-                        <span className="flex items-center text-amber-400">
-                          <Clock className="h-3 w-3 mr-1" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-[#202638] leading-normal mb-1">{task.description}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#5C6478] font-semibold">
+                        <span className="flex items-center text-[#FF7A52] gap-1 font-bold">
+                          <Clock className="h-3 w-3" />
                           {new Date(task.dueDate).toLocaleString()}
                         </span>
                         {isAdminOrManager && (
                           <span>• Assigned to: {task.counselor?.fullName}</span>
                         )}
                         {task.lead && (
-                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-blue-400 hover:underline">{task.lead.fullName}</Link></span>
+                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-[#4855E4] hover:underline font-bold">{task.lead.fullName}</Link></span>
                         )}
                       </div>
                     </div>
                     {isAdminOrManager && (
-                      <button onClick={() => handleDelete(task.id)} className="text-neutral-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                      <button 
+                        onClick={() => handleDelete(task.id)} 
+                        className="text-[#8891A3] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 p-1"
+                        aria-label="Delete pending task"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
@@ -203,42 +215,46 @@ export default function TasksClient({
         </div>
 
         {/* Completed Tasks */}
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm shadow-black/20 opacity-75">
-          <h3 className="text-lg font-semibold text-white flex items-center mb-4">
-            <CheckSquare className="h-5 w-5 mr-2 text-emerald-400" /> Completed ({completedTasks.length})
+        <div className="neo-raised p-6 opacity-85">
+          <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2 mb-5">
+            <CheckSquare className="h-4.5 w-4.5 text-[#21C285]" /> Completed ({completedTasks.length})
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {completedTasks.length === 0 ? (
-              <p className="text-neutral-500 text-sm text-center py-4">No completed tasks yet.</p>
+              <p className="text-[#8891A3] text-xs font-bold text-center py-6">No completed tasks yet.</p>
             ) : (
               completedTasks.map(task => (
-                <div key={task.id} className="bg-neutral-950 p-4 rounded-lg border border-neutral-800">
-                  <div className="flex items-start">
+                <div key={task.id} className="bg-[#E7ECF3] p-4 rounded-xl shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] border border-[#AEB9C9]/10">
+                  <div className="flex items-start gap-3">
                     <input 
                       type="checkbox" 
                       checked={true}
                       onChange={() => handleStatusChange(task.id, task.status)}
                       disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
-                      className="mt-1 h-4 w-4 rounded border-neutral-700 bg-neutral-900 text-blue-600 cursor-pointer disabled:opacity-50"
+                      className="mt-1 w-4 h-4 rounded cursor-pointer accent-[#4855E4] disabled:opacity-50 shrink-0"
                     />
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-neutral-400 line-through mb-1">{task.description}</p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
-                        <span className="flex items-center">
-                          <CheckSquare className="h-3 w-3 mr-1" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-[#8891A3] line-through leading-normal mb-1">{task.description}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#8891A3] font-semibold">
+                        <span className="flex items-center gap-1 font-bold text-[#21C285]">
+                          <CheckSquare className="h-3 w-3" />
                           Done
                         </span>
                         {isAdminOrManager && (
                           <span>• By: {task.counselor?.fullName}</span>
                         )}
                         {task.lead && (
-                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-blue-400 hover:underline">{task.lead.fullName}</Link></span>
+                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-[#4855E4] hover:underline font-bold">{task.lead.fullName}</Link></span>
                         )}
                       </div>
                     </div>
                     {isAdminOrManager && (
-                      <button onClick={() => handleDelete(task.id)} className="text-neutral-500 hover:text-red-400 ml-2">
+                      <button 
+                        onClick={() => handleDelete(task.id)} 
+                        className="text-[#8891A3] hover:text-red-500 shrink-0 p-1"
+                        aria-label="Delete completed task"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
@@ -250,37 +266,71 @@ export default function TasksClient({
         </div>
       </div>
 
+      {/* Task Creation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="neo-raised-lg max-w-md w-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-white">Assign Task</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-neutral-400 hover:text-white"><X className="h-5 w-5" /></button>
+              <h3 className="text-base font-bold text-[#202638]">Assign Task</h3>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="p-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] transition-all"
+                aria-label="Close task assignments dialog"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-1">Description</label>
-                <input required type="text" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="E.g. Prepare weekly report" />
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Description</label>
+                <input 
+                  required 
+                  type="text" 
+                  value={formData.description} 
+                  onChange={e => setFormData({...formData, description: e.target.value})} 
+                  className={inputClass}
+                  placeholder="E.g. Prepare university report" 
+                />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-1">Due Date</label>
-                <input required type="datetime-local" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Due Date</label>
+                <input 
+                  required 
+                  type="datetime-local" 
+                  value={formData.dueDate} 
+                  onChange={e => setFormData({...formData, dueDate: e.target.value})} 
+                  className={inputClass}
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-1">Assign To</label>
-                <select value={formData.counselorId} onChange={e => setFormData({...formData, counselorId: e.target.value})} className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                <label className="block text-xs font-bold text-[#5C6478] mb-2">Assign To</label>
+                <select 
+                  value={formData.counselorId} 
+                  onChange={e => setFormData({...formData, counselorId: e.target.value})} 
+                  className={selectClass}
+                >
                   {counselors.map(c => (
                     <option key={c.id} value={c.id}>{c.fullName}</option>
                   ))}
                 </select>
               </div>
               
-              <div className="pt-4 flex justify-end space-x-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors">Cancel</button>
-                <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50">
+              <div className="pt-4 flex justify-end gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="px-5 py-2.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting} 
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all"
+                >
                   {isSubmitting ? 'Saving...' : 'Assign'}
                 </button>
               </div>
