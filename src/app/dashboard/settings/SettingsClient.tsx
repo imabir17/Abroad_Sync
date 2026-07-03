@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { 
   createStageAction, 
   updateStageAction, 
@@ -26,6 +27,12 @@ interface SettingsClientProps {
 }
 
 export default function SettingsClient({ initialStages, stageLeadCounts }: SettingsClientProps) {
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const [stages, setStages] = useState<PipelineStage[]>(initialStages)
   const [newStageName, setNewStageName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
@@ -308,12 +315,12 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
         </div>
       </div>
 
-      {/* Migration Deletion Modal Prompt */}
-      {showDeleteModal && stageToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
+      {/* Migration Deletion Modal Prompt Portaled to document.body */}
+      {mounted && showDeleteModal && stageToDelete && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-[#202638]/40 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
           
-          <div className="relative z-10 w-full max-w-md bg-[#E7ECF3] shadow-[24px_24px_50px_#AEB9C9,-18px_-18px_40px_#FFFFFF] rounded-[28px] p-6 md:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative z-10 w-full max-w-md bg-[#E7ECF3] shadow-[0_12px_36px_rgba(32,38,56,0.15)] border border-[#AEB9C9]/20 rounded-2xl p-6 md:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#E5484D]/10 flex items-center justify-center text-[#E5484D]">
                 <AlertTriangle className="w-5 h-5" />
@@ -368,7 +375,8 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
