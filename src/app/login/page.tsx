@@ -390,7 +390,7 @@ export default function LoginPage() {
           </div>
 
           <p className="signup-note text-center mt-6 text-xs text-[#8891A3]">
-            New agency? <a href="mailto:sales@abroadsync.com" className="font-bold text-[#4855E4] hover:text-[#333FC2]">Request access</a>
+            New agency? <a href="mailto:abroadsync@gmail.com" className="font-bold text-[#4855E4] hover:text-[#333FC2]">Request access</a>
           </p>
         </div>
 

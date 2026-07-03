@@ -705,7 +705,7 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
             </div>
 
             <a 
-              href="mailto:sales@abroadsync.com" 
+              href="mailto:abroadsync@gmail.com" 
               className="w-full py-3.5 rounded-full bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white font-bold text-center flex items-center justify-center hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
             >
               <Mail className="w-4 h-4 mr-2" />
@@ -728,7 +728,7 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
               Set up your workspace in a few minutes and move your first lead through the pipeline today.
             </p>
             <a 
-              href="mailto:sales@abroadsync.com" 
+              href="mailto:abroadsync@gmail.com" 
               className="px-8 py-3.5 rounded-full font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] inline-flex items-center gap-2 hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150"
             >
               Start free trial <ArrowRight className="w-4 h-4" />
@@ -753,7 +753,7 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
             <a href="#product" className="hover:text-[#202638] transition-colors">Product</a>
             <a href="#pipeline" className="hover:text-[#202638] transition-colors">Pipeline</a>
             <a href="#access" className="hover:text-[#202638] transition-colors">Access</a>
-            <a href="mailto:sales@abroadsync.com" className="hover:text-[#202638] transition-colors">sales@abroadsync.com</a>
+            <a href="mailto:abroadsync@gmail.com" className="hover:text-[#202638] transition-colors">abroadsync@gmail.com</a>
           </div>
 
           <div className="text-xs text-[#8891A3]">

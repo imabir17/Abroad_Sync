@@ -98,21 +98,23 @@ export default async function LeadsPage({
   const leads = leadsData || []
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">Leads Pipeline</h2>
-          <p className="text-neutral-400">Manage and track your prospective students.</p>
+          <h2 className="text-2xl font-bold text-[#202638] font-display">Leads Pipeline</h2>
+          <p className="text-xs text-[#5C6478] mt-1">Manage and track your prospective student recruitment.</p>
         </div>
-        <Link href="/dashboard/leads/new" className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-          <Plus className="h-4 w-4 mr-2" />
+        <Link 
+          href="/dashboard/leads/new" 
+          className="flex items-center gap-1.5 px-5 py-3 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[9px_9px_20px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
+        >
+          <Plus className="h-4.5 w-4.5" />
           Add New Lead
         </Link>
       </div>
 
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-sm overflow-hidden relative">
+      <div className="space-y-6">
         <LeadFilters isAdminOrManager={true} counselors={counselors} sources={allSources} />
-        
         <LeadsTableClient leads={leads} isAdminOrManager={isAdminOrManager} counselors={counselors} />
       </div>
     </div>
