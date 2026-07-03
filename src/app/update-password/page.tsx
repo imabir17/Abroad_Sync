@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import { updatePassword } from '@/app/actions/auth'
 import { ShieldAlert, ShieldCheck, Shield, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function UpdatePasswordPage() {
   const [state, formAction, isPending] = useActionState(updatePassword, { error: '' })
@@ -103,6 +104,11 @@ export default function UpdatePasswordPage() {
       {/* Orbs */}
       <div className="orb orb1 pointer-events-none"></div>
       <div className="orb orb2 pointer-events-none"></div>
+
+      {/* Theme Toggle Button */}
+      <div className="absolute top-6 right-6 z-30">
+        <ThemeToggle />
+      </div>
 
       <div className="relative z-10 w-full max-w-[460px] rounded-[32px] bg-[#E7ECF3] shadow-[24px_24px_50px_#AEB9C9,-18px_-18px_40px_#FFFFFF] p-8 md:p-10 animate-in fade-in slide-in-from-bottom-6 duration-500">
         

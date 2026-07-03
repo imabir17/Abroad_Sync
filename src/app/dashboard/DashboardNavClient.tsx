@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import ThemeToggle from '@/components/ThemeToggle'
 
 interface User {
   fullName: string
@@ -175,6 +176,9 @@ export default function DashboardNavClient({
             <h2 className="text-sm sm:text-base font-bold text-[#5C6478] truncate">
               Welcome back, <span className="text-[#202638]">{user.fullName.split(' ')[0]}</span>
             </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
           </div>
         </header>
 

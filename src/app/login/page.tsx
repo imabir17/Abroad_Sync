@@ -4,6 +4,7 @@ import { useState, useRef, useActionState } from 'react'
 import { login } from '@/app/actions/auth'
 import Link from 'next/link'
 import { Mail, Lock, Eye, EyeOff, Check, X, AlertCircle } from 'lucide-react'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function LoginPage() {
   // Binds the login action with React 19 useActionState
@@ -192,6 +193,11 @@ export default function LoginPage() {
       {/* Background drifting orbs */}
       <div className="orb orb1 pointer-events-none"></div>
       <div className="orb orb2 pointer-events-none"></div>
+
+      {/* Theme Toggle Button */}
+      <div className="absolute top-6 right-6 z-30">
+        <ThemeToggle />
+      </div>
 
       {/* Main container shell */}
       <div className="relative z-10 w-full max-w-[920px] grid grid-cols-1 md:grid-cols-2 rounded-[32px] bg-[#E7ECF3] shadow-[24px_24px_60px_#AEB9C9,-18px_-18px_50px_#FFFFFF] overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-500">

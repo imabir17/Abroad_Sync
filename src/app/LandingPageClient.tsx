@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
 import { 
   GraduationCap, 
   Globe, 
@@ -197,6 +198,7 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
           </div>
 
           <div className="hidden md:flex gap-4 items-center">
+            <ThemeToggle />
             {isLoggedIn ? (
               <Link href="/dashboard" className="px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150">
                 Dashboard
@@ -213,14 +215,17 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2.5 rounded-xl bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#202638] transition-all duration-200"
-            aria-label="Toggle navigation menu"
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile Menu Actions */}
+          <div className="flex md:hidden items-center gap-3">
+            <ThemeToggle />
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2.5 rounded-xl bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#202638] transition-all duration-200"
+              aria-label="Toggle navigation menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
