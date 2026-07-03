@@ -18,8 +18,11 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
   const [englishTestStatus, setEnglishTestStatus] = useState<string>('')
   
   // Duplicate Check State
+  // Debounced duplicate check input state
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [countryCode, setCountryCode] = useState('+880')
+  const [localPhone, setLocalPhone] = useState('')
+  const combinedPhone = `${countryCode}${localPhone.replace(/^0/, '')}`
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null)
   
   // Rating State
@@ -28,8 +31,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
   // Debounced duplicate check
   useEffect(() => {
     const checkDuplicate = async () => {
-      if (email.length > 3 || phone.length > 5) {
-        const result = await checkLeadDuplicate(email, phone)
+      if (email.length > 3 || localPhone.length > 4) {
+        const result = await checkLeadDuplicate(email, combinedPhone)
         if (result.duplicate) {
           setDuplicateWarning(result.message || 'Duplicate found')
         } else {
@@ -42,12 +45,12 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
     
     const timeoutId = setTimeout(checkDuplicate, 500)
     return () => clearTimeout(timeoutId)
-  }, [email, phone])
+  }, [email, combinedPhone, localPhone])
 
   const [state, formAction, isPending] = useActionState(createLead, { error: '' })
 
-  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-4 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-4 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-4 text-base font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-base font-bold text-[#5C6478] rounded-xl py-2.5 px-4 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
 
   return (
     <form action={formAction} className="space-y-8">
@@ -96,16 +99,40 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             />
           </div>
           <div>
-            <label htmlFor="phone" className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Phone Number</label>
-            <input 
-              type="tel" 
-              name="phone" 
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className={inputClass}
-              placeholder="+1 (555) 000-0000" 
-            />
+            <label htmlFor="phone" className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Phone Number *</label>
+            <div className="flex gap-2.5">
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="w-[110px] bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-3 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer shrink-0"
+              >
+                <option value="+880">BD (+880)</option>
+                <option value="+91">IN (+91)</option>
+                <option value="+1">US/CA (+1)</option>
+                <option value="+44">UK (+44)</option>
+                <option value="+61">AU (+61)</option>
+                <option value="+92">PK (+92)</option>
+                <option value="+977">NP (+977)</option>
+                <option value="+94">LK (+94)</option>
+                <option value="+971">AE (+971)</option>
+                <option value="+60">MY (+60)</option>
+                <option value="+39">IT (+39)</option>
+                <option value="+49">DE (+49)</option>
+                <option value="+33">FR (+33)</option>
+              </select>
+
+              <input 
+                required
+                type="tel" 
+                id="localPhone"
+                value={localPhone}
+                onChange={(e) => setLocalPhone(e.target.value)}
+                className={`${inputClass} flex-1`}
+                placeholder="e.g. 1966427333" 
+              />
+            </div>
+            
+            <input type="hidden" name="phone" value={combinedPhone} />
           </div>
         </div>
       </div>

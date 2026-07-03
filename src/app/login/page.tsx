@@ -297,7 +297,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-none bg-transparent outline-none w-full py-3.5 text-xs text-[#202638]"
+                  className="border-none bg-transparent outline-none w-full py-3.5 text-base text-[#202638]"
                 />
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-none bg-transparent outline-none w-full py-3.5 text-xs text-[#202638]"
+                  className="border-none bg-transparent outline-none w-full py-3.5 text-base text-[#202638]"
                 />
                 <button 
                   type="button" 

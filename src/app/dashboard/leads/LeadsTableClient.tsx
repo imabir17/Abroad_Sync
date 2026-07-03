@@ -91,8 +91,11 @@ export default function LeadsTableClient({
   }
 
   const getWhatsAppLink = (phone: string) => {
-    const cleanNumber = phone.replace(/\D/g, '')
-    return `https://wa.me/${cleanNumber}`
+    let clean = phone.replace(/\D/g, '')
+    if (clean.startsWith('01') && clean.length === 11) {
+      clean = '880' + clean.slice(1)
+    }
+    return `https://wa.me/${clean}`
   }
 
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
