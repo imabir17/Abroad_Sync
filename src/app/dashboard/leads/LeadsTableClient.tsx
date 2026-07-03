@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
-import { Users, ExternalLink } from 'lucide-react'
+import { Users, ExternalLink, Phone, Mail } from 'lucide-react'
 import { StarRating } from '@/components/StarRating'
 
 // SWR Client Fetcher
@@ -81,6 +81,15 @@ export default function LeadsTableClient({
   isAdminOrManager: boolean
   counselors: any[] 
 }) {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  }
+
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [transferCounselorId, setTransferCounselorId] = useState('')
   const [isTransferring, setIsTransferring] = useState(false)
@@ -158,7 +167,7 @@ export default function LeadsTableClient({
       )}
 
       {/* Leads Table Grid wrapper */}
-      <div className="overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-[#DCE3ED] border-b border-[#AEB9C9]/20 text-[#5C6478] text-[10px] font-bold uppercase tracking-wider">
@@ -233,6 +242,86 @@ export default function LeadsTableClient({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Leads Card List */}
+      <div className="block md:hidden space-y-4 p-2">
+        {activeLeads.map((lead, i) => {
+          const counselorName = lead.assignedCounselor?.fullName
+          return (
+            <div 
+              key={lead.id} 
+              className="bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-2xl p-4 space-y-3.5 border border-[#AEB9C9]/10"
+            >
+              {/* Header: Name, Country, Avatar */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">
+                    {getInitials(lead.fullName)}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-[#202638] truncate">{lead.fullName}</h4>
+                    <p className="text-[10px] text-[#8891A3] truncate">
+                      {lead.preferredCountry ? `Pref: ${lead.preferredCountry}` : 'No preferred country'}
+                    </p>
+                  </div>
+                </div>
+                <div className="shrink-0 flex items-center gap-2">
+                  <span className="text-[9px] font-bold bg-[#4855E4]/10 text-[#4855E4] px-2.5 py-0.5 rounded-full">
+                    {lead.stage}
+                  </span>
+                </div>
+              </div>
+
+              {/* Stats: Stars & Counselor */}
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-[#AEB9C9]/10">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] text-[#8891A3] font-semibold">Lead Rating</span>
+                  <StarRating rating={lead.rating} editable={false} size={11} />
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-[#8891A3] block font-semibold">Counselor</span>
+                  <span className="text-[10.5px] font-bold text-[#5C6478]">
+                    {counselorName || 'Unassigned'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Toolbar */}
+              <div className="flex items-center gap-3 pt-2">
+                {lead.phone && (
+                  <a 
+                    href={`tel:${lead.phone}`}
+                    className="flex-1 h-10 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-emerald-600 rounded-xl hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all flex items-center justify-center gap-2 text-xs font-bold"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Call</span>
+                  </a>
+                )}
+                {lead.email && (
+                  <a 
+                    href={`mailto:${lead.email}`}
+                    className="flex-1 h-10 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[#4855E4] rounded-xl hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all flex items-center justify-center gap-2 text-xs font-bold"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Email</span>
+                  </a>
+                )}
+                <Link 
+                  href={`/dashboard/leads/${lead.id}`}
+                  className="flex-1 h-10 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white rounded-xl shadow-md active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5 text-xs font-bold"
+                >
+                  <span>View</span>
+                </Link>
+              </div>
+            </div>
+          )
+        })}
+        {activeLeads.length === 0 && (
+          <div className="neo-raised p-8 text-center text-xs font-bold text-[#8891A3]">
+            No leads found matching your search.
+          </div>
+        )}
       </div>
     </div>
   )

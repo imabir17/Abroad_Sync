@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateLeadStageAction } from '@/app/actions/leads'
 import { StarRating } from '@/components/StarRating'
 import { PipelineStage } from '@/app/actions/stages'
@@ -33,6 +33,13 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
+  const [activeStageName, setActiveStageName] = useState<string>('')
+
+  useEffect(() => {
+    if (stages.length > 0 && !activeStageName) {
+      setActiveStageName(stages[0].name)
+    }
+  }, [stages, activeStageName])
 
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
     e.dataTransfer.setData('text/plain', leadId)
@@ -94,24 +101,50 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
   }
 
   return (
-    <div className="w-full overflow-x-auto flex gap-4 pb-6 select-none items-start">
-      {stages.map((stage, sIdx) => {
-        const stageLeads = leads.filter(l => l.stage === stage.name)
-        const isDraggingOverThis = dragOverStage === stage.name
-        const dotColor = getStageColor(sIdx)
+    <div className="flex-1 flex flex-col gap-4 min-h-0 w-full">
+      {/* Mobile stage selector tabs */}
+      <div className="flex lg:hidden overflow-x-auto gap-2.5 pb-2.5 px-0.5 scrollbar-none shrink-0 w-full">
+        {stages.map((stage) => {
+          const count = leads.filter(l => l.stage === stage.name).length
+          const isActive = activeStageName === stage.name
+          return (
+            <button
+              key={stage.id}
+              type="button"
+              onClick={() => setActiveStageName(stage.name)}
+              className={`px-4 py-2 text-[11px] font-bold rounded-xl whitespace-nowrap transition-all duration-150 shrink-0 border-none ${
+                isActive
+                  ? 'text-[#202638] bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF]'
+                  : 'text-[#5C6478] bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:text-[#202638]'
+              }`}
+            >
+              {stage.name} ({count})
+            </button>
+          )
+        })}
+      </div>
 
-        return (
-          <div
-            key={stage.id}
-            onDragOver={(e) => handleDragOver(e, stage.name)}
-            onDragLeave={() => setDragOverStage(null)}
-            onDrop={(e) => handleDrop(e, stage.name)}
-            className={`flex-1 min-w-[155px] max-w-[210px] bg-[#E7ECF3] rounded-xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-2 ${
-              isDraggingOverThis
-                ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF]'
-                : 'border-transparent shadow-[4px_4px_10px_#AEB9C9,-4px_-4px_10px_#FFFFFF]'
-            }`}
-          >
+      <div className="w-full overflow-x-auto flex gap-4 pb-6 select-none items-start flex-1 min-h-0">
+        {stages.map((stage, sIdx) => {
+          const stageLeads = leads.filter(l => l.stage === stage.name)
+          const isDraggingOverThis = dragOverStage === stage.name
+          const dotColor = getStageColor(sIdx)
+          const isMobileHidden = activeStageName && activeStageName !== stage.name
+
+          return (
+            <div
+              key={stage.id}
+              onDragOver={(e) => handleDragOver(e, stage.name)}
+              onDragLeave={() => setDragOverStage(null)}
+              onDrop={(e) => handleDrop(e, stage.name)}
+              className={`min-w-[155px] max-w-[210px] bg-[#E7ECF3] rounded-xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-2 ${
+                isMobileHidden ? 'hidden lg:flex' : 'flex'
+              } ${
+                isDraggingOverThis
+                  ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF]'
+                  : 'border-transparent shadow-[4px_4px_10px_#AEB9C9,-4px_-4px_10px_#FFFFFF]'
+              }`}
+            >
             {/* Column Header */}
             <div className="p-2.5 flex items-center justify-between border-b border-[#AEB9C9]/20 shrink-0">
               <div className="flex items-center gap-1.5 min-w-0">
@@ -208,6 +241,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
           </div>
         )
       })}
+      </div>
     </div>
   )
 }
