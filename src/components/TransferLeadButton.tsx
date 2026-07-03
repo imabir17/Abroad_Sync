@@ -32,7 +32,7 @@ export default function TransferLeadButton({ leadId, currentCounselorId, counsel
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-4 z-50">
+        <div className="absolute left-0 md:left-auto md:right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-4 z-50">
           <h4 className="text-sm font-medium text-white mb-3">Transfer to Counselor</h4>
           <select 
             value={selectedId}
