@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useSWR from 'swr'
+import { createPortal } from 'react-dom'
 import { createClient } from '@/utils/supabase/client'
 import { createTask, updateTaskStatus, deleteTask } from '@/app/actions/tasks'
-import { CheckSquare, Clock, Plus, Trash2, X } from 'lucide-react'
+import { CheckSquare, Clock, Plus, Trash2, X, AlertTriangle, Calendar, User, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 // SWR Tasks Fetcher
@@ -14,7 +15,6 @@ const tasksFetcher = async () => {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return []
 
-  // Fetch current user details to inspect role & companyId
   const { data: user } = await supabase
     .from('User')
     .select('id, role, companyId')
@@ -28,7 +28,6 @@ const tasksFetcher = async () => {
   let query = supabase
     .from('Task')
     .select('*, counselor:User!inner(fullName, role, companyId), lead:Lead(id, fullName)')
-    .order('status', { ascending: false })
     .order('dueDate', { ascending: true })
 
   if (!isAdminOrManager) {
@@ -56,6 +55,7 @@ export default function TasksClient({
   isAdminOrManager: boolean
   currentUser: any 
 }) {
+  const [mounted, setMounted] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({ 
     description: '', 
@@ -63,8 +63,13 @@ export default function TasksClient({
     counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
-  // Integrate SWR Caching
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // SWR Caching
   const { data: clientTasks, mutate } = useSWR(
     'tasks',
     tasksFetcher,
@@ -81,6 +86,7 @@ export default function TasksClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setErrorMsg('')
     
     const data = new FormData()
     data.append('description', formData.description)
@@ -88,17 +94,20 @@ export default function TasksClient({
     data.append('counselorId', formData.counselorId)
 
     try {
-      await createTask(data)
-      mutate() // trigger background revalidation
-      
-      setFormData({ 
-        description: '', 
-        dueDate: '', 
-        counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
-      })
-      setIsModalOpen(false)
-    } catch (err) {
-      console.error(err)
+      const res = await createTask(data)
+      if (res && 'error' in res) {
+        setErrorMsg(res.error || 'Failed to create task')
+      } else {
+        mutate() // trigger revalidation
+        setFormData({ 
+          description: '', 
+          dueDate: '', 
+          counselorId: counselors.length > 0 ? counselors[0].id : currentUser.id 
+        })
+        setIsModalOpen(false)
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to create task')
     } finally {
       setIsSubmitting(false)
     }
@@ -117,7 +126,7 @@ export default function TasksClient({
       await updateTaskStatus(taskId, newStatus)
       mutate()
     } catch (err) {
-      mutate() // rollback on error
+      mutate() // rollback
     }
   }
 
@@ -138,164 +147,240 @@ export default function TasksClient({
     }
   }
 
-  const pendingTasks = activeTasks.filter(t => t.status === 'Pending')
-  const completedTasks = activeTasks.filter(t => t.status === 'Completed')
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  }
 
-  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-3 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-3 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+  // Group tasks by urgency/date
+  const now = new Date()
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)
+
+  const overdueTasks: any[] = []
+  const todayTasks: any[] = []
+  const upcomingTasks: any[] = []
+  const completedTasks: any[] = []
+
+  activeTasks.forEach(task => {
+    if (task.status === 'Completed') {
+      completedTasks.push(task)
+      return
+    }
+
+    const due = new Date(task.dueDate)
+    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate())
+
+    if (dueDay < todayStart) {
+      overdueTasks.push(task)
+    } else if (dueDay.getTime() === todayStart.getTime()) {
+      todayTasks.push(task)
+    } else {
+      upcomingTasks.push(task)
+    }
+  })
+
+  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-4 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2.5 px-4 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+
+  const renderTaskRow = (task: any) => {
+    const isCompleted = task.status === 'Completed'
+    const due = new Date(task.dueDate)
+    const formattedTime = due.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    const counselorName = task.counselor?.fullName
+
+    return (
+      <div 
+        key={task.id} 
+        className={`flex items-center gap-4 p-4 mb-3.5 bg-[#E7ECF3] rounded-2xl shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] border border-[#AEB9C9]/10 group transition-all duration-300 ${
+          isCompleted ? 'opacity-60' : ''
+        }`}
+      >
+        {/* check-circle checkbox */}
+        <button
+          type="button"
+          onClick={() => handleStatusChange(task.id, task.status)}
+          disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
+          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer border-none transition-all duration-200 ${
+            isCompleted 
+              ? 'bg-gradient-to-br from-[#1FAE73] to-[#158a5c] shadow-[2px_2px_6px_rgba(21,138,92,0.4)] text-white'
+              : 'bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] text-transparent hover:text-[#8891A3]'
+          }`}
+          aria-label={isCompleted ? "Mark task as pending" : "Mark task as completed"}
+        >
+          <CheckSquare className="w-3.5 h-3.5 stroke-[3]" />
+        </button>
+
+        {/* Task Details */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-xs font-bold text-[#202638] mb-1 leading-normal ${isCompleted ? 'line-through text-[#8891A3]' : ''}`}>
+            {task.description}
+          </p>
+          <div className="flex flex-wrap items-center gap-2.5 text-[10px] text-[#5C6478] font-semibold">
+            {task.lead && (
+              <span className="bg-[#4855E4]/8 text-[#333FC2] px-2.5 py-0.5 rounded-full font-bold">
+                <Link href={`/dashboard/leads/${task.lead.id}`} className="hover:underline">
+                  {task.lead.fullName}
+                </Link>
+              </span>
+            )}
+            <span className="flex items-center gap-1 text-[#8891A3]">
+              <Clock className="w-3.5 h-3.5" />
+              {formattedTime}
+            </span>
+          </div>
+        </div>
+
+        {/* Counselor Badge */}
+        {counselorName && (
+          <div 
+            className="w-6.5 h-6.5 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white flex items-center justify-center text-[8.5px] font-bold shadow-sm shrink-0"
+            title={`Assigned to ${counselorName}`}
+          >
+            {getInitials(counselorName)}
+          </div>
+        )}
+
+        {/* Action Trash button */}
+        {isAdminOrManager && (
+          <button
+            onClick={() => handleDelete(task.id)}
+            className="text-[#8891A3] hover:text-[#E5484D] transition-colors shrink-0 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 focus:opacity-100"
+            aria-label="Delete task"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      
+      {/* Header controls */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-[#202638] font-display">Tasks & Reminders</h2>
-          <p className="text-xs text-[#5C6478]">Manage your follow-ups and student assignments.</p>
+          <h2 className="text-2xl font-bold text-[#202638] font-display">Tasks</h2>
+          <p className="text-xs text-[#5C6478]">Your team's follow-up agenda, organized by urgency.</p>
         </div>
         {isAdminOrManager && (
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setErrorMsg('')
+              setIsModalOpen(true)
+            }}
             className="flex items-center gap-1.5 px-5 py-3 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[9px_9px_20px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
           >
             <Plus className="h-4.5 w-4.5" />
-            Assign Task
+            New Task
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Pending Tasks */}
-        <div className="neo-raised p-6">
-          <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2 mb-5">
-            <Clock className="h-4.5 w-4.5 text-[#FF7A52]" /> Pending ({pendingTasks.length})
-          </h3>
-          
-          <div className="space-y-4">
-            {pendingTasks.length === 0 ? (
-              <p className="text-[#8891A3] text-xs font-bold text-center py-6">No pending tasks.</p>
-            ) : (
-              pendingTasks.map(task => (
-                <div key={task.id} className="bg-[#E7ECF3] p-4 rounded-xl shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] border border-[#AEB9C9]/10 group transition-all">
-                  <div className="flex items-start gap-3">
-                    <input 
-                      type="checkbox" 
-                      checked={false}
-                      onChange={() => handleStatusChange(task.id, task.status)}
-                      disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
-                      className="mt-1 w-4 h-4 rounded cursor-pointer accent-[#4855E4] disabled:opacity-50 shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#202638] leading-normal mb-1">{task.description}</p>
-                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#5C6478] font-semibold">
-                        <span className="flex items-center text-[#FF7A52] gap-1 font-bold">
-                          <Clock className="h-3 w-3" />
-                          {new Date(task.dueDate).toLocaleString()}
-                        </span>
-                        {isAdminOrManager && (
-                          <span>• Assigned to: {task.counselor?.fullName}</span>
-                        )}
-                        {task.lead && (
-                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-[#4855E4] hover:underline font-bold">{task.lead.fullName}</Link></span>
-                        )}
-                      </div>
-                    </div>
-                    {isAdminOrManager && (
-                      <button 
-                        onClick={() => handleDelete(task.id)} 
-                        className="text-[#8891A3] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 p-1"
-                        aria-label="Delete pending task"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Main groupings */}
+      <div className="space-y-8">
+        
+        {/* 1. Overdue Section */}
+        {overdueTasks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#E5484D] px-1">
+              <span className="w-2 h-2 rounded-full bg-[#E5484D]"></span>
+              <span>Overdue</span>
+              <span className="text-[10px] bg-[#E5484D]/10 px-2 py-0.5 rounded-full">{overdueTasks.length}</span>
+            </div>
+            <div>{overdueTasks.map(renderTaskRow)}</div>
           </div>
+        )}
+
+        {/* 2. Today Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#4855E4] px-1">
+            <span className="w-2 h-2 rounded-full bg-[#4855E4]"></span>
+            <span>Today</span>
+            <span className="text-[10px] bg-[#4855E4]/10 px-2 py-0.5 rounded-full">{todayTasks.length}</span>
+          </div>
+          {todayTasks.length === 0 ? (
+            <div className="neo-raised p-6 text-center text-xs font-bold text-[#8891A3]">
+              No tasks scheduled for today.
+            </div>
+          ) : (
+            <div>{todayTasks.map(renderTaskRow)}</div>
+          )}
         </div>
 
-        {/* Completed Tasks */}
-        <div className="neo-raised p-6 opacity-85">
-          <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2 mb-5">
-            <CheckSquare className="h-4.5 w-4.5 text-[#21C285]" /> Completed ({completedTasks.length})
-          </h3>
-          
-          <div className="space-y-4">
-            {completedTasks.length === 0 ? (
-              <p className="text-[#8891A3] text-xs font-bold text-center py-6">No completed tasks yet.</p>
-            ) : (
-              completedTasks.map(task => (
-                <div key={task.id} className="bg-[#E7ECF3] p-4 rounded-xl shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] border border-[#AEB9C9]/10">
-                  <div className="flex items-start gap-3">
-                    <input 
-                      type="checkbox" 
-                      checked={true}
-                      onChange={() => handleStatusChange(task.id, task.status)}
-                      disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
-                      className="mt-1 w-4 h-4 rounded cursor-pointer accent-[#4855E4] disabled:opacity-50 shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#8891A3] line-through leading-normal mb-1">{task.description}</p>
-                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#8891A3] font-semibold">
-                        <span className="flex items-center gap-1 font-bold text-[#21C285]">
-                          <CheckSquare className="h-3 w-3" />
-                          Done
-                        </span>
-                        {isAdminOrManager && (
-                          <span>• By: {task.counselor?.fullName}</span>
-                        )}
-                        {task.lead && (
-                          <span>• Lead: <Link href={`/dashboard/leads/${task.lead.id}`} className="text-[#4855E4] hover:underline font-bold">{task.lead.fullName}</Link></span>
-                        )}
-                      </div>
-                    </div>
-                    {isAdminOrManager && (
-                      <button 
-                        onClick={() => handleDelete(task.id)} 
-                        className="text-[#8891A3] hover:text-red-500 shrink-0 p-1"
-                        aria-label="Delete completed task"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
+        {/* 3. Upcoming Section */}
+        {upcomingTasks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#12A8B5] px-1">
+              <span className="w-2 h-2 rounded-full bg-[#12A8B5]"></span>
+              <span>Upcoming</span>
+              <span className="text-[10px] bg-[#12A8B5]/10 px-2 py-0.5 rounded-full">{upcomingTasks.length}</span>
+            </div>
+            <div>{upcomingTasks.map(renderTaskRow)}</div>
           </div>
-        </div>
+        )}
+
+        {/* 4. Completed Section */}
+        {completedTasks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#1FAE73] px-1">
+              <span className="w-2 h-2 rounded-full bg-[#1FAE73]"></span>
+              <span>Completed</span>
+              <span className="text-[10px] bg-[#1FAE73]/10 px-2 py-0.5 rounded-full">{completedTasks.length}</span>
+            </div>
+            <div>{completedTasks.map(renderTaskRow)}</div>
+          </div>
+        )}
+
+        {activeTasks.length === 0 && (
+          <div className="neo-raised p-12 text-center text-xs font-bold text-[#8891A3]">
+            No tasks found. Create a task to get started!
+          </div>
+        )}
       </div>
 
-      {/* Task Creation Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="neo-raised-lg max-w-md w-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-base font-bold text-[#202638]">Assign Task</h3>
+      {/* Creation Modal (Portaled) */}
+      {mounted && isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-[#202638]/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="relative z-10 max-w-md w-full bg-[#E7ECF3] shadow-[0_12px_36px_rgba(32,38,56,0.15)] border border-[#AEB9C9]/20 rounded-2xl p-6 md:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center">
+              <h3 className="text-base font-bold text-[#202638] font-display">Assign Task</h3>
               <button 
                 onClick={() => setIsModalOpen(false)} 
                 className="p-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#5C6478] transition-all"
-                aria-label="Close task assignments dialog"
+                aria-label="Close task creation panel"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             
+            {errorMsg && (
+              <div className="flex items-center gap-2 text-xs text-[#E5484D] bg-[#E5484D]/8 p-4 rounded-xl border border-[#E5484D]/10">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-bold text-[#5C6478] mb-2">Description</label>
+                <label className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Description</label>
                 <input 
                   required 
                   type="text" 
                   value={formData.description} 
                   onChange={e => setFormData({...formData, description: e.target.value})} 
                   className={inputClass}
-                  placeholder="E.g. Prepare university report" 
+                  placeholder="e.g. Call Nusrat regarding visa documents" 
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-[#5C6478] mb-2">Due Date</label>
+                <label className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Due Date</label>
                 <input 
                   required 
                   type="datetime-local" 
@@ -306,7 +391,7 @@ export default function TasksClient({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#5C6478] mb-2">Assign To</label>
+                <label className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Assign To</label>
                 <select 
                   value={formData.counselorId} 
                   onChange={e => setFormData({...formData, counselorId: e.target.value})} 
@@ -318,7 +403,7 @@ export default function TasksClient({
                 </select>
               </div>
               
-              <div className="pt-4 flex justify-end gap-3">
+              <div className="pt-2 flex justify-end gap-3">
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)} 
@@ -329,14 +414,16 @@ export default function TasksClient({
                 <button 
                   type="submit" 
                   disabled={isSubmitting} 
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all"
+                  className="px-5 py-2.5 bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg disabled:opacity-50 transition-all flex items-center gap-1.5"
                 >
-                  {isSubmitting ? 'Saving...' : 'Assign'}
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Assign</span>
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
