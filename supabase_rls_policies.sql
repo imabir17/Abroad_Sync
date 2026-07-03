@@ -75,8 +75,7 @@ CREATE POLICY "Users can view team members in their company" ON "User"
 CREATE POLICY "Super Admins can manage team members" ON "User"
     FOR ALL TO authenticated
     USING (
-        id = auth.uid()::text OR 
-        ("companyId" = get_my_company_id() AND is_super_admin())
+        "companyId" = get_my_company_id() AND is_super_admin()
     );
 
 -- 7. "Lead" table policies

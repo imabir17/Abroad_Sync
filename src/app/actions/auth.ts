@@ -150,19 +150,7 @@ export async function updatePassword(prevState: any, formData: FormData) {
   if (error) {
     return { error: error.message }
   }
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (user && user.email) {
-    const supabaseAdmin = createSupabaseAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-    
-    await supabaseAdmin
-      .from('User')
-      .update({ password: password })
-      .eq('email', user.email)
-  }
+
 
   // Clear active session to enforce a clean re-login with the new password
   await supabase.auth.signOut()

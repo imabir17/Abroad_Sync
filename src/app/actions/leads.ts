@@ -214,9 +214,47 @@ export async function updateLeadDetails(leadId: string, data: any) {
     throw new Error('Unauthorized')
   }
 
+  // Whitelist editable fields to prevent mass assignment vulnerability
+  const ALLOWED_FIELDS = [
+    'fullName',
+    'phone',
+    'email',
+    'lastStudyLevel',
+    'preferredStudyLevel',
+    'preferredCountry',
+    'preferredCourse',
+    'preferredIntake',
+    'englishTestStatus',
+    'englishTestType',
+    'englishTestScore',
+    'sscGroup',
+    'sscYear',
+    'sscResult',
+    'hscGroup',
+    'hscYear',
+    'hscResult',
+    'bachelorsMajor',
+    'bachelorsYear',
+    'bachelorsCgpa',
+    'mastersMajor',
+    'mastersYear',
+    'mastersCgpa',
+    'workExperience',
+    'source',
+    'budget',
+    'initialNote'
+  ]
+
+  const sanitizedData: Record<string, any> = {}
+  for (const key of ALLOWED_FIELDS) {
+    if (data && key in data) {
+      sanitizedData[key] = data[key]
+    }
+  }
+
   const { error: updateError } = await supabase
     .from('Lead')
-    .update(data)
+    .update(sanitizedData)
     .eq('id', leadId)
 
   if (updateError) throw new Error('Failed to update details: ' + updateError.message)
