@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -43,6 +43,12 @@ export default function DashboardNavClient({
       href: '/dashboard/tasks',
       label: 'Tasks',
       icon: CheckSquare,
+      show: true,
+    },
+    {
+      href: '/dashboard/pipeline',
+      label: 'Pipeline',
+      icon: Kanban,
       show: true,
     },
     {

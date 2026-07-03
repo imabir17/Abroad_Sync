@@ -1,0 +1,209 @@
+'use client'
+
+import { useState } from 'react'
+import { updateLeadStageAction } from '@/app/actions/leads'
+import { StarRating } from '@/components/StarRating'
+import { PipelineStage } from '@/app/actions/stages'
+import Link from 'next/link'
+import { ExternalLink, User } from 'lucide-react'
+
+// Pre-defined column colors for stages
+const STAGE_DOT_COLORS = [
+  '#4855E4', '#12A8B5', '#8B5CF6', '#1FAE73', '#FF7A52', '#E5484D', '#8B5CF6', '#EAB308'
+]
+
+interface Lead {
+  id: string
+  fullName: string
+  preferredCountry: string | null
+  stage: string
+  rating: string | null
+  createdAt: string
+  updatedAt: string
+  assignedCounselorId: string | null
+  assignedCounselor?: { fullName: string } | { fullName: string }[] | null
+}
+
+interface PipelineBoardClientProps {
+  initialLeads: Lead[]
+  stages: PipelineStage[]
+}
+
+export default function PipelineBoardClient({ initialLeads, stages }: PipelineBoardClientProps) {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads)
+  const [draggedId, setDraggedId] = useState<string | null>(null)
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null)
+
+  const handleDragStart = (e: React.DragEvent, leadId: string) => {
+    e.dataTransfer.setData('text/plain', leadId)
+    setDraggedId(leadId)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedId(null)
+    setDragOverStage(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent, stageName: string) => {
+    e.preventDefault()
+    if (dragOverStage !== stageName) {
+      setDragOverStage(stageName)
+    }
+  }
+
+  const handleDrop = async (e: React.DragEvent, targetStageName: string) => {
+    e.preventDefault()
+    const leadId = e.dataTransfer.getData('text/plain')
+    setDragOverStage(null)
+    setDraggedId(null)
+
+    if (!leadId) return
+
+    const leadToMove = leads.find(l => l.id === leadId)
+    if (!leadToMove) return
+
+    const oldStage = leadToMove.stage
+    if (oldStage === targetStageName) return
+
+    // Optimistic Update
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: targetStageName, updatedAt: new Date().toISOString() } : l))
+
+    try {
+      const result = await updateLeadStageAction(leadId, targetStageName)
+      if (!result.success) {
+        throw new Error('Failed to update stage')
+      }
+    } catch (err) {
+      console.error('Error shifting lead stage:', err)
+      // Rollback on failure
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: oldStage } : l))
+    }
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  }
+
+  const getStageColor = (index: number) => {
+    return STAGE_DOT_COLORS[index % STAGE_DOT_COLORS.length]
+  }
+
+  return (
+    <div className="flex-1 overflow-x-auto flex gap-6 pb-6 select-none items-start">
+      {stages.map((stage, sIdx) => {
+        const stageLeads = leads.filter(l => l.stage === stage.name)
+        const isDraggingOverThis = dragOverStage === stage.name
+        const dotColor = getStageColor(sIdx)
+
+        return (
+          <div
+            key={stage.id}
+            onDragOver={(e) => handleDragOver(e, stage.name)}
+            onDragLeave={() => setDragOverStage(null)}
+            onDrop={(e) => handleDrop(e, stage.name)}
+            className={`w-72 bg-[#E7ECF3] rounded-2xl flex flex-col max-h-[calc(100vh-230px)] shrink-0 transition-all duration-200 border-2 ${
+              isDraggingOverThis
+                ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF]'
+                : 'border-transparent shadow-[4px_4px_10px_#AEB9C9,-4px_-4px_10px_#FFFFFF]'
+            }`}
+          >
+            {/* Column Header */}
+            <div className="p-4 flex items-center justify-between border-b border-[#AEB9C9]/20 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: dotColor }}></span>
+                <span className="text-xs font-bold text-[#202638] font-display truncate max-w-[150px]">{stage.name}</span>
+              </div>
+              <span className="text-[10px] font-bold text-[#8891A3] bg-[#DCE3ED] px-2 py-0.5 rounded-full shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF]">
+                {stageLeads.length}
+              </span>
+            </div>
+
+            {/* Column Body Cards List */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3.5 min-h-[100px] scrollbar-thin">
+              {stageLeads.map((lead) => {
+                const days = Math.max(0, Math.floor((Date.now() - new Date(lead.updatedAt || lead.createdAt).getTime()) / (1000 * 60 * 60 * 24)))
+                const counselor = lead.assignedCounselor
+                const counselorName = counselor 
+                  ? (Array.isArray(counselor) ? counselor[0]?.fullName : counselor.fullName)
+                  : undefined
+                const isThisDragged = draggedId === lead.id
+
+                return (
+                  <div
+                    key={lead.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, lead.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] rounded-xl p-4 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-[5px_5px_10px_#AEB9C9,-5px_-5px_10px_#FFFFFF] transition-all duration-150 relative group border border-[#AEB9C9]/10 ${
+                      isThisDragged ? 'opacity-30 scale-95 shadow-inner' : ''
+                    }`}
+                  >
+                    {/* Top Row: Initials Badge & Name */}
+                    <div className="flex items-start justify-between gap-2.5 mb-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm">
+                          {getInitials(lead.fullName)}
+                        </div>
+                        <span className="text-xs font-bold text-[#202638] truncate">{lead.fullName}</span>
+                      </div>
+                      
+                      <Link 
+                        href={`/dashboard/leads/${lead.id}`}
+                        className="p-1 rounded-md text-[#8891A3] hover:text-[#4855E4] hover:bg-[#DCE3ED]/50 transition-colors shrink-0"
+                        title="View profile"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+
+                    {/* Middle Row: Preferences */}
+                    <p className="text-[10px] font-semibold text-[#5C6478] mb-3 truncate">
+                      {lead.preferredCountry ? `Preferred: ${lead.preferredCountry}` : 'No destination selected'}
+                    </p>
+
+                    {/* Bottom Row: Ratings, Counselor & Days */}
+                    <div className="flex items-center justify-between border-t border-[#AEB9C9]/10 pt-3 mt-1">
+                      <div className="flex flex-col gap-1">
+                        <StarRating rating={lead.rating} editable={false} size={10} />
+                        <span className="text-[9px] font-semibold text-[#8891A3]">
+                          {days === 0 ? 'Updated today' : `${days}d in stage`}
+                        </span>
+                      </div>
+
+                      {counselorName ? (
+                        <div 
+                          className="w-5.5 h-5.5 rounded-full bg-[#12A8B5] text-white flex items-center justify-center text-[8px] font-extrabold shadow-sm"
+                          title={`Assigned to ${counselorName}`}
+                        >
+                          {getInitials(counselorName)}
+                        </div>
+                      ) : (
+                        <div 
+                          className="w-5.5 h-5.5 rounded-full bg-[#C7CFDC]/50 text-[#8891A3] flex items-center justify-center shadow-inner"
+                          title="Unassigned counselor"
+                        >
+                          <User className="w-3 h-3" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {stageLeads.length === 0 && (
+                <div className="h-20 border-2 border-dashed border-[#AEB9C9]/20 rounded-xl flex items-center justify-center text-[10px] font-bold text-[#8891A3]/80">
+                  Drop leads here
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}

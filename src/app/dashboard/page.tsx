@@ -190,23 +190,38 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Stages Grid */}
-      <div>
-        <h3 className="text-base font-bold text-[#202638] mb-5 flex items-center gap-2">
-          <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Stages
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-          {stagesCards.map(stage => (
-            <Link key={stage.name} href={`/dashboard/leads?stage=${encodeURIComponent(stage.name)}`}>
-              <div className="neo-raised p-4 hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all flex flex-col justify-between h-28 relative overflow-hidden group">
-                <span className="text-xs font-bold text-[#5C6478] leading-tight group-hover:text-[#202638] transition-colors">{stage.name}</span>
-                <div className="flex items-end justify-between">
-                  <p className="text-xl font-black text-[#202638] font-display">{stage.count}</p>
-                  <span className="w-2 h-2 rounded-full border border-white" style={{ backgroundColor: stage.color }}></span>
+      {/* Pipeline Snapshot Funnel */}
+      <div className="neo-raised p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-base font-bold text-[#202638] flex items-center gap-2 font-display">
+            <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Snapshot
+          </h3>
+          <Link href="/dashboard/pipeline" className="text-xs font-bold text-[#4855E4] hover:underline flex items-center gap-1">
+            Open Board →
+          </Link>
+        </div>
+        <div className="space-y-5">
+          {stagesCards.map(stage => {
+            const percentage = totalLeads > 0 ? Math.round((stage.count / totalLeads) * 100) : 0
+            return (
+              <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
+                <div className="flex items-center gap-4">
+                  <span className="w-24 text-xs font-bold text-[#5C6478] group-hover:text-[#202638] transition-colors truncate">{stage.name}</span>
+                  <div className="flex-1 h-3.5 bg-[#E7ECF3] shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-105" 
+                      style={{ 
+                        width: `${percentage}%`, 
+                        backgroundColor: stage.color,
+                        boxShadow: `0 0 8px ${stage.color}40`
+                      }}
+                    ></div>
+                  </div>
+                  <span className="w-10 text-right text-xs font-bold text-[#202638]">{stage.count}</span>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </div>
 

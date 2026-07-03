@@ -429,3 +429,38 @@ export async function toggleFileOpened(leadId: string, isOpened: boolean) {
   revalidatePath('/dashboard/reports') // So reports recalculate immediately if needed
   return { success: true }
 }
+
+export async function updateLeadStageAction(leadId: string, stage: string) {
+  const user = await getUserSession()
+  if (!user) throw new Error('Unauthorized')
+
+  const supabase = await createClient()
+  const { data: lead } = await supabase
+    .from('Lead')
+    .select('stage, assignedCounselorId')
+    .eq('id', leadId)
+    .eq('companyId', user.companyId)
+    .single()
+
+  if (!lead) throw new Error('Lead not found')
+
+  if (user.role === 'Counselor' && lead.assignedCounselorId !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const updateData: any = { stage }
+  if (lead.stage === 'New' && stage !== 'New') {
+    updateData.contactedAt = new Date().toISOString()
+  }
+
+  const { error: updateError } = await supabase
+    .from('Lead')
+    .update(updateData)
+    .eq('id', leadId)
+
+  if (updateError) throw new Error('Failed to update stage: ' + updateError.message)
+
+  revalidatePath('/dashboard/leads')
+  revalidatePath('/dashboard')
+  return { success: true }
+}
