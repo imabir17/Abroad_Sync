@@ -32,10 +32,7 @@ export default function LoginPage() {
     setTilt({ x: 0, y: 0 })
   }
 
-  const handleAutofillDemo = () => {
-    setEmail('demo@abroadsync.com')
-    setPassword('demo-preview-2026')
-  }
+
 
   return (
     <div className="min-h-screen bg-[#E7ECF3] flex items-center justify-center p-6 relative overflow-hidden font-sans">
@@ -366,28 +363,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo Credentials divider */}
-          <div className="flex items-center gap-3.5 my-6">
-            <div className="flex-1 h-[1px] bg-[#AEB9C9]/50 opacity-50"></div>
-            <span className="text-[10px] font-bold text-[#8891A3]">DEMO ACCESS</span>
-            <div className="flex-1 h-[1px] bg-[#AEB9C9]/50 opacity-50"></div>
-          </div>
-
-          {/* Demo Credentials box */}
-          <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] flex items-start gap-3">
-            <AlertCircle className="w-4.5 h-4.5 text-[#12A8B5] shrink-0 mt-0.5" />
-            <div>
-              <div className="text-xs font-bold text-[#202638] mb-0.5">Try it without an account</div>
-              <div className="text-[11px] text-[#5C6478]">demo@abroadsync.com · Role: Manager</div>
-              <button 
-                type="button" 
-                onClick={handleAutofillDemo}
-                className="mt-2 text-[11px] font-bold text-[#4855E4] hover:text-[#333FC2] block p-0 bg-transparent border-none cursor-pointer"
-              >
-                Autofill demo credentials →
-              </button>
-            </div>
-          </div>
 
           <p className="signup-note text-center mt-6 text-xs text-[#8891A3]">
             New agency? <a href="mailto:abroadsync@gmail.com" className="font-bold text-[#4855E4] hover:text-[#333FC2]">Request access</a>
