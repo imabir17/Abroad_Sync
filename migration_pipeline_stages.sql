@@ -13,3 +13,30 @@ CREATE TABLE IF NOT EXISTS "PipelineStage" (
 
 -- Index for ordering stages
 CREATE INDEX IF NOT EXISTS idx_pipelinestage_company ON "PipelineStage"("companyId");
+
+-- Enable Row-Level Security on PipelineStage
+ALTER TABLE "PipelineStage" ENABLE ROW LEVEL SECURITY;
+
+-- Clean up existing policies if any
+DROP POLICY IF EXISTS "Users can view stages in their company" ON "PipelineStage";
+DROP POLICY IF EXISTS "Admins and Managers can manage stages" ON "PipelineStage";
+
+-- SELECT: Allow all authenticated users in the company to view stages
+CREATE POLICY "Users can view stages in their company" ON "PipelineStage"
+    FOR SELECT TO authenticated
+    USING ("companyId" = get_my_company_id());
+
+-- ALL: Allow Admins and Managers to manage stages in their company
+CREATE POLICY "Admins and Managers can manage stages" ON "PipelineStage"
+    FOR ALL TO authenticated
+    USING (
+        "companyId" = get_my_company_id() AND 
+        (
+            (auth.jwt() -> 'app_metadata'::text ->> 'role')::text = 'Super Admin' OR 
+            (auth.jwt() -> 'app_metadata'::text ->> 'role')::text = 'Manager' OR
+            EXISTS (
+                SELECT 1 FROM "User" 
+                WHERE "User".id = auth.uid()::text AND ("User".role = 'Super Admin' OR "User".role = 'Manager')
+            )
+        )
+    );
