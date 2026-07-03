@@ -5,6 +5,7 @@ import DashboardTasks from '@/components/DashboardTasks'
 import DashboardCharts from '@/components/DashboardCharts'
 import TasksModalClient from '@/components/TasksModalClient'
 import { LEAD_RATINGS, LEAD_STAGES } from '@/lib/constants'
+import { getStagesAction } from '@/app/actions/stages'
 import Link from 'next/link'
 
 // Pre-defined colors for ratings and stages for consistent UI
@@ -53,17 +54,42 @@ export default async function DashboardPage() {
   const totalLeads = leadsForStats.length
   const pendingCount = allTasks.filter(t => t.status === 'Pending').length
 
-  // 3. Process Ratings Data in memory
+  // 3. Process Ratings Data in memory (handling legacy and star ratings)
   const ratingsCounts: Record<string, number> = {}
   leadsForStats.forEach(lead => {
-    const rating = lead.rating || 'Unrated'
-    ratingsCounts[rating] = (ratingsCounts[rating] || 0) + 1
+    const ratingStr = lead.rating || 'Unrated'
+    let ratingVal = 'Unrated'
+    if (ratingStr === 'Very Good') ratingVal = '5'
+    else if (ratingStr === 'Good') ratingVal = '4'
+    else if (ratingStr === 'Moderate') ratingVal = '3'
+    else if (ratingStr === 'Bad') ratingVal = '2'
+    else if (['1', '2', '3', '4', '5'].includes(ratingStr)) ratingVal = ratingStr
+    
+    ratingsCounts[ratingVal] = (ratingsCounts[ratingVal] || 0) + 1
   })
 
-  const ratingsCards = LEAD_RATINGS.map(rating => ({
-    name: rating,
-    count: ratingsCounts[rating] || 0,
-    color: RATING_COLORS[rating] || '#737373'
+  const RATING_LABELS: Record<string, string> = {
+    '5': '5 Stars',
+    '4': '4 Stars',
+    '3': '3 Stars',
+    '2': '2 Stars',
+    '1': '1 Star',
+    'Unrated': 'Unrated'
+  }
+
+  const RATING_COLORS_NEW: Record<string, string> = {
+    '5': '#10b981',
+    '4': '#3b82f6',
+    '3': '#f59e0b',
+    '2': '#ef4444',
+    '1': '#f43f5e',
+    'Unrated': '#737373'
+  }
+
+  const ratingsCards = ['5', '4', '3', '2', '1', 'Unrated'].map(ratingKey => ({
+    name: RATING_LABELS[ratingKey],
+    count: ratingsCounts[ratingKey] || 0,
+    color: RATING_COLORS_NEW[ratingKey] || '#737373'
   }))
   
   const ratingsChartData = ratingsCards.filter(r => r.count > 0).map(r => ({
@@ -72,18 +98,21 @@ export default async function DashboardPage() {
     fill: r.color
   }))
 
-  const veryGoodCount = ratingsCounts['Very Good'] || 0
-  const goodCount = ratingsCounts['Good'] || 0
+  const veryGoodCount = ratingsCounts['5'] || 0
+  const goodCount = ratingsCounts['4'] || 0
   const conversionRate = totalLeads > 0 ? Math.round(((veryGoodCount + goodCount) / totalLeads) * 100) : 0
 
-  // 4. Process Stages Data in memory
+  // 4. Fetch custom stages and process in memory
+  const stages = await getStagesAction()
+  const stageListNames = stages.length > 0 ? stages.map(s => s.name) : LEAD_STAGES
+
   const stagesCounts: Record<string, number> = {}
   leadsForStats.forEach(lead => {
     const stage = lead.stage || 'New'
     stagesCounts[stage] = (stagesCounts[stage] || 0) + 1
   })
 
-  const stagesCards = LEAD_STAGES.map((stage, i) => ({
+  const stagesCards = stageListNames.map((stage, i) => ({
     name: stage,
     count: stagesCounts[stage] || 0,
     color: STAGE_COLORS[i % STAGE_COLORS.length]

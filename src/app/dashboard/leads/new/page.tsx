@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { LeadForm } from '@/components/LeadForm'
+import { getStagesAction } from '@/app/actions/stages'
 
 export default async function NewLeadPage() {
   const user = await getUserSession()
@@ -22,6 +23,9 @@ export default async function NewLeadPage() {
     counselors = counselorsData || []
   }
 
+  // Fetch dynamic stages
+  const stages = await getStagesAction()
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       <div className="flex items-center gap-4">
@@ -38,7 +42,7 @@ export default async function NewLeadPage() {
         </div>
       </div>
 
-      <LeadForm counselors={counselors} isAdminOrManager={isAdminOrManager} />
+      <LeadForm counselors={counselors} isAdminOrManager={isAdminOrManager} stages={stages} />
     </div>
   )
 }

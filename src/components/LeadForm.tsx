@@ -6,10 +6,11 @@ import { User, GraduationCap, FileText, Briefcase, AlertTriangle, Save, Loader2 
 import { createLead, checkLeadDuplicate } from '@/app/actions/leads'
 import { COUNTRIES } from '@/lib/countries'
 import { LEAD_STAGES, LEAD_RATINGS } from '@/lib/constants'
+import { StarRating } from '@/components/StarRating'
 
 type Counselor = { id: string; fullName: string }
 
-export function LeadForm({ counselors, isAdminOrManager }: { counselors: Counselor[], isAdminOrManager: boolean }) {
+export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counselors: Counselor[], isAdminOrManager: boolean, stages?: any[] }) {
   const [lastCompletedStage, setLastCompletedStage] = useState<string>('')
   const [sourceType, setSourceType] = useState<string>('')
   
@@ -20,6 +21,9 @@ export function LeadForm({ counselors, isAdminOrManager }: { counselors: Counsel
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null)
+  
+  // Rating State
+  const [rating, setRating] = useState('Unrated')
 
   // Debounced duplicate check
   useEffect(() => {
@@ -410,22 +414,23 @@ export function LeadForm({ counselors, isAdminOrManager }: { counselors: Counsel
               id="stage"
               className={selectClass}
             >
-              {LEAD_STAGES.map(stage => (
-                <option key={stage} value={stage}>{stage}</option>
-              ))}
+              {stages.length > 0 ? (
+                stages.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))
+              ) : (
+                LEAD_STAGES.map(stage => (
+                  <option key={stage} value={stage}>{stage}</option>
+                ))
+              )}
             </select>
           </div>
           <div>
-            <label htmlFor="rating" className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Lead Rating</label>
-            <select 
-              name="rating" 
-              id="rating"
-              className={selectClass}
-            >
-              {LEAD_RATINGS.map(rating => (
-                <option key={rating} value={rating}>{rating}</option>
-              ))}
-            </select>
+            <label className="block text-[10px] font-bold text-[#5C6478] uppercase tracking-wider mb-2">Lead Rating</label>
+            <div className="py-2.5 px-3 flex items-center bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] rounded-xl h-[38px]">
+              <StarRating rating={rating} onChange={(val) => setRating(val)} size={20} />
+            </div>
+            <input type="hidden" name="rating" value={rating} />
           </div>
           {isAdminOrManager && (
             <div className="md:col-span-2">

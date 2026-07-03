@@ -2,18 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import { updateLeadStatus } from '@/app/actions/leads'
-import { LEAD_STAGES, LEAD_RATINGS } from '@/lib/constants'
+import { LEAD_STAGES } from '@/lib/constants'
+import { StarRating } from './StarRating'
 
 export function LeadStatusDropdowns({ 
   leadId, 
   currentStage, 
   currentRating,
-  canEdit = true
+  canEdit = true,
+  stages = []
 }: { 
   leadId: string, 
   currentStage: string, 
   currentRating: string | null,
   canEdit?: boolean
+  stages?: any[]
 }) {
   const [isPending, setIsPending] = useState(false)
   const [localStage, setLocalStage] = useState(currentStage)
@@ -46,9 +49,8 @@ export function LeadStatusDropdowns({
     }
   }
 
-  const handleRatingChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleRatingSelect = async (newRating: string) => {
     if (!canEdit) return
-    const newRating = e.target.value
     const rollbackRating = localRating
     
     // Optimistic update
@@ -64,40 +66,42 @@ export function LeadStatusDropdowns({
     }
   }
 
+  const selectClass = "bg-[#E7ECF3] text-xs font-bold text-[#202638] rounded-xl outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer h-[26px] border-none pr-2 bg-transparent"
+
   return (
-    <div className="flex items-center space-x-3">
-      {isPending && <span className="text-xs text-neutral-500 animate-pulse">Saving...</span>}
+    <div className="flex items-center gap-3">
+      {isPending && <span className="text-[10px] font-bold text-[#8891A3] animate-pulse">Saving...</span>}
       
-      <div className="flex items-center space-x-2 bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
-        <span className="text-sm text-neutral-400 px-2">Stage:</span>
+      {/* Dynamic Stage selector */}
+      <div className="flex items-center gap-2 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-xl px-3.5 py-1.5 h-[40px] shrink-0">
+        <span className="text-xs font-bold text-[#5C6478]">Stage:</span>
         <select 
           onChange={handleStageChange}
           disabled={isPending || !canEdit}
-          className="bg-neutral-950 border border-neutral-800 text-sm text-white rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer disabled:opacity-50" 
+          className={selectClass}
           value={localStage}
         >
-          {LEAD_STAGES.map(stage => (
-            <option key={stage} value={stage}>{stage}</option>
-          ))}
+          {stages.length > 0 ? (
+            stages.map(s => (
+              <option key={s.id} value={s.name}>{s.name}</option>
+            ))
+          ) : (
+            LEAD_STAGES.map(stage => (
+              <option key={stage} value={stage}>{stage}</option>
+            ))
+          )}
         </select>
       </div>
 
-      <div className="flex items-center space-x-2 bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
-        <span className="text-sm text-neutral-400 px-2">Rating:</span>
-        <select 
-          onChange={handleRatingChange}
-          disabled={isPending || !canEdit}
-          className={`bg-neutral-950 border border-neutral-800 text-sm font-medium rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer disabled:opacity-50
-            ${localRating === 'Very Good' ? 'text-emerald-400' : 
-              localRating === 'Good' ? 'text-blue-400' : 
-              localRating === 'Moderate' ? 'text-amber-400' : 
-              localRating === 'Bad' ? 'text-red-400' : 'text-neutral-400'}`} 
-          value={localRating}
-        >
-          {LEAD_RATINGS.map(rating => (
-            <option key={rating} value={rating}>{rating}</option>
-          ))}
-        </select>
+      {/* Star rating selector */}
+      <div className="flex items-center gap-2.5 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-xl px-4 py-1.5 h-[40px] shrink-0">
+        <span className="text-xs font-bold text-[#5C6478]">Rating:</span>
+        <StarRating 
+          rating={localRating} 
+          onChange={handleRatingSelect} 
+          editable={canEdit && !isPending} 
+          size={16} 
+        />
       </div>
     </div>
   )

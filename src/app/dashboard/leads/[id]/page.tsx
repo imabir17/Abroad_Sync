@@ -6,6 +6,7 @@ import { ArrowLeft, Mail, Phone } from 'lucide-react'
 import { LeadStatusDropdowns } from '@/components/LeadStatusDropdowns'
 import LeadDetailClient from '@/components/LeadDetailClient'
 import TransferLeadButton from '@/components/TransferLeadButton'
+import { getStagesAction } from '@/app/actions/stages'
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const user = await getUserSession()
@@ -48,6 +49,9 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
     counselors = counselorsData || []
   }
 
+  // Fetch customizable stages
+  const stages = await getStagesAction()
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       {/* Header */}
@@ -77,6 +81,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             currentStage={lead.stage} 
             currentRating={lead.rating} 
             canEdit={canEdit}
+            stages={stages}
           />
         </div>
       </div>

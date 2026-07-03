@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
 import { Users, ExternalLink } from 'lucide-react'
+import { StarRating } from '@/components/StarRating'
 
 // SWR Client Fetcher
 const leadsFetcher = async ([, paramsString]: [string, string]) => {
@@ -199,14 +200,7 @@ export default function LeadsTableClient({
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`inline-flex items-center px-2.5 py-1.0 rounded-full text-[10px] font-bold border
-                    ${lead.rating === 'Very Good' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
-                      lead.rating === 'Good' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 
-                      lead.rating === 'Moderate' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
-                      lead.rating === 'Bad' ? 'bg-red-500/10 text-red-600 border-red-500/20' :
-                      'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'}`}>
-                    {lead.rating || 'Unrated'}
-                  </span>
+                  <StarRating rating={lead.rating} editable={false} size={14} />
                 </td>
                 <td className="px-6 py-4 text-xs font-semibold text-[#5C6478]">
                   {lead.stage}

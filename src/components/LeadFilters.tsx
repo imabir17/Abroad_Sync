@@ -11,11 +11,13 @@ type Counselor = { id: string; fullName: string }
 export function LeadFilters({ 
   isAdminOrManager, 
   counselors, 
-  sources = [] 
+  sources = [],
+  stages = []
 }: { 
   isAdminOrManager: boolean
   counselors: Counselor[]
   sources?: string[] 
+  stages?: any[]
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -113,9 +115,15 @@ export function LeadFilters({
               className={selectClass}
             >
               <option value="">All Stages</option>
-              {LEAD_STAGES.map(stage => (
-                <option key={stage} value={stage}>{stage}</option>
-              ))}
+              {stages.length > 0 ? (
+                stages.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))
+              ) : (
+                LEAD_STAGES.map(stage => (
+                  <option key={stage} value={stage}>{stage}</option>
+                ))
+              )}
             </select>
           </div>
 
@@ -136,9 +144,11 @@ export function LeadFilters({
             className={selectClass}
           >
             <option value="">All Ratings</option>
-            {LEAD_RATINGS.map(rating => (
-              <option key={rating} value={rating}>{rating}</option>
-            ))}
+            <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+            <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+            <option value="3">⭐⭐⭐ (3 Stars)</option>
+            <option value="2">⭐⭐ (2 Stars)</option>
+            <option value="1">⭐ (1 Star)</option>
           </select>
 
           <select 

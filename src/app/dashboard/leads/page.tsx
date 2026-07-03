@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { LeadFilters } from '@/components/LeadFilters'
+import { getStagesAction } from '@/app/actions/stages'
 import LeadsTableClient from './LeadsTableClient'
 
 export default async function LeadsPage({ 
@@ -97,6 +98,9 @@ export default async function LeadsPage({
   }
   const leads = leadsData || []
 
+  // Fetch customizable stages
+  const stages = await getStagesAction()
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       <div className="flex items-center justify-between">
@@ -114,7 +118,7 @@ export default async function LeadsPage({
       </div>
 
       <div className="space-y-6">
-        <LeadFilters isAdminOrManager={true} counselors={counselors} sources={allSources} />
+        <LeadFilters isAdminOrManager={true} counselors={counselors} sources={allSources} stages={stages} />
         <LeadsTableClient leads={leads} isAdminOrManager={isAdminOrManager} counselors={counselors} />
       </div>
     </div>

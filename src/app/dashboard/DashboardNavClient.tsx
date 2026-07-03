@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -56,6 +56,12 @@ export default function DashboardNavClient({
       label: 'Staff Management',
       icon: UserSquare,
       show: user.role === 'Super Admin',
+    },
+    {
+      href: '/dashboard/settings',
+      label: 'Settings',
+      icon: Settings,
+      show: isAdminOrManager,
     },
   ]
 
