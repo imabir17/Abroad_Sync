@@ -28,22 +28,6 @@
   --blur: 18px;
 }
 
-[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #1A1F2C;
-  --bg-deep: #12151F;
-  --shadow-dark: #0F121B;
-  --shadow-light: #252C3E;
-  --text-1: #F3F4F6;
-  --text-2: #9CA3AF;
-  --text-3: #6B7280;
-  --accent: #6E79F2;
-  --accent-light: #8E98FF;
-  --accent-dark: #4855E4;
-  --teal: #22D3EE;
-  --coral: #FF8A65;
-}
-
 body {
   background-color: var(--bg);
   color: var(--text-1);

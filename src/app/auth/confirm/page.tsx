@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { ShieldCheck, ShieldAlert, Loader2, RefreshCw } from 'lucide-react'
-import ThemeToggle from '@/components/ThemeToggle'
 
 function ConfirmPageContent() {
   const router = useRouter()
@@ -156,11 +155,6 @@ export default function AuthConfirmPage() {
       {/* Orbs */}
       <div className="orb orb1 pointer-events-none"></div>
       <div className="orb orb2 pointer-events-none"></div>
-
-      {/* Theme Toggle Button */}
-      <div className="absolute top-6 right-6 z-30">
-        <ThemeToggle />
-      </div>
 
       <Suspense fallback={
         <div className="w-full max-w-[420px] bg-[#E7ECF3] shadow-[24px_24px_50px_#AEB9C9,-18px_-18px_40px_#FFFFFF] rounded-[32px] p-8 md:p-10 text-center space-y-5 animate-in fade-in duration-200 relative z-10">
