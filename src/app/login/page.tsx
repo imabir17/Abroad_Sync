@@ -367,6 +367,12 @@ export default function LoginPage() {
           <p className="signup-note text-center mt-6 text-xs text-[#8891A3]">
             New agency? <a href="mailto:abroadsync@gmail.com" className="font-bold text-[#4855E4] hover:text-[#333FC2]">Request access</a>
           </p>
+          
+          <div className="flex justify-center items-center gap-4 mt-8 text-[10px] text-[#8891A3]">
+            <Link href="/privacy" className="hover:text-[#4855E4] transition-colors">Privacy Policy</Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-[#4855E4] transition-colors">Terms & Conditions</Link>
+          </div>
         </div>
 
       </div>
