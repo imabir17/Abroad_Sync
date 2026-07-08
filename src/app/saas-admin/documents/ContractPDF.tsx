@@ -154,6 +154,28 @@ export default function ContractPDF({ agencyName, buyerAddress, date, subscripti
           IN NO EVENT SHALL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED THE TOTAL AMOUNT PAID BY CUSTOMER HEREUNDER FOR THE SERVICES GIVING RISE TO THE LIABILITY IN THE TWELVE (12) MONTHS PRECEDING THE FIRST INCIDENT OUT OF WHICH THE LIABILITY AROSE. NEITHER PARTY SHALL BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES.
         </Text>
 
+        <Text style={styles.sectionTitle}>7. Unlimited User Licensing</Text>
+        <Text style={styles.paragraph}>
+          Unlike traditional seat-based CRM pricing, this Agreement grants the Customer the unrestricted right to provision an unlimited number of user accounts under their organization. The Customer, acting as the Super Admin, may add as many Counselors, Managers, and administrative staff as necessary to operate their business without incurring additional per-user licensing fees. The Customer assumes full responsibility for the actions and data privacy compliance of all users operating under their instance of the Service.
+        </Text>
+
+        <Text style={styles.sectionTitle}>8. Quick Start User Guide (Platform Operation)</Text>
+        <Text style={styles.paragraph}>
+          To maximize the value of the Service immediately upon activation, the Customer should adhere to the following operational sequence:
+        </Text>
+        <Text style={styles.paragraph}>
+          <Text style={styles.bold}>A. Staff Onboarding (Settings {'>'} Staff):</Text> As the Super Admin, navigate to the Staff Management dashboard to invite your team. You can assign roles such as 'Manager' (who oversee team operations and have broader access) or 'Counselor' (who manage their specifically assigned student leads).
+        </Text>
+        <Text style={styles.paragraph}>
+          <Text style={styles.bold}>B. Lead Generation & Assignment (Leads):</Text> Enter new prospective students into the system manually or via integrations. Super Admins and Managers can assign these leads to specific Counselors. The system allows detailed tracking of student requirements, preferred countries, and current status.
+        </Text>
+        <Text style={styles.paragraph}>
+          <Text style={styles.bold}>C. Pipeline Tracking (Pipeline):</Text> Utilize the visual Kanban board pipeline to drag and drop leads through their journey—from initial inquiry to visa approval and final enrollment. This provides a birds-eye view of your agency's entire operation.
+        </Text>
+        <Text style={styles.paragraph}>
+          <Text style={styles.bold}>D. Task Management (Tasks):</Text> Counselors can create and assign daily tasks to ensure timely follow-ups with leads. 
+        </Text>
+
         <View style={styles.signatureSection} wrap={false}>
           <View style={styles.signatureBox}>
             <Text style={styles.bold}>For Abroad Sync Inc.</Text>
