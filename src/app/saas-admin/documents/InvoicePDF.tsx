@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
   page: {
@@ -232,8 +232,8 @@ export default function InvoicePDF({
         
         <View style={styles.headerRow}>
           <View style={styles.logoGroup}>
-            {/* Simulated Logo Box since we can't easily inline the complex SVG without specific SVG tags in react-pdf */}
-            <View style={styles.logoBox} />
+            {/* Real Logo Image */}
+            <Image src="/logo.jpg" style={styles.logoBox} />
             <View>
               <Text style={styles.logoText}>AbroadSync</Text>
               <Text style={styles.logoSubtext}>B2B Enterprise</Text>
