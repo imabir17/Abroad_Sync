@@ -9,30 +9,25 @@ const styles = StyleSheet.create({
     color: '#202638'
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    margin: '-60 -60 40 -60',
-    backgroundColor: '#333FC2',
-    paddingVertical: 40,
-    paddingHorizontal: 60,
+    marginBottom: 40,
+    borderBottomWidth: 1,
+    borderBottomColor: '#111827',
+    paddingBottom: 20,
   },
   logoImage: {
     width: 60,
     height: 60,
-    marginBottom: 10,
     borderRadius: 12,
-  },
-  logo: {
-    fontSize: 24,
-    fontFamily: 'Helvetica-Bold',
-    marginBottom: 10,
-    color: '#ffffff',
   },
   title: {
     fontSize: 16,
     fontFamily: 'Helvetica-Bold',
     textTransform: 'uppercase',
     letterSpacing: 2,
-    color: '#ffffff',
+    color: '#111827',
   },
   bold: {
     fontFamily: 'Times-Bold',
