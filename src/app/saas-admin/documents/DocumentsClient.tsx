@@ -24,6 +24,7 @@ export default function DocumentsClient() {
   
   // Form State
   const [agencyName, setAgencyName] = useState('Global Education Agency')
+  const [buyerAddress, setBuyerAddress] = useState('123 Education St, London, UK')
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0])
   const [invoiceDueDate, setInvoiceDueDate] = useState(() => {
     const d = new Date()
@@ -37,6 +38,7 @@ export default function DocumentsClient() {
 
   const documentData = {
     agencyName,
+    buyerAddress,
     date,
     invoiceDueDate,
     subscriptionFee,
@@ -77,6 +79,19 @@ export default function DocumentsClient() {
                   value={agencyName}
                   onChange={(e) => setAgencyName(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 border border-[#D1D5DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6E79F2] focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#4B5563] mb-1">Buyer Address</label>
+              <div className="relative">
+                <Building className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-3" />
+                <textarea
+                  value={buyerAddress}
+                  onChange={(e) => setBuyerAddress(e.target.value)}
+                  rows={2}
+                  className="w-full pl-9 pr-3 py-2 border border-[#D1D5DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6E79F2] focus:border-transparent resize-none"
                 />
               </div>
             </div>

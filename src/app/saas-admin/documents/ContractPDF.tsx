@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
 
 interface ContractPDFProps {
   agencyName: string
+  buyerAddress: string
   date: string
   subscriptionFee: string
 }
@@ -86,7 +87,7 @@ const formatDate = (val: string) => {
 
 const formatMoney = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val)
 
-export default function ContractPDF({ agencyName, date, subscriptionFee }: ContractPDFProps) {
+export default function ContractPDF({ agencyName, buyerAddress, date, subscriptionFee }: ContractPDFProps) {
   const subFeeNum = parseFloat(subscriptionFee) || 0
 
   return (
@@ -103,11 +104,11 @@ export default function ContractPDF({ agencyName, date, subscriptionFee }: Contr
         </Text>
         
         <Text style={styles.paragraph}>
-          <Text style={styles.bold}>Abroad Sync Inc.</Text>, a Delaware Corporation, hereinafter referred to as the "Provider",
+          <Text style={styles.bold}>AbroadSync</Text>, located at 2nd Floor 1, 2 Asad Ave, Dhaka 1207, hereinafter referred to as the "Provider",
         </Text>
         <Text style={styles.paragraph}>AND</Text>
         <Text style={styles.paragraph}>
-          <Text style={styles.bold}>{agencyName || '[Agency Name]'}</Text>, hereinafter referred to as the "Customer".
+          <Text style={styles.bold}>{agencyName || '[Agency Name]'}</Text>, located at {buyerAddress || '[Buyer Address]'}, hereinafter referred to as the "Customer".
         </Text>
         
         <Text style={styles.italic}>

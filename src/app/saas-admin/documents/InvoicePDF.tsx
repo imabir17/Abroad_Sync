@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
 
 interface InvoicePDFProps {
   agencyName: string
+  buyerAddress: string
   date: string
   invoiceDueDate: string
   subscriptionFee: string
@@ -207,6 +208,7 @@ const formatMoney = (val: number) => new Intl.NumberFormat('en-US', { style: 'cu
 
 export default function InvoicePDF({
   agencyName,
+  buyerAddress,
   date,
   invoiceDueDate,
   subscriptionFee,
@@ -236,7 +238,7 @@ export default function InvoicePDF({
             <Image src="/logo.jpg" style={styles.logoBox} />
             <View>
               <Text style={styles.logoText}>AbroadSync</Text>
-              <Text style={styles.logoSubtext}>B2B Enterprise</Text>
+              <Text style={styles.logoSubtext}>2nd Floor 1, 2 Asad Ave, Dhaka 1207</Text>
             </View>
           </View>
           <View style={styles.titleGroup}>
@@ -249,6 +251,7 @@ export default function InvoicePDF({
           <View>
             <Text style={styles.billedToTitle}>Billed To</Text>
             <Text style={styles.billedToName}>{agencyName || '[Agency Name]'}</Text>
+            <Text style={{ fontSize: 9, color: '#4B5563', marginTop: 4, maxWidth: 200, lineHeight: 1.4 }}>{buyerAddress || '[Buyer Address]'}</Text>
           </View>
           <View style={styles.datesGroup}>
             <View style={styles.dateRow}>
