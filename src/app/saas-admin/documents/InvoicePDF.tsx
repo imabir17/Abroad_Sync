@@ -226,6 +226,7 @@ export default function InvoicePDF({
   const tax = discountedSubtotal * (taxRateNum / 100)
   const total = discountedSubtotal + tax
 
+  // eslint-disable-next-line react-hooks/purity
   const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
 
   return (

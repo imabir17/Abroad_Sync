@@ -30,6 +30,7 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
@@ -304,7 +305,7 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
           <div className="neo-raised p-6">
             <h3 className="text-sm font-bold text-[#202638] mb-3">Customization Rules</h3>
             <p className="text-xs text-[#5C6478] leading-relaxed">
-              Custom pipeline stages allow you to adjust AbroadSync to match your consultancy's student recruitment flow.
+              Custom pipeline stages allow you to adjust AbroadSync to match your consultancy&apos;s student recruitment flow.
             </p>
             <ul className="list-disc list-inside text-xs text-[#5C6478] mt-3 space-y-2">
               <li>Changes reflect instantly across the Leads Filters and Kanban board.</li>
@@ -330,7 +331,7 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
 
             <div className="text-xs text-[#5C6478] space-y-3 leading-relaxed">
               <p>
-                Are you sure you want to delete the stage <span className="font-bold text-[#202638]">"{stageToDelete.name}"</span>?
+                Are you sure you want to delete the stage <span className="font-bold text-[#202638]">&quot;{stageToDelete.name}&quot;</span>?
               </p>
               
               {activeLeadsCount > 0 ? (

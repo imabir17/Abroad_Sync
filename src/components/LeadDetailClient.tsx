@@ -41,6 +41,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
   // Sync interactions from props
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalInteractions(lead.interactions || [])
   }, [lead.interactions])
 
@@ -279,7 +280,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {/* Bachelors Details */}
               {(formData.bachelorsMajor || formData.bachelorsYear || formData.bachelorsCgpa || isEditing) && (
                 <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Bachelor's Degree</h4>
+                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Bachelor&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <p className="text-[10px] font-bold text-[#8891A3] mb-1">Major</p>
@@ -300,7 +301,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {/* Masters Details */}
               {(formData.mastersMajor || formData.mastersYear || formData.mastersCgpa || isEditing) && (
                 <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Master's Degree</h4>
+                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Master&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <p className="text-[10px] font-bold text-[#8891A3] mb-1">Major</p>

@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   const supabase = await createClient()
 
   // 1. Fetch leads for statistics (calculating count and groupings in memory to save network overhead)
-  let leadsQuery = supabase
+  const leadsQuery = supabase
     .from('Lead')
     .select('rating, stage')
     .eq('companyId', user.companyId)

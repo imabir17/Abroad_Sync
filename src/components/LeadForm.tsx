@@ -155,8 +155,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <option value="">Select Level</option>
               <option value="SSC">SSC / O-Levels</option>
               <option value="HSC">HSC / A-Levels</option>
-              <option value="Bachelors">Bachelor's Degree</option>
-              <option value="Masters">Master's Degree</option>
+              <option value="Bachelors">Bachelor&apos;s Degree</option>
+              <option value="Masters">Master&apos;s Degree</option>
             </select>
           </div>
           <div>
@@ -169,8 +169,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <option value="">Select Level</option>
               <option value="Language Course">Language Course</option>
               <option value="Language Program">Language Program</option>
-              <option value="Bachelors">Bachelor's Degree</option>
-              <option value="Masters">Master's Degree</option>
+              <option value="Bachelors">Bachelor&apos;s Degree</option>
+              <option value="Masters">Master&apos;s Degree</option>
               <option value="PhD">PhD</option>
             </select>
           </div>
@@ -327,7 +327,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             {/* Bachelors Details */}
             {(lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h4 className="text-xs font-bold text-[#202638] mb-3">Bachelor's Degree</h4>
+                <h4 className="text-xs font-bold text-[#202638] mb-3">Bachelor&apos;s Degree</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-2">Major/Subject</label>
@@ -348,7 +348,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             {/* Masters Details */}
             {(lastCompletedStage === 'Masters') && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h4 className="text-xs font-bold text-[#202638] mb-3">Master's Degree</h4>
+                <h4 className="text-xs font-bold text-[#202638] mb-3">Master&apos;s Degree</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-2">Major/Subject</label>

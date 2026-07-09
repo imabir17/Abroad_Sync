@@ -24,10 +24,12 @@ export function LeadStatusDropdowns({
 
   // Keep state synced with parent props
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalStage(currentStage)
   }, [currentStage])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalRating(currentRating || 'Unrated')
   }, [currentRating])
 

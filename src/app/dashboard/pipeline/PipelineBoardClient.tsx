@@ -33,13 +33,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
-  const [activeStageName, setActiveStageName] = useState<string>('')
-
-  useEffect(() => {
-    if (stages.length > 0 && !activeStageName) {
-      setActiveStageName(stages[0].name)
-    }
-  }, [stages, activeStageName])
+  const [activeStageName, setActiveStageName] = useState<string>(stages.length > 0 ? stages[0].name : '')
 
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
     e.dataTransfer.setData('text/plain', leadId)
