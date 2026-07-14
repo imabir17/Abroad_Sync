@@ -33,8 +33,8 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 font-display">System Settings</h2>
-        <p className="text-xs text-gray-600">Manage your agency workspace parameters, customizable stages, and rules.</p>
+        <h2 className="text-2xl font-bold text-white font-display">System Settings</h2>
+        <p className="text-xs text-gray-400">Manage your agency workspace parameters, customizable stages, and rules.</p>
       </div>
 
       <SettingsClient initialStages={stages} stageLeadCounts={stageLeadCounts} />

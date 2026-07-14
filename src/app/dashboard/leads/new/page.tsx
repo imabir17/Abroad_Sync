@@ -31,14 +31,14 @@ export default async function NewLeadPage() {
       <div className="flex items-center gap-4">
         <Link 
           href="/dashboard/leads" 
-          className="p-2.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 transition-all"
+          className="p-2.5 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] hover:bg-[#333333] text-gray-400 hover:text-white transition-all"
           aria-label="Back to leads list"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 font-display">Add New Lead</h2>
-          <p className="text-xs text-gray-600">Enter the details for the new prospective student profile.</p>
+          <h2 className="text-2xl font-bold text-white font-display">Add New Lead</h2>
+          <p className="text-xs text-gray-400">Enter the details for the new prospective student profile.</p>
         </div>
       </div>
 

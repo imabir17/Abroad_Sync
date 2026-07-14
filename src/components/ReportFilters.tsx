@@ -35,11 +35,11 @@ export function ReportFilters({
     router.push(`/dashboard/reports?${params.toString()}`)
   }
 
-  const selectClass = "px-3 py-2.5 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:text-gray-900 rounded-xl outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
-  const inputClass = "px-3 py-2 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "px-3 py-2.5 bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white hover:border-[#555555] rounded-xl outline-none focus:border-[#007ACC] transition-all cursor-pointer"
+  const inputClass = "px-3 py-2.5 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] transition-all"
 
   return (
-    <div className="neo-raised p-5 mb-8 flex flex-wrap gap-5 items-end">
+    <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-5 mb-8 flex flex-wrap gap-5 items-end">
       <div className="flex flex-col gap-2">
         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Time Range</label>
         <select 
@@ -95,7 +95,7 @@ export function ReportFilters({
 
       <button 
         onClick={applyFilters}
-        className="px-5 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-[5px_5px_12px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150 cursor-pointer"
+        className="px-5 py-3 bg-[#0E639C] text-white text-xs font-bold rounded-xl shadow-md hover:bg-[#1177BB] active:translate-y-0.5 transition-all duration-150 cursor-pointer"
       >
         Apply Filters
       </button>
