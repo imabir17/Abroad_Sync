@@ -24,6 +24,27 @@ export async function getCountries() {
   return data
 }
 
+export async function getCountryById(id: string) {
+  const user = await getUserSession()
+  if (!user) return null
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('Country')
+    .select('*')
+    .eq('companyId', user.companyId)
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching country:', error)
+    return null
+  }
+
+  return data
+}
+
 export async function createCountry(prevState: any, formData: FormData) {
   const user = await getUserSession()
   if (!user) {
@@ -42,8 +63,17 @@ export async function createCountry(prevState: any, formData: FormData) {
   const payload: any = {
     companyId: user.companyId,
     name,
+    continent: formData.get('continent') as string,
+    capitals: formData.get('capitals') as string,
+    majorCities: formData.get('majorCities') as string,
+    countryCode: formData.get('countryCode') as string,
+    currency: formData.get('currency') as string,
     academicRequirement: formData.get('academicRequirement') as string,
     studyGapAcceptance: formData.get('studyGapAcceptance') as string,
+    ieltsRequirement: formData.get('ieltsRequirement') as string,
+    pteRequirement: formData.get('pteRequirement') as string,
+    toeflRequirement: formData.get('toeflRequirement') as string,
+    duolingoRequirement: formData.get('duolingoRequirement') as string,
     intakes: formData.get('intakes') as string,
     applicationFee: formData.get('applicationFee') as string,
     tuitionFees: formData.get('tuitionFees') as string,
@@ -81,6 +111,21 @@ export async function createCountry(prevState: any, formData: FormData) {
     if (visaChecklistString) payload.visaChecklist = JSON.parse(visaChecklistString)
   } catch (e) {}
 
+  try {
+    const keySellingPointsString = formData.get('keySellingPoints') as string
+    if (keySellingPointsString) payload.keySellingPoints = JSON.parse(keySellingPointsString)
+  } catch (e) {}
+
+  try {
+    const universityChecklistString = formData.get('universityChecklist') as string
+    if (universityChecklistString) payload.universityChecklist = JSON.parse(universityChecklistString)
+  } catch (e) {}
+
+  try {
+    const universitiesString = formData.get('universities') as string
+    if (universitiesString) payload.universities = JSON.parse(universitiesString)
+  } catch (e) {}
+
   const { error } = await supabase
     .from('Country')
     .insert(payload)
@@ -114,8 +159,17 @@ export async function updateCountry(prevState: any, formData: FormData) {
   
   const payload: any = {
     name,
+    continent: formData.get('continent') as string,
+    capitals: formData.get('capitals') as string,
+    majorCities: formData.get('majorCities') as string,
+    countryCode: formData.get('countryCode') as string,
+    currency: formData.get('currency') as string,
     academicRequirement: formData.get('academicRequirement') as string,
     studyGapAcceptance: formData.get('studyGapAcceptance') as string,
+    ieltsRequirement: formData.get('ieltsRequirement') as string,
+    pteRequirement: formData.get('pteRequirement') as string,
+    toeflRequirement: formData.get('toeflRequirement') as string,
+    duolingoRequirement: formData.get('duolingoRequirement') as string,
     intakes: formData.get('intakes') as string,
     applicationFee: formData.get('applicationFee') as string,
     tuitionFees: formData.get('tuitionFees') as string,
@@ -150,6 +204,21 @@ export async function updateCountry(prevState: any, formData: FormData) {
   try {
     const visaChecklistString = formData.get('visaChecklist') as string
     if (visaChecklistString) payload.visaChecklist = JSON.parse(visaChecklistString)
+  } catch (e) {}
+
+  try {
+    const keySellingPointsString = formData.get('keySellingPoints') as string
+    if (keySellingPointsString) payload.keySellingPoints = JSON.parse(keySellingPointsString)
+  } catch (e) {}
+
+  try {
+    const universityChecklistString = formData.get('universityChecklist') as string
+    if (universityChecklistString) payload.universityChecklist = JSON.parse(universityChecklistString)
+  } catch (e) {}
+
+  try {
+    const universitiesString = formData.get('universities') as string
+    if (universitiesString) payload.universities = JSON.parse(universitiesString)
   } catch (e) {}
 
   const { error } = await supabase

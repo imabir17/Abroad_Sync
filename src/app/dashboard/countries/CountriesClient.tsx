@@ -88,7 +88,11 @@ export default function CountriesClient({
           </div>
         ) : (
           filteredCountries.map(country => (
-            <div key={country.id} className="bg-[#E7ECF3] rounded-2xl p-6 shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] flex flex-col">
+            <div 
+              key={country.id} 
+              onClick={() => router.push(`/dashboard/countries/${country.id}`)}
+              className="bg-[#E7ECF3] rounded-2xl p-6 shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] flex flex-col cursor-pointer hover:scale-[1.02] transition-transform"
+            >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6E79F2]/20 to-[#4855E4]/20 flex items-center justify-center shadow-inner">
@@ -100,13 +104,19 @@ export default function CountriesClient({
                 {isAdminOrManager && (
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEdit(country)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(country);
+                      }}
                       className="p-2 rounded-lg bg-[#E7ECF3] text-[#5C6478] hover:text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(country.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(country.id);
+                      }}
                       disabled={isDeleting === country.id}
                       className="p-2 rounded-lg bg-[#E7ECF3] text-[#5C6478] hover:text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all disabled:opacity-50"
                     >
