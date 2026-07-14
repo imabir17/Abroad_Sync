@@ -45,8 +45,8 @@ export default async function PipelinePage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12 h-[calc(100vh-140px)] flex flex-col">
       <div>
-        <h2 className="text-2xl font-bold text-[#202638] font-display">Pipeline Board</h2>
-        <p className="text-xs text-[#5C6478] mt-1">
+        <h2 className="text-2xl font-bold text-gray-900 font-display">Pipeline Board</h2>
+        <p className="text-xs text-gray-600 mt-1">
           {isCounselor 
             ? 'Track and progress your assigned prospective students through recruitment.' 
             : 'Track and progress agency prospective student recruitment across all counseling staff.'

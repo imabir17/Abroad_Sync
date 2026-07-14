@@ -68,15 +68,15 @@ export function LeadStatusDropdowns({
     }
   }
 
-  const selectClass = "bg-[#E7ECF3] text-xs font-bold text-[#202638] rounded-xl outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer h-[26px] border-none pr-2 bg-transparent"
+  const selectClass = "bg-white text-xs font-bold text-gray-900 rounded-xl outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer h-[26px] border-none pr-2 bg-transparent"
 
   return (
     <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-      {isPending && <span className="text-[10px] font-bold text-[#8891A3] animate-pulse shrink-0">Saving...</span>}
+      {isPending && <span className="text-[10px] font-bold text-gray-400 animate-pulse shrink-0">Saving...</span>}
       
       {/* Dynamic Stage selector */}
-      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-xl px-3.5 py-1.5 h-[42px]">
-        <span className="text-xs font-bold text-[#5C6478]">Stage:</span>
+      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-1.5 h-[42px]">
+        <span className="text-xs font-bold text-gray-600">Stage:</span>
         <select 
           onChange={handleStageChange}
           disabled={isPending || !canEdit}
@@ -96,8 +96,8 @@ export function LeadStatusDropdowns({
       </div>
 
       {/* Star rating selector */}
-      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2.5 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-xl px-4 py-1.5 h-[42px]">
-        <span className="text-xs font-bold text-[#5C6478]">Rating:</span>
+      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2.5 bg-white border border-gray-200 rounded-xl px-4 py-1.5 h-[42px]">
+        <span className="text-xs font-bold text-gray-600">Rating:</span>
         <StarRating 
           rating={localRating} 
           onChange={handleRatingSelect} 

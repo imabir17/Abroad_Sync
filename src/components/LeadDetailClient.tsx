@@ -170,8 +170,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
     }
   }
 
-  const inputClass = "w-full bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] border-none rounded-xl py-2 px-3 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] rounded-xl py-2 px-3 outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+  const inputClass = "w-full bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none transition-all"
+  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2 px-3 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
   
   return (
     <div className="space-y-8 pb-12">
@@ -184,12 +184,12 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           <div className={`neo-raised p-5 flex items-center justify-between transition-colors duration-300 ${
             isFileOpened ? 'bg-emerald-500/5 shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF]' : ''
           }`}>
-            <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2">
-              <FolderOpen className={`h-4.5 w-4.5 ${isFileOpened ? 'text-emerald-500' : 'text-[#8891A3]'}`} />
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <FolderOpen className={`h-4.5 w-4.5 ${isFileOpened ? 'text-emerald-500' : 'text-gray-400'}`} />
               File Opened Status
             </h3>
             <label className="flex items-center cursor-pointer gap-2">
-              {isPendingFileOpened && <span className="text-[10px] text-[#8891A3] animate-pulse font-bold">Saving...</span>}
+              {isPendingFileOpened && <span className="text-[10px] text-gray-400 animate-pulse font-bold">Saving...</span>}
               <input 
                 type="checkbox" 
                 checked={isFileOpened}
@@ -203,14 +203,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {/* Academic History Card */}
           <div className="neo-raised p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-[#4855E4]" />
                 Academic History
               </h3>
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                 >
                   Edit
                 </button>
@@ -218,14 +218,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Cancel editing academic history"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Save academic history details"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -237,20 +237,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             <div className="space-y-5">
               {/* SSC Details */}
               {(formData.sscGroup || formData.sscYear || formData.sscResult || isEditing) && (
-                <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">SSC / O-Levels</h4>
+                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                  <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">SSC / O-Levels</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Group</p>
-                      {isEditing ? <input name="sscGroup" value={formData.sscGroup} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.sscGroup || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Group</p>
+                      {isEditing ? <input name="sscGroup" value={formData.sscGroup} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.sscGroup || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Year</p>
-                      {isEditing ? <input name="sscYear" value={formData.sscYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.sscYear || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Year</p>
+                      {isEditing ? <input name="sscYear" value={formData.sscYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.sscYear || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Result</p>
-                      {isEditing ? <input name="sscResult" value={formData.sscResult} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.sscResult || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Result</p>
+                      {isEditing ? <input name="sscResult" value={formData.sscResult} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.sscResult || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -258,20 +258,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* HSC Details */}
               {(formData.hscGroup || formData.hscYear || formData.hscResult || isEditing) && (
-                <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">HSC / A-Levels</h4>
+                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                  <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">HSC / A-Levels</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Group</p>
-                      {isEditing ? <input name="hscGroup" value={formData.hscGroup} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.hscGroup || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Group</p>
+                      {isEditing ? <input name="hscGroup" value={formData.hscGroup} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.hscGroup || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Year</p>
-                      {isEditing ? <input name="hscYear" value={formData.hscYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.hscYear || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Year</p>
+                      {isEditing ? <input name="hscYear" value={formData.hscYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.hscYear || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Result</p>
-                      {isEditing ? <input name="hscResult" value={formData.hscResult} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.hscResult || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Result</p>
+                      {isEditing ? <input name="hscResult" value={formData.hscResult} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.hscResult || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -279,20 +279,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* Bachelors Details */}
               {(formData.bachelorsMajor || formData.bachelorsYear || formData.bachelorsCgpa || isEditing) && (
-                <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Bachelor&apos;s Degree</h4>
+                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                  <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">Bachelor&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Major</p>
-                      {isEditing ? <input name="bachelorsMajor" value={formData.bachelorsMajor} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.bachelorsMajor || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Major</p>
+                      {isEditing ? <input name="bachelorsMajor" value={formData.bachelorsMajor} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.bachelorsMajor || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Year</p>
-                      {isEditing ? <input name="bachelorsYear" value={formData.bachelorsYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.bachelorsYear || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Year</p>
+                      {isEditing ? <input name="bachelorsYear" value={formData.bachelorsYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.bachelorsYear || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">CGPA</p>
-                      {isEditing ? <input name="bachelorsCgpa" value={formData.bachelorsCgpa} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.bachelorsCgpa || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">CGPA</p>
+                      {isEditing ? <input name="bachelorsCgpa" value={formData.bachelorsCgpa} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.bachelorsCgpa || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -300,20 +300,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* Masters Details */}
               {(formData.mastersMajor || formData.mastersYear || formData.mastersCgpa || isEditing) && (
-                <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-                  <h4 className="text-xs font-bold text-[#202638] mb-3 border-b border-[#AEB9C9]/20 pb-2">Master&apos;s Degree</h4>
+                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                  <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">Master&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Major</p>
-                      {isEditing ? <input name="mastersMajor" value={formData.mastersMajor} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.mastersMajor || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Major</p>
+                      {isEditing ? <input name="mastersMajor" value={formData.mastersMajor} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.mastersMajor || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">Year</p>
-                      {isEditing ? <input name="mastersYear" value={formData.mastersYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.mastersYear || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">Year</p>
+                      {isEditing ? <input name="mastersYear" value={formData.mastersYear} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.mastersYear || '-'}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#8891A3] mb-1">CGPA</p>
-                      {isEditing ? <input name="mastersCgpa" value={formData.mastersCgpa} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold">{formData.mastersCgpa || '-'}</p>}
+                      <p className="text-[10px] font-bold text-gray-400 mb-1">CGPA</p>
+                      {isEditing ? <input name="mastersCgpa" value={formData.mastersCgpa} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold">{formData.mastersCgpa || '-'}</p>}
                     </div>
                   </div>
                 </div>
@@ -324,14 +324,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {/* Preferences Card */}
           <div className="neo-raised p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Globe className="h-5 w-5 text-[#12A8B5]" />
                 Preferences
               </h3>
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                 >
                   Edit
                 </button>
@@ -339,14 +339,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Cancel editing preferences"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Save preference changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -357,16 +357,16 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
             <div className="space-y-4">
               <div>
-                <p className="text-[10px] font-bold text-[#8891A3] mb-1">Preferred Intake</p>
+                <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Intake</p>
                 {isEditing ? (
                   <div className="flex gap-2">
-                    <select value={intakeMonth} onChange={(e) => setIntakeMonth(e.target.value)} className="w-1/2 bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] border-none rounded-xl py-2 px-3 text-xs font-semibold text-[#5C6478]">
+                    <select value={intakeMonth} onChange={(e) => setIntakeMonth(e.target.value)} className="w-1/2 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
                       <option value="">Month</option>
                       {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
                         <option key={m} value={m}>{m}</option>
                       ))}
                     </select>
-                    <select value={intakeYear} onChange={(e) => setIntakeYear(e.target.value)} className="w-1/2 bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] border-none rounded-xl py-2 px-3 text-xs font-semibold text-[#5C6478]">
+                    <select value={intakeYear} onChange={(e) => setIntakeYear(e.target.value)} className="w-1/2 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
                       <option value="">Year</option>
                       {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(y => (
                         <option key={y} value={y}>{y}</option>
@@ -374,20 +374,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     </select>
                   </div>
                 ) : (
-                  <p className="text-xs font-bold text-[#202638]">{formData.preferredIntake || '-'}</p>
+                  <p className="text-xs font-bold text-gray-900">{formData.preferredIntake || '-'}</p>
                 )}
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[#8891A3] mb-1">Preferred Level</p>
-                {isEditing ? <input name="preferredStudyLevel" value={formData.preferredStudyLevel} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredStudyLevel || 'Not specified'}</p>}
+                <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Level</p>
+                {isEditing ? <input name="preferredStudyLevel" value={formData.preferredStudyLevel} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredStudyLevel || 'Not specified'}</p>}
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[#8891A3] mb-1">Preferred Country</p>
-                {isEditing ? <input name="preferredCountry" value={formData.preferredCountry} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCountry || 'Not specified'}</p>}
+                <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Country</p>
+                {isEditing ? <input name="preferredCountry" value={formData.preferredCountry} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCountry || 'Not specified'}</p>}
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[#8891A3] mb-1">Preferred Course</p>
-                {isEditing ? <input name="preferredCourse" value={formData.preferredCourse} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-[#202638] font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCourse || 'Not specified'}</p>}
+                <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Course</p>
+                {isEditing ? <input name="preferredCourse" value={formData.preferredCourse} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCourse || 'Not specified'}</p>}
               </div>
             </div>
           </div>
@@ -396,14 +396,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {(formData.workExperience || isEditing) && (
             <div className="neo-raised p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-[#FF7A52]" />
                   Experience
                 </h3>
                 {!isEditing ? (
                   <button 
                     onClick={() => setIsEditing(true)} 
-                    className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                    className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                   >
                     Edit
                   </button>
@@ -411,14 +411,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setIsEditing(false)} 
-                      className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                       aria-label="Cancel editing experience details"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
                     <button 
                       onClick={saveDetails} 
-                      className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-[#21C285] hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-[#21C285] hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                       aria-label="Save experience details changes"
                     >
                       <Save className="h-3.5 w-3.5" />
@@ -426,21 +426,21 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   </div>
                 )}
               </div>
-              {isEditing ? <textarea name="workExperience" value={formData.workExperience} onChange={handleEditChange} className={`${inputClass} min-h-[85px]`} /> : <p className="text-xs font-semibold text-[#5C6478] whitespace-pre-wrap">{formData.workExperience}</p>}
+              {isEditing ? <textarea name="workExperience" value={formData.workExperience} onChange={handleEditChange} className={`${inputClass} min-h-[85px]`} /> : <p className="text-xs font-semibold text-gray-600 whitespace-pre-wrap">{formData.workExperience}</p>}
             </div>
           )}
 
           {/* English Proficiency Card */}
           <div className="neo-raised p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#21C285]" />
                 English Proficiency
               </h3>
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                 >
                   Edit
                 </button>
@@ -448,14 +448,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Cancel editing English proficiency"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Save English proficiency changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -482,20 +482,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             ) : (
               formData.englishTestStatus === 'Appeared' ? (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3.5 rounded-xl bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] text-center">
-                    <p className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-1">Test Type</p>
-                    <p className="text-base font-black text-[#202638] font-display">{formData.englishTestType || '-'}</p>
+                  <div className="p-3.5 rounded-xl bg-white bg-gray-50 border border-gray-200 text-center">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Test Type</p>
+                    <p className="text-base font-black text-gray-900 font-display">{formData.englishTestType || '-'}</p>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] text-center">
-                    <p className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-1">Overall Score</p>
-                    <p className="text-base font-black text-[#202638] font-display">{formData.englishTestScore || '-'}</p>
+                  <div className="p-3.5 rounded-xl bg-white bg-gray-50 border border-gray-200 text-center">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Overall Score</p>
+                    <p className="text-base font-black text-gray-900 font-display">{formData.englishTestScore || '-'}</p>
                   </div>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-white bg-gray-50 border border-gray-200 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-1">Test Status</p>
-                    <p className="text-xs font-bold text-[#202638]">{formData.englishTestStatus || 'Not specified'}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Test Status</p>
+                    <p className="text-xs font-bold text-gray-900">{formData.englishTestStatus || 'Not specified'}</p>
                   </div>
                 </div>
               )
@@ -505,14 +505,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {/* Budget & Origin Card */}
           <div className="neo-raised p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-[#FF7A52]" />
                 Origin & Budget
               </h3>
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                 >
                   Edit
                 </button>
@@ -520,14 +520,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Cancel editing origin and budget details"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-[#E7ECF3] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
                     aria-label="Save origin and budget changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -536,8 +536,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               ) : null}
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-xl bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF]">
-                <p className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-1">Source</p>
+              <div className="p-3 rounded-xl bg-white bg-gray-50 border border-gray-200">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Source</p>
                 {isEditing ? (
                   <select name="source" value={formData.source} onChange={handleEditChange} className={selectClass}>
                     <option value="">Unknown</option>
@@ -551,15 +551,15 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     <option value="Other">Other</option>
                   </select>
                 ) : (
-                  <p className="text-xs font-bold text-[#202638]">{formData.source || 'Unknown'}</p>
+                  <p className="text-xs font-bold text-gray-900">{formData.source || 'Unknown'}</p>
                 )}
               </div>
-              <div className="p-3 rounded-xl bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF]">
-                <p className="text-[10px] font-bold text-[#8891A3] uppercase tracking-wider mb-1">Budget</p>
+              <div className="p-3 rounded-xl bg-white bg-gray-50 border border-gray-200">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Budget</p>
                 {isEditing ? (
                   <input name="budget" value={formData.budget} onChange={handleEditChange} className={inputClass} placeholder="e.g. $20k" />
                 ) : (
-                  <p className="text-xs font-bold text-[#202638]">{formData.budget || 'Not specified'}</p>
+                  <p className="text-xs font-bold text-gray-900">{formData.budget || 'Not specified'}</p>
                 )}
               </div>
             </div>
@@ -571,8 +571,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           
           {/* Consultation Notes Timeline */}
           <div className="neo-raised flex flex-col h-[400px]">
-            <div className="p-5 border-b border-[#AEB9C9]/20 flex justify-between items-center bg-[#DCE3ED]/20">
-              <h3 className="text-sm font-bold text-[#202638] flex items-center gap-2">
+            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-[#DCE3ED]/20">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <MessageSquare className="h-4.5 w-4.5 text-[#4855E4]" />
                 Activity Timeline
               </h3>
@@ -582,15 +582,15 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {lead.initialNote && (
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="h-8 w-8 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] flex items-center justify-center text-blue-500">
+                    <div className="h-8 w-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-blue-500">
                       <MessageSquare className="h-4 w-4" />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] p-4 rounded-2xl text-xs text-[#5C6478]">
-                      <div className="flex justify-between items-start mb-2 border-b border-[#AEB9C9]/10 pb-1.5">
+                    <div className="bg-white bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
+                      <div className="flex justify-between items-start mb-2 border-b border-gray-200 pb-1.5">
                         <p className="font-bold text-[#4855E4]">Initial Inquiry Note</p>
-                        <p className="text-[10px] text-[#8891A3]">{new Date(lead.createdAt).toLocaleString()}</p>
+                        <p className="text-[10px] text-gray-400">{new Date(lead.createdAt).toLocaleString()}</p>
                       </div>
                       <p className="whitespace-pre-wrap leading-relaxed font-semibold">{lead.initialNote}</p>
                     </div>
@@ -601,17 +601,17 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {localInteractions.map((interaction: any) => (
                 <div key={interaction.id} className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="h-8 w-8 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] flex items-center justify-center text-indigo-500">
+                    <div className="h-8 w-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-indigo-500">
                       <MessageSquare className="h-4 w-4" />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] p-4 rounded-2xl text-xs text-[#5C6478]">
-                      <div className="flex justify-between items-start mb-2 border-b border-[#AEB9C9]/10 pb-1.5">
-                        <p className="font-bold text-[#202638]">
+                    <div className="bg-white bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
+                      <div className="flex justify-between items-start mb-2 border-b border-gray-200 pb-1.5">
+                        <p className="font-bold text-gray-900">
                           {interaction.counselor ? `${interaction.counselor.fullName} ${interaction.counselor.role ? `(${interaction.counselor.role})` : ''}` : 'System'}
                         </p>
-                        <p className="text-[10px] text-[#8891A3]">{new Date(interaction.createdAt).toLocaleString()}</p>
+                        <p className="text-[10px] text-gray-400">{new Date(interaction.createdAt).toLocaleString()}</p>
                       </div>
                       <p className="whitespace-pre-wrap leading-relaxed font-semibold">{interaction.content}</p>
                     </div>
@@ -620,25 +620,25 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               ))}
               
               {localInteractions.length === 0 && !lead.initialNote && (
-                <div className="text-center text-[#8891A3] py-12 font-bold text-xs">
+                <div className="text-center text-gray-400 py-12 font-bold text-xs">
                   No activity recorded yet.
                 </div>
               )}
             </div>
             
             {canEdit && (
-              <div className="p-4 border-t border-[#AEB9C9]/20 bg-[#DCE3ED]/25">
+              <div className="p-4 border-t border-gray-200 bg-[#DCE3ED]/25">
                 <div className="flex gap-3">
                   <textarea 
                     value={noteContent}
                     onChange={(e) => setNoteContent(e.target.value)}
                     placeholder="Add a consultation note..." 
-                    className="flex-1 bg-[#E7ECF3] shadow-[inset_2px_2px_5px_#AEB9C9,inset_-2px_-2px_5px_#FFFFFF] border-none rounded-xl p-3 text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none resize-none h-12 transition-all duration-200 focus:h-24"
+                    className="flex-1 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl p-3 text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none resize-none h-12 transition-all duration-200 focus:h-24"
                   ></textarea>
                   <button 
                     onClick={handlePostNote}
                     disabled={isPostingNote}
-                    className="px-5 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md hover:shadow-[5px_5px_12px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150 h-12 self-end"
+                    className="px-5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-md hover:shadow-[5px_5px_12px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150 h-12 self-end"
                   >
                     Post
                   </button>
@@ -651,20 +651,20 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {canEdit && (
             <div className="neo-raised p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <Clock className="h-5 w-5 text-[#FF7A52]" />
                   Follow-Up Tasks
                 </h3>
                 <button 
                   onClick={() => setIsAddingTask(!isAddingTask)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
                 >
                   {isAddingTask ? 'Cancel' : '+ Add Task'}
                 </button>
               </div>
               
               {isAddingTask && (
-                <div className="mb-5 bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] p-4 rounded-xl space-y-4">
+                <div className="mb-5 bg-white border border-gray-300 shadow-sm p-4 rounded-xl space-y-4">
                   <input 
                     value={taskDescription}
                     onChange={e => setTaskDescription(e.target.value)}
@@ -680,7 +680,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     />
                     <button 
                       onClick={handleAddTask} 
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md active:translate-y-0.5 transition-all"
+                      className="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-md active:translate-y-0.5 transition-all"
                     >
                       Save
                     </button>
@@ -690,12 +690,12 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               
               <div className="space-y-4">
                 {lead.tasks?.length === 0 ? (
-                  <div className="text-center text-[#8891A3] py-8 border border-dashed border-[#AEB9C9] rounded-xl font-bold text-xs">
+                  <div className="text-center text-gray-400 py-8 border border-dashed border-[#AEB9C9] rounded-xl font-bold text-xs">
                     No upcoming tasks.
                   </div>
                 ) : (
                   lead.tasks?.map((task: any) => (
-                    <div key={task.id} className={`flex items-start gap-3 bg-[#E7ECF3] p-4 rounded-2xl shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]'}`}>
+                    <div key={task.id} className={`flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:bg-gray-50 border border-gray-200'}`}>
                       <input 
                         type="checkbox" 
                         disabled={!canEdit}
@@ -704,13 +704,13 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                         className="mt-1 w-4 h-4 rounded cursor-pointer accent-[#4855E4] disabled:opacity-50 shrink-0" 
                       />
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold leading-normal ${task.status === 'Completed' ? 'line-through text-[#8891A3]' : 'text-[#202638]'}`}>{task.description}</p>
+                        <p className={`text-xs font-bold leading-normal ${task.status === 'Completed' ? 'line-through text-gray-400' : 'text-gray-900'}`}>{task.description}</p>
                         <div className="flex items-center flex-wrap gap-2 mt-1.5">
                           <p className="text-[10px] text-[#FF7A52] font-bold flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" /> {new Date(task.dueDate).toLocaleString()} {task.status === 'Completed' && ' (Completed)'}
                           </p>
                           {task.counselor && (
-                            <span className="text-[10px] text-[#8891A3] font-semibold">
+                            <span className="text-[10px] text-gray-400 font-semibold">
                               • Added by {task.counselor.fullName}
                             </span>
                           )}
@@ -728,13 +728,13 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
       {/* Applications list */}
       <div className="neo-raised p-6">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-bold text-[#202638] flex items-center gap-2">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Building className="h-5 w-5 text-[#12A8B5]" /> Applications
           </h3>
           {canEdit && (
             <button 
               onClick={() => setIsAddingApp(!isAddingApp)} 
-              className="px-3.5 py-1.5 rounded-xl bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-[10px] font-bold text-[#4855E4] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
             >
               {isAddingApp ? 'Cancel' : '+ Add Application'}
             </button>
@@ -742,7 +742,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
         </div>
 
         {isAddingApp && (
-          <div className="mb-5 bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] p-5 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="mb-5 bg-white border border-gray-300 shadow-sm p-5 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
             <input 
               value={appCountry}
               onChange={e => setAppCountry(e.target.value)}
@@ -763,7 +763,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             />
             <button 
               onClick={handleAddApp} 
-              className="px-5 py-2 rounded-xl bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white text-xs font-bold shadow-md hover:shadow-lg active:translate-y-0.5 transition-all"
+              className="px-5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-md hover:shadow-lg active:translate-y-0.5 transition-all"
             >
               Save Application
             </button>
@@ -772,15 +772,15 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
         <div className="space-y-4">
           {(!lead.applications || lead.applications.length === 0) ? (
-            <div className="text-center text-[#8891A3] py-8 border border-dashed border-[#AEB9C9] rounded-xl font-bold text-xs">
+            <div className="text-center text-gray-400 py-8 border border-dashed border-[#AEB9C9] rounded-xl font-bold text-xs">
               No applications submitted yet.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {lead.applications.map((app: any) => (
-                <div key={app.id} className="p-5 rounded-2xl bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] flex flex-col justify-between min-h-36">
+                <div key={app.id} className="p-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex flex-col justify-between min-h-36">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 bg-[#E7ECF3] shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] text-[#12A8B5] rounded-full">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 bg-white bg-gray-50 border border-gray-200 text-[#12A8B5] rounded-full">
                       {app.country}
                     </span>
                     {app.status !== 'Pending' && (
@@ -792,8 +792,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     )}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#202638] mb-1 font-display">{app.university}</h4>
-                    <p className="text-[11px] text-[#5C6478] font-semibold">{app.courseName}</p>
+                    <h4 className="text-xs font-bold text-gray-900 mb-1 font-display">{app.university}</h4>
+                    <p className="text-[11px] text-gray-600 font-semibold">{app.courseName}</p>
                   </div>
                 </div>
               ))}

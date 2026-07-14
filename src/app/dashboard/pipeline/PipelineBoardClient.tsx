@@ -108,8 +108,8 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
               onClick={() => setActiveStageName(stage.name)}
               className={`px-4 py-2 text-[11px] font-bold rounded-xl whitespace-nowrap transition-all duration-150 shrink-0 border-none ${
                 isActive
-                  ? 'text-[#202638] bg-[#E7ECF3] shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF]'
-                  : 'text-[#5C6478] bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] hover:text-[#202638]'
+                  ? 'text-gray-900 bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF]'
+                  : 'text-gray-600 bg-white border border-gray-200 hover:text-gray-900'
               }`}
             >
               {stage.name} ({count})
@@ -131,23 +131,23 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
               onDragOver={(e) => handleDragOver(e, stage.name)}
               onDragLeave={() => setDragOverStage(null)}
               onDrop={(e) => handleDrop(e, stage.name)}
-              className={`min-w-[155px] max-w-[210px] bg-[#E7ECF3] rounded-xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-2 ${
+              className={`min-w-[155px] max-w-[210px] bg-white rounded-xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-2 ${
                 isMobileHidden ? 'hidden lg:flex' : 'flex'
               } ${
                 isDraggingOverThis
-                  ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF]'
+                  ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 bg-gray-50 border border-gray-200'
                   : 'border-transparent shadow-[4px_4px_10px_#AEB9C9,-4px_-4px_10px_#FFFFFF]'
               }`}
             >
             {/* Column Header */}
-            <div className="p-2.5 flex items-center justify-between border-b border-[#AEB9C9]/20 shrink-0">
+            <div className="p-2.5 flex items-center justify-between border-b border-gray-200 shrink-0">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dotColor }}></span>
-                <span className="text-[11px] font-bold text-[#202638] font-display truncate max-w-[95px]" title={stage.name}>
+                <span className="text-[11px] font-bold text-gray-900 font-display truncate max-w-[95px]" title={stage.name}>
                   {stage.name}
                 </span>
               </div>
-              <span className="text-[9px] font-bold text-[#8891A3] bg-[#DCE3ED] px-1.5 py-0.5 rounded-full shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] shrink-0">
+              <span className="text-[9px] font-bold text-gray-400 bg-[#DCE3ED] px-1.5 py-0.5 rounded-full shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] shrink-0">
                 {stageLeads.length}
               </span>
             </div>
@@ -168,24 +168,24 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                     draggable
                     onDragStart={(e) => handleDragStart(e, lead.id)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] transition-all duration-150 relative group border border-[#AEB9C9]/10 ${
+                    className={`bg-white border border-gray-200 rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-sm border border-gray-200 transition-all duration-150 relative group border border-gray-200 ${
                       isThisDragged ? 'opacity-30 scale-95 shadow-inner' : ''
                     }`}
                   >
                     {/* Top Row: Initials Badge & Name */}
                     <div className="flex items-start justify-between gap-1.5 mb-1.5">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <div className="w-5.5 h-5.5 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white flex items-center justify-center text-[8px] font-bold shrink-0 shadow-sm">
+                        <div className="w-5.5 h-5.5 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[8px] font-bold shrink-0 shadow-sm">
                           {getInitials(lead.fullName)}
                         </div>
-                        <span className="text-[10.5px] font-bold text-[#202638] truncate" title={lead.fullName}>
+                        <span className="text-[10.5px] font-bold text-gray-900 truncate" title={lead.fullName}>
                           {lead.fullName}
                         </span>
                       </div>
                       
                       <Link 
                         href={`/dashboard/leads/${lead.id}`}
-                        className="p-0.5 rounded text-[#8891A3] hover:text-[#4855E4] hover:bg-[#DCE3ED]/50 transition-colors shrink-0"
+                        className="p-0.5 rounded text-gray-400 hover:text-[#4855E4] hover:bg-[#DCE3ED]/50 transition-colors shrink-0"
                         title="View profile"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -193,15 +193,15 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                     </div>
 
                     {/* Middle Row: Preferences */}
-                    <p className="text-[9px] font-semibold text-[#5C6478] mb-2 truncate">
+                    <p className="text-[9px] font-semibold text-gray-600 mb-2 truncate">
                       {lead.preferredCountry ? `Pref: ${lead.preferredCountry}` : 'No destination'}
                     </p>
 
                     {/* Bottom Row: Ratings, Counselor & Days */}
-                    <div className="flex items-center justify-between border-t border-[#AEB9C9]/10 pt-2 mt-1">
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-2 mt-1">
                       <div className="flex flex-col gap-0.5 min-w-0">
                         <StarRating rating={lead.rating} editable={false} size={8} />
-                        <span className="text-[8px] font-semibold text-[#8891A3] truncate">
+                        <span className="text-[8px] font-semibold text-gray-400 truncate">
                           {days === 0 ? 'Today' : `${days}d in stage`}
                         </span>
                       </div>
@@ -215,7 +215,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                         </div>
                       ) : (
                         <div 
-                          className="w-4.5 h-4.5 rounded-full bg-[#C7CFDC]/50 text-[#8891A3] flex items-center justify-center shadow-inner shrink-0"
+                          className="w-4.5 h-4.5 rounded-full bg-[#C7CFDC]/50 text-gray-400 flex items-center justify-center shadow-inner shrink-0"
                           title="Unassigned counselor"
                         >
                           <User className="w-2.5 h-2.5" />
@@ -227,7 +227,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
               })}
 
               {stageLeads.length === 0 && (
-                <div className="h-16 border-2 border-dashed border-[#AEB9C9]/20 rounded-xl flex items-center justify-center text-[9px] font-bold text-[#8891A3]/80">
+                <div className="h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-[9px] font-bold text-gray-400/80">
                   Drop leads
                 </div>
               )}

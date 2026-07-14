@@ -66,7 +66,7 @@ export function LeadFilters({
     })
   }
 
-  const selectClass = "px-3 py-2 bg-[#E7ECF3] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] text-xs font-bold text-[#5C6478] hover:text-[#202638] rounded-xl outline-none focus:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all cursor-pointer"
+  const selectClass = "px-3 py-2 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:text-gray-900 rounded-xl outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
 
   return (
     <div className="neo-raised p-6 flex flex-col gap-4 relative">
@@ -79,13 +79,13 @@ export function LeadFilters({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative w-full lg:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8891A3]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name, email, or phone..."
             defaultValue={searchParams.get('q') || ''}
             onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-3 bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] rounded-xl text-xs font-semibold text-[#202638] placeholder-[#8891A3] focus:outline-none focus:shadow-[inset_4px_4px_8px_#AEB9C9,inset_-4px_-4px_8px_#FFFFFF] transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 shadow-sm rounded-xl text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none focus:bg-gray-50 border border-gray-200 transition-all"
           />
         </div>
 
@@ -93,7 +93,7 @@ export function LeadFilters({
         <div className="flex flex-wrap items-center gap-3">
           {isAdminOrManager && (
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#8891A3] shrink-0" />
+              <Users className="h-4 w-4 text-gray-400 shrink-0" />
               <select 
                 onChange={handleCounselorFilter}
                 defaultValue={searchParams.get('counselorId') || ''}
@@ -108,7 +108,7 @@ export function LeadFilters({
           )}
 
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[#8891A3] shrink-0" />
+            <Filter className="h-4 w-4 text-gray-400 shrink-0" />
             <select 
               onChange={handleStageFilter}
               defaultValue={searchParams.get('stage') || ''}

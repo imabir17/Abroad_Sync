@@ -12,12 +12,12 @@ interface CountryFormModalProps {
 
 const InputField = ({ name, label, defaultValue }: { name: string, label: string, defaultValue?: string }) => (
   <div className="space-y-1">
-    <label className="text-xs font-bold text-[#5C6478] uppercase">{label}</label>
+    <label className="text-xs font-bold text-gray-600 uppercase">{label}</label>
     <input
       type="text"
       name={name}
       defaultValue={defaultValue || ''}
-      className="w-full px-4 py-2.5 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638] transition-all"
+      className="w-full px-4 py-2.5 bg-white border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 border border-gray-300 shadow-sm text-gray-900 transition-all"
     />
   </div>
 )
@@ -29,7 +29,7 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
       <button
         type="button"
         onClick={() => setItems([...items, ''])}
-        className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+        className="p-1.5 rounded-lg bg-white text-[#4855E4] border border-gray-200 hover:bg-gray-50 border border-gray-200"
       >
         <Plus className="w-4 h-4" />
       </button>
@@ -45,19 +45,19 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
               newItems[idx] = e.target.value
               setItems(newItems)
             }}
-            className="flex-1 px-4 py-2 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638]"
+            className="flex-1 px-4 py-2 bg-white border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 border border-gray-300 shadow-sm text-gray-900"
             placeholder={placeholder}
           />
           <button
             type="button"
             onClick={() => setItems(items.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 border border-gray-200"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
       ))}
-      {items.length === 0 && <p className="text-xs text-[#8891A3]">No items added.</p>}
+      {items.length === 0 && <p className="text-xs text-gray-400">No items added.</p>}
     </div>
   </div>
 )
@@ -69,14 +69,14 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
       <button
         type="button"
         onClick={() => setUniversities([...universities, { name: '', location: '' }])}
-        className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+        className="p-1.5 rounded-lg bg-white text-[#4855E4] border border-gray-200 hover:bg-gray-50 border border-gray-200"
       >
         <Plus className="w-4 h-4" />
       </button>
     </div>
     <div className="space-y-4">
       {universities.map((uni, idx) => (
-        <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
+        <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
           <div className="flex-1 space-y-3">
             <input
               type="text"
@@ -86,7 +86,7 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
                 newUnis[idx].name = e.target.value
                 setUniversities(newUnis)
               }}
-              className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
+              className="w-full px-4 py-2 bg-transparent border-b border-gray-200 text-sm focus:outline-none focus:border-[#4855E4] text-gray-900"
               placeholder="University Name"
             />
             <input
@@ -97,20 +97,20 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
                 newUnis[idx].location = e.target.value
                 setUniversities(newUnis)
               }}
-              className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
+              className="w-full px-4 py-2 bg-transparent border-b border-gray-200 text-sm focus:outline-none focus:border-[#4855E4] text-gray-900"
               placeholder="Location (e.g. Pafos, Cyprus)"
             />
           </div>
           <button
             type="button"
             onClick={() => setUniversities(universities.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] mt-2"
+            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 border border-gray-200 mt-2"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
       ))}
-      {universities.length === 0 && <p className="text-xs text-[#8891A3]">No universities added.</p>}
+      {universities.length === 0 && <p className="text-xs text-gray-400">No universities added.</p>}
     </div>
   </div>
 )
@@ -176,21 +176,21 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-5xl bg-[#E7ECF3] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex items-center justify-between p-6 border-b border-[#AEB9C9]/20 shrink-0">
-          <h2 className="text-xl font-bold text-[#202638] font-display">
+      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 shrink-0">
+          <h2 className="text-xl font-bold text-gray-900 font-display">
             {country ? 'Edit Country Guide' : 'Add New Country Guide'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-[#E7ECF3] text-[#5C6478] hover:text-[#202638] shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF] active:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] transition-all"
+            className="p-2 rounded-xl bg-white text-gray-600 hover:text-gray-900 border border-gray-200 active:bg-gray-50 border border-gray-200 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Custom Tabs */}
-        <div className="px-6 pt-4 flex gap-2 overflow-x-auto custom-scrollbar shrink-0 border-b border-[#AEB9C9]/20 pb-4">
+        <div className="px-6 pt-4 flex gap-2 overflow-x-auto custom-scrollbar shrink-0 border-b border-gray-200 pb-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -198,8 +198,8 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-[#6E79F2] to-[#4855E4] text-white shadow-[3px_3px_6px_#AEB9C9,-3px_-3px_6px_#FFFFFF]'
-                  : 'bg-[#E7ECF3] text-[#5C6478] hover:text-[#202638] shadow-[inset_2px_2px_4px_#FFFFFF,inset_-2px_-2px_4px_#AEB9C9]'
+                  ? 'bg-blue-600 text-white border border-gray-200'
+                  : 'bg-white text-gray-600 hover:text-gray-900 shadow-[inset_2px_2px_4px_#FFFFFF,inset_-2px_-2px_4px_#AEB9C9]'
               }`}
             >
               {tab.label}
@@ -237,7 +237,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
                 <InputField name="courseDurationPg" label="Course Duration PG" defaultValue={country?.courseDurationPg} />
                 <InputField name="processingDuration" label="Processing Duration" defaultValue={country?.processingDuration} />
                 
-                <div className="col-span-full border-b border-[#AEB9C9]/30 pb-2 mt-4">
+                <div className="col-span-full border-b border-gray-200 pb-2 mt-4">
                   <h3 className="font-bold text-[#4855E4]">English Language Tests</h3>
                 </div>
                 <InputField name="ieltsRequirement" label="IELTS Requirement" defaultValue={country?.ieltsRequirement} />
@@ -296,11 +296,11 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
           </form>
         </div>
 
-        <div className="p-6 border-t border-[#AEB9C9]/20 flex justify-end gap-3 shrink-0 bg-[#E7ECF3]">
+        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 shrink-0 bg-white">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl font-bold text-[#5C6478] bg-[#E7ECF3] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] active:scale-95 transition-all"
+            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 border border-gray-200 active:scale-95 transition-all"
             disabled={isPending}
           >
             Cancel
@@ -309,7 +309,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
             type="submit"
             form="country-form"
             disabled={isPending}
-            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#6E79F2] to-[#4855E4] shadow-[4px_4px_8px_#AEB9C9,-4px_-4px_8px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] active:scale-95 transition-all disabled:opacity-70"
+            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-sm border border-gray-200 hover:shadow-inner active:scale-95 transition-all disabled:opacity-70"
           >
             <Save className="w-4 h-4" />
             {isPending ? 'Saving...' : 'Save Guide'}

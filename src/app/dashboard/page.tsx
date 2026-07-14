@@ -128,31 +128,31 @@ export default async function DashboardPage() {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-bold text-[#202638] font-display">Overview</h2>
-        <p className="text-xs text-[#5C6478] mt-1">Comprehensive real-time breakdown of student lead pipelines.</p>
+        <h2 className="text-2xl font-bold text-gray-900 font-display">Overview</h2>
+        <p className="text-xs text-gray-600 mt-1">Comprehensive real-time breakdown of student lead pipelines.</p>
       </div>
 
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#5C6478]">Total Leads</h3>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6E79F2] to-[#333FC2] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
+            <h3 className="text-xs font-bold text-gray-600">Total Leads</h3>
+            <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
               <Users className="h-4.5 w-4.5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-[#202638] font-display mt-4">{totalLeads}</p>
+          <p className="text-3xl font-black text-gray-900 font-display mt-4">{totalLeads}</p>
         </div>
 
         <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#5C6478]">Pipeline Health</h3>
+            <h3 className="text-xs font-bold text-gray-600">Pipeline Health</h3>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3FC7CE] to-[#0F8A94] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
               <Activity className="h-4.5 w-4.5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-[#202638] font-display mt-4">{conversionRate}%</p>
-          <p className="text-[10px] text-[#8891A3] mt-2 font-medium">Ratio of high potential leads (Very Good + Good)</p>
+          <p className="text-3xl font-black text-gray-900 font-display mt-4">{conversionRate}%</p>
+          <p className="text-[10px] text-gray-400 mt-2 font-medium">Ratio of high potential leads (Very Good + Good)</p>
         </div>
 
         {/* Tasks trigger */}
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
       {/* Agenda list for non Super Admins */}
       {user.role !== 'Super Admin' && (
         <div className="neo-raised p-8">
-          <h3 className="text-base font-bold text-[#202638] mb-6 flex items-center gap-2">
+          <h3 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
             <Clock className="w-4.5 h-4.5 text-[#FF7A52]" />
             Today's Agenda
           </h3>
@@ -172,18 +172,18 @@ export default async function DashboardPage() {
 
       {/* Ratings Cards List */}
       <div>
-        <h3 className="text-base font-bold text-[#202638] mb-5 flex items-center gap-2">
+        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <UserCheck className="h-5 w-5 text-[#21C285]" /> Lead Ratings
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {ratingsCards.map(rating => (
             <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.name)}`}>
-              <div className="neo-raised p-5 hover:shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] transition-all flex flex-col justify-between h-28">
+              <div className="neo-raised p-5 hover:border border-gray-300 shadow-sm transition-all flex flex-col justify-between h-28">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#5C6478]">{rating.name}</span>
+                  <span className="text-xs font-bold text-gray-600">{rating.name}</span>
                   <span className="w-2.5 h-2.5 rounded-full border border-white" style={{ backgroundColor: rating.color, boxShadow: `0 0 10px ${rating.color}40` }}></span>
                 </div>
-                <p className="text-2xl font-black text-[#202638] font-display">{rating.count}</p>
+                <p className="text-2xl font-black text-gray-900 font-display">{rating.count}</p>
               </div>
             </Link>
           ))}
@@ -193,7 +193,7 @@ export default async function DashboardPage() {
       {/* Pipeline Snapshot Funnel */}
       <div className="neo-raised p-8">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-base font-bold text-[#202638] flex items-center gap-2 font-display">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 font-display">
             <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Snapshot
           </h3>
           <Link href="/dashboard/pipeline" className="text-xs font-bold text-[#4855E4] hover:underline flex items-center gap-1">
@@ -206,8 +206,8 @@ export default async function DashboardPage() {
             return (
               <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
                 <div className="flex items-center gap-4">
-                  <span className="w-24 text-xs font-bold text-[#5C6478] group-hover:text-[#202638] transition-colors truncate">{stage.name}</span>
-                  <div className="flex-1 h-3.5 bg-[#E7ECF3] shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] rounded-full overflow-hidden">
+                  <span className="w-24 text-xs font-bold text-gray-600 group-hover:text-gray-900 transition-colors truncate">{stage.name}</span>
+                  <div className="flex-1 h-3.5 bg-white bg-gray-50 border border-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-105" 
                       style={{ 
@@ -217,7 +217,7 @@ export default async function DashboardPage() {
                       }}
                     ></div>
                   </div>
-                  <span className="w-10 text-right text-xs font-bold text-[#202638]">{stage.count}</span>
+                  <span className="w-10 text-right text-xs font-bold text-gray-900">{stage.count}</span>
                 </div>
               </Link>
             )
@@ -228,7 +228,7 @@ export default async function DashboardPage() {
       {/* Charts Panel */}
       {totalLeads > 0 && (
         <div className="neo-raised p-8">
-          <h3 className="text-base font-bold text-[#202638] mb-6 font-display">Analytics Charts</h3>
+          <h3 className="text-base font-bold text-gray-900 mb-6 font-display">Analytics Charts</h3>
           <DashboardCharts ratingsData={ratingsChartData} stagesData={stagesChartData} />
         </div>
       )}

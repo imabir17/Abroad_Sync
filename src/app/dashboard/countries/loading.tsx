@@ -8,7 +8,7 @@ export default function Loading() {
         </div>
         <div className="h-10 w-32 bg-[#AEB9C9]/20 rounded-xl"></div>
       </div>
-      <div className="bg-[#E7ECF3] rounded-2xl shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] border border-[#AEB9C9]/20 h-[600px]"></div>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 border border-gray-200 h-[600px]"></div>
     </div>
   )
 }
