@@ -66,10 +66,10 @@ export function LeadFilters({
     })
   }
 
-  const selectClass = "px-3 py-2 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:text-gray-900 rounded-xl outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+  const selectClass = "px-3 py-2 bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white hover:border-[#555555] rounded-xl outline-none focus:border-[#007ACC] transition-all cursor-pointer"
 
   return (
-    <div className="neo-raised p-6 flex flex-col gap-4 relative">
+    <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6 flex flex-col gap-4 relative">
       {isPending && (
         <span className="absolute top-3 right-4 text-[10px] font-bold text-[#12A8B5] bg-[#12A8B5]/10 px-2 py-0.5 rounded-full">
           Updating...
@@ -85,7 +85,7 @@ export function LeadFilters({
             placeholder="Search by name, email, or phone..."
             defaultValue={searchParams.get('q') || ''}
             onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 shadow-sm rounded-xl text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none focus:bg-gray-50 border border-gray-200 transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-[#1E1E1E] border border-[#3C3C3C] shadow-sm rounded-xl text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] transition-all"
           />
         </div>
 
