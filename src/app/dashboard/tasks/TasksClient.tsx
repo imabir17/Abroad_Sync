@@ -185,8 +185,8 @@ export default function TasksClient({
     }
   })
 
-  const inputClass = "w-full bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-xs font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
-  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
+  const inputClass = "w-full bg-white border-2 border-white rounded-xl py-2.5 px-4 text-xs font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-200 shadow-sm transition-all"
+  const selectClass = "w-full bg-white border-2 border-white text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 shadow-sm transition-all cursor-pointer"
 
   const renderTaskRow = (task: any) => {
     const isCompleted = task.status === 'Completed'
@@ -197,7 +197,7 @@ export default function TasksClient({
     return (
       <div 
         key={task.id} 
-        className={`flex items-center gap-4 p-4 mb-3.5 bg-white rounded-2xl shadow-sm border border-gray-200 group transition-all duration-300 ${
+        className={`flex items-center gap-4 p-4 mb-3.5 bg-white/80 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white group transition-all duration-300 ${
           isCompleted ? 'opacity-60' : ''
         }`}
       >
@@ -306,7 +306,7 @@ export default function TasksClient({
             <span className="text-[10px] bg-[#4855E4]/10 px-2 py-0.5 rounded-full">{todayTasks.length}</span>
           </div>
           {todayTasks.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center text-xs font-bold text-gray-400">
+            <div className="bg-slate-50 rounded-[2rem] border-4 border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 text-center text-xs font-bold text-gray-400">
               No tasks scheduled for today.
             </div>
           ) : (
@@ -339,7 +339,7 @@ export default function TasksClient({
         )}
 
         {activeTasks.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-xs font-bold text-gray-400">
+          <div className="bg-slate-50 rounded-[2rem] border-4 border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-12 text-center text-xs font-bold text-gray-400">
             No tasks found. Create a task to get started!
           </div>
         )}
@@ -348,7 +348,7 @@ export default function TasksClient({
       {/* Creation Modal (Portaled) */}
       {mounted && isModalOpen && createPortal(
         <div className="fixed inset-0 bg-[#202638]/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <div className="relative z-10 max-w-md w-full bg-white shadow-[0_12px_36px_rgba(32,38,56,0.15)] border border-gray-200 rounded-2xl p-6 md:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative z-10 max-w-md w-full bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 md:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-bold text-gray-900 font-display">Assign Task</h3>
               <button 

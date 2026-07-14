@@ -146,10 +146,10 @@ export default function LeadsTableClient({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] overflow-hidden">
       {/* Bulk Transfer Action Bar */}
       {isAdminOrManager && selectedLeadIds.length > 0 && (
-        <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 animate-in fade-in duration-300">
+        <div className="bg-slate-50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-white animate-in fade-in duration-300">
           <span className="text-xs font-bold text-gray-900">{selectedLeadIds.length} leads selected</span>
           <div className="flex items-center gap-3">
             <select 
@@ -275,7 +275,7 @@ export default function LeadsTableClient({
           return (
             <div 
               key={lead.id} 
-              className="bg-white border border-gray-200 rounded-2xl p-4 space-y-3.5"
+              className={`bg-slate-50 border-4 border-white rounded-3xl shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] p-4 space-y-3.5`}
             >
               {/* Header: Name, Country, Avatar */}
               <div className="flex items-start justify-between gap-3">
@@ -346,7 +346,7 @@ export default function LeadsTableClient({
           )
         })}
         {activeLeads.length === 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-xs font-bold text-gray-400">
+          <div className="bg-slate-50 rounded-[2rem] border-4 border-white shadow-sm p-8 text-center text-xs font-bold text-gray-400">
             No leads found matching your search.
           </div>
         )}

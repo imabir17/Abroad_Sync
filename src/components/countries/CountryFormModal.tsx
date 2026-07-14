@@ -17,7 +17,7 @@ const InputField = ({ name, label, defaultValue }: { name: string, label: string
       type="text"
       name={name}
       defaultValue={defaultValue || ''}
-      className="w-full px-4 py-2.5 bg-white border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 border border-gray-300 shadow-sm text-gray-900 transition-all"
+      className="w-full px-4 py-2.5 bg-white border-2 border-white rounded-xl text-sm focus:outline-none focus:border-blue-200 shadow-sm text-gray-900 transition-all"
     />
   </div>
 )
@@ -45,7 +45,7 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
               newItems[idx] = e.target.value
               setItems(newItems)
             }}
-            className="flex-1 px-4 py-2 bg-white border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 border border-gray-300 shadow-sm text-gray-900"
+            className="flex-1 px-4 py-2 bg-white border-2 border-white rounded-xl text-sm focus:outline-none focus:border-blue-200 shadow-sm text-gray-900"
             placeholder={placeholder}
           />
           <button
@@ -176,7 +176,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-5xl bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 shrink-0">
           <h2 className="text-xl font-bold text-gray-900 font-display">
             {country ? 'Edit Country Guide' : 'Add New Country Guide'}
@@ -198,8 +198,8 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white border border-gray-200'
-                  : 'bg-white text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200'
+                  ? 'bg-white text-blue-600 border-2 border-white shadow-sm'
+                  : 'bg-transparent text-gray-600 hover:text-gray-900 border-2 border-transparent hover:bg-white/50'
               }`}
             >
               {tab.label}
@@ -296,11 +296,11 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
           </form>
         </div>
 
-        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 shrink-0 bg-white">
+        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 shrink-0 bg-slate-50/50">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all"
+            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white hover:bg-gray-50 active:scale-95 transition-all"
             disabled={isPending}
           >
             Cancel
@@ -309,7 +309,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
             type="submit"
             form="country-form"
             disabled={isPending}
-            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-sm border border-transparent hover:shadow-md active:scale-95 transition-all disabled:opacity-70"
+            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.3)] border-2 border-blue-500 hover:brightness-110 active:scale-95 transition-all disabled:opacity-70"
           >
             <Save className="w-4 h-4" />
             {isPending ? 'Saving...' : 'Save Guide'}

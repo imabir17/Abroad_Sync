@@ -134,7 +134,7 @@ export default async function DashboardPage() {
 
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
+        <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-gray-600">Total Leads</h3>
             <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-sm flex items-center justify-center text-white">
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
           <p className="text-3xl font-black text-gray-900 font-display mt-4">{totalLeads}</p>
         </div>
 
-        <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
+        <div className="bg-emerald-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-gray-600">Pipeline Health</h3>
             <div className="w-8 h-8 rounded-lg bg-teal-500 shadow-sm flex items-center justify-center text-white">
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
 
       {/* Agenda list for non Super Admins */}
       {user.role !== 'Super Admin' && (
-        <div className="neo-raised p-8">
+        <div className="bg-rose-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
           <h3 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
             <Clock className="w-4.5 h-4.5 text-[#FF7A52]" />
             Today's Agenda
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {ratingsCards.map(rating => (
             <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.name)}`}>
-              <div className="neo-raised p-5 hover:border border-gray-300 shadow-sm transition-all flex flex-col justify-between h-28">
+              <div className="bg-white border-4 border-white rounded-3xl shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-5 hover:border-gray-100 transition-all flex flex-col justify-between h-28">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-600">{rating.name}</span>
                   <span className="w-2.5 h-2.5 rounded-full border border-white" style={{ backgroundColor: rating.color, boxShadow: `0 0 10px ${rating.color}40` }}></span>
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Pipeline Snapshot Funnel */}
-      <div className="neo-raised p-8">
+      <div className="bg-indigo-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 font-display">
             <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Snapshot
@@ -227,7 +227,7 @@ export default async function DashboardPage() {
 
       {/* Charts Panel */}
       {totalLeads > 0 && (
-        <div className="neo-raised p-8">
+        <div className="bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
           <h3 className="text-base font-bold text-gray-900 mb-6 font-display">Analytics Charts</h3>
           <DashboardCharts ratingsData={ratingsChartData} stagesData={stagesChartData} />
         </div>

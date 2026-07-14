@@ -201,7 +201,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Academic History Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-[#4855E4]" />
@@ -237,7 +237,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             <div className="space-y-5">
               {/* SSC Details */}
               {(formData.sscGroup || formData.sscYear || formData.sscResult || isEditing) && (
-                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                <div className="p-4 rounded-2xl bg-white/60 border-2 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)]">
                   <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">SSC / O-Levels</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
@@ -258,7 +258,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* HSC Details */}
               {(formData.hscGroup || formData.hscYear || formData.hscResult || isEditing) && (
-                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                <div className="p-4 rounded-2xl bg-white/60 border-2 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)]">
                   <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">HSC / A-Levels</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
@@ -279,7 +279,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* Bachelors Details */}
               {(formData.bachelorsMajor || formData.bachelorsYear || formData.bachelorsCgpa || isEditing) && (
-                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                <div className="p-4 rounded-2xl bg-white/60 border-2 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)]">
                   <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">Bachelor&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
@@ -300,7 +300,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
               {/* Masters Details */}
               {(formData.mastersMajor || formData.mastersYear || formData.mastersCgpa || isEditing) && (
-                <div className="p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+                <div className="p-4 rounded-2xl bg-white/60 border-2 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)]">
                   <h4 className="text-xs font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">Master&apos;s Degree</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
@@ -322,7 +322,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Preferences Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-indigo-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Globe className="h-5 w-5 text-[#12A8B5]" />
@@ -394,7 +394,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
           {/* Professional Experience Card */}
           {(formData.workExperience || isEditing) && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-orange-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-[#FF7A52]" />
@@ -431,7 +431,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           )}
 
           {/* English Proficiency Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-emerald-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#21C285]" />
@@ -503,7 +503,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Budget & Origin Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-rose-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-[#FF7A52]" />
@@ -570,7 +570,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
         <div className="lg:col-span-2 space-y-8">
           
           {/* Consultation Notes Timeline */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-[400px]">
+          <div className="bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] flex flex-col h-[400px]">
             <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <MessageSquare className="h-4.5 w-4.5 text-[#4855E4]" />
@@ -649,7 +649,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
           {/* Follow-Up Tasks Card */}
           {canEdit && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-purple-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <Clock className="h-5 w-5 text-[#FF7A52]" />
@@ -695,7 +695,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   </div>
                 ) : (
                   lead.tasks?.map((task: any) => (
-                    <div key={task.id} className={`flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:bg-gray-50'}`}>
+                    <div key={task.id} className={`flex items-start gap-3 bg-white/60 p-4 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:bg-white'}`}>
                       <input 
                         type="checkbox" 
                         disabled={!canEdit}
@@ -726,7 +726,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
       </div>
       
       {/* Applications list */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Building className="h-5 w-5 text-[#12A8B5]" /> Applications
@@ -778,7 +778,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {lead.applications.map((app: any) => (
-                <div key={app.id} className="p-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex flex-col justify-between min-h-36">
+                <div key={app.id} className="p-5 rounded-3xl bg-white/60 shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white flex flex-col justify-between min-h-36">
                   <div className="flex justify-between items-start mb-3">
                     <span className="text-[10px] font-bold px-2.5 py-0.5 bg-gray-50 border border-gray-200 text-[#12A8B5] rounded-full">
                       {app.country}

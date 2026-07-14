@@ -13,7 +13,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
 
   // Helper component for info cards
   const InfoCard = ({ icon: Icon, title, value }: { icon: any, title: string, value: string }) => (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-2">
+    <div className="bg-orange-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-2">
       <div className="flex items-center gap-2 text-[#4855E4]">
         <Icon className="w-4 h-4" />
         <span className="text-xs font-bold uppercase tracking-wider text-gray-600">{title}</span>
@@ -23,7 +23,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
   )
 
   const Section = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
+    <div className="bg-slate-50 rounded-[2rem] border-4 border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 md:p-8">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
         <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner text-[#4855E4]">
           <Icon className="w-5 h-5" />
@@ -40,7 +40,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
       <div className="flex items-center gap-4">
         <Link 
           href="/dashboard/countries" 
-          className="p-3 rounded-xl bg-white text-gray-600 hover:text-blue-600 shadow-sm border border-gray-200 hover:bg-gray-50 transition-all"
+          className="p-3 rounded-2xl bg-white text-gray-600 hover:text-blue-600 shadow-sm border-2 border-white hover:bg-gray-50 transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -76,7 +76,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
                   <span className="font-semibold text-gray-900">{country.studyGapAcceptance || 'N/A'}</span>
                 </div>
               </div>
-              <div className="p-4 rounded-2xl bg-white border border-gray-300 shadow-sm space-y-2">
+              <div className="p-4 rounded-2xl bg-blue-50/50 border-4 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.7)] space-y-2">
                 <h4 className="font-bold text-[#4855E4] text-sm mb-3">Language Tests</h4>
                 <div className="flex justify-between text-sm"><span className="text-gray-600">IELTS</span><span className="font-semibold text-gray-900">{country.ieltsRequirement || 'N/A'}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-gray-600">PTE</span><span className="font-semibold text-gray-900">{country.pteRequirement || 'N/A'}</span></div>
@@ -100,7 +100,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
               </div>
             </div>
             {country.totalCost && (
-              <div className="mt-6 p-4 rounded-2xl bg-blue-50 border border-[#4855E4]/20">
+              <div className="mt-6 p-4 rounded-2xl bg-emerald-50/50 border-4 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.7)]">
                 <span className="text-xs text-[#4855E4] uppercase font-bold block mb-1">Total Cost Breakdown</span>
                 <span className="font-semibold text-gray-900">{country.totalCost}</span>
               </div>
@@ -159,7 +159,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
             <Section title="University Checklist" icon={FileText}>
               <ul className="space-y-2">
                 {country.universityChecklist.map((item: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
+                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-white/60 border-2 border-white shadow-sm text-sm font-semibold text-gray-900">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#4855E4]" />
                     {item}
                   </li>
@@ -172,7 +172,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
             <Section title="Visa Checklist" icon={FileText}>
               <ul className="space-y-2">
                 {country.visaChecklist.map((item: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
+                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-white/60 border-2 border-white shadow-sm text-sm font-semibold text-gray-900">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#4855E4]" />
                     {item}
                   </li>
@@ -187,7 +187,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
         <Section title="Top Universities" icon={Building2}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {country.universities.map((uni: any, idx: number) => (
-              <div key={idx} className="p-4 rounded-2xl bg-white shadow-sm border border-gray-100 flex gap-4 items-center">
+              <div key={idx} className="p-4 rounded-2xl bg-white/60 shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white flex gap-4 items-center">
                 <div className="w-12 h-12 shrink-0 rounded-xl bg-blue-50 flex items-center justify-center text-[#4855E4]">
                   <Building2 className="w-6 h-6" />
                 </div>

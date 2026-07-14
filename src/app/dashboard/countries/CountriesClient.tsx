@@ -20,6 +20,10 @@ export default function CountriesClient({
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const router = useRouter()
 
+  const CARD_COLORS = [
+    'bg-blue-50', 'bg-emerald-50', 'bg-purple-50', 'bg-orange-50', 'bg-rose-50', 'bg-indigo-50'
+  ]
+
   const filteredCountries = countries.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase())
   )
@@ -87,11 +91,11 @@ export default function CountriesClient({
             <p className="text-sm">Try adjusting your search or add a new country.</p>
           </div>
         ) : (
-          filteredCountries.map(country => (
+          filteredCountries.map((country, idx) => (
             <div 
               key={country.id} 
               onClick={() => router.push(`/dashboard/countries/${country.id}`)}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col cursor-pointer hover:scale-[1.02] transition-transform"
+              className={`${CARD_COLORS[idx % CARD_COLORS.length]} rounded-[2rem] p-6 border-4 border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] flex flex-col cursor-pointer hover:scale-[1.02] transition-transform`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
@@ -128,19 +132,19 @@ export default function CountriesClient({
               
               <div className="flex-1 space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Academic Req</p>
                     <p className="font-semibold text-gray-900 truncate">{country.academicRequirement || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Study Gap</p>
                     <p className="font-semibold text-gray-900 truncate">{country.studyGapAcceptance || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Total Cost</p>
                     <p className="font-semibold text-gray-900 truncate">{country.totalCost || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Intakes</p>
                     <p className="font-semibold text-gray-900 truncate">{country.intakes || 'N/A'}</p>
                   </div>

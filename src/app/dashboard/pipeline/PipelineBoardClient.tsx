@@ -131,12 +131,12 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
               onDragOver={(e) => handleDragOver(e, stage.name)}
               onDragLeave={() => setDragOverStage(null)}
               onDrop={(e) => handleDrop(e, stage.name)}
-              className={`min-w-[155px] max-w-[210px] bg-white rounded-xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-2 ${
+              className={`min-w-[155px] max-w-[210px] bg-slate-50 rounded-3xl flex flex-col max-h-[calc(100vh-230px)] transition-all duration-200 border-4 ${
                 isMobileHidden ? 'hidden lg:flex' : 'flex'
               } ${
                 isDraggingOverThis
-                  ? 'border-blue-400 bg-gray-50'
-                  : 'border-gray-200 shadow-sm'
+                  ? 'border-blue-400 bg-blue-50/30'
+                  : 'border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)]'
               }`}
             >
             {/* Column Header */}
@@ -168,7 +168,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                     draggable
                     onDragStart={(e) => handleDragStart(e, lead.id)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-white border border-gray-200 rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-md transition-all duration-150 relative group ${
+                    className={`bg-white/60 border-2 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-md transition-all duration-150 relative group ${
                       isThisDragged ? 'opacity-30 scale-95 shadow-inner' : ''
                     }`}
                   >

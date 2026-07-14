@@ -49,8 +49,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
   const [state, formAction, isPending] = useActionState(createLead, { error: '' })
 
-  const inputClass = "w-full bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
-  const selectClass = "w-full bg-white border border-gray-200 text-base font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
+  const inputClass = "w-full bg-white border-2 border-white rounded-xl py-2.5 px-4 text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-200 shadow-[2px_2px_6px_rgba(0,0,0,0.02),inset_1px_1px_3px_rgba(0,0,0,0.03)] transition-all"
+  const selectClass = "w-full bg-white border-2 border-white text-base font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 shadow-[2px_2px_6px_rgba(0,0,0,0.02),inset_1px_1px_3px_rgba(0,0,0,0.03)] transition-all cursor-pointer"
 
   return (
     <form action={formAction} className="space-y-8">
@@ -62,7 +62,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
       
       {/* Personal Info */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative">
+      <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 relative">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <User className="h-5 w-5 text-[#4855E4]" /> Personal Information
         </h3>
@@ -138,7 +138,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Main Academic Setup */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-emerald-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <GraduationCap className="h-5 w-5 text-[#12A8B5]" /> Academic & Language Setup
         </h3>
@@ -280,7 +280,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
       {/* Dynamic Academic Details */}
       {(lastCompletedStage === 'SSC' || lastCompletedStage === 'HSC' || lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="bg-purple-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-base font-bold text-gray-900 mb-6 border-b border-gray-200 pb-2">Detailed Academic History</h3>
           
           <div className="space-y-8">
@@ -370,7 +370,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
 
       {/* Work Experience */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-orange-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <Briefcase className="h-5 w-5 text-[#FF7A52]" /> Professional Experience
         </h3>
@@ -387,7 +387,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Operational Details */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-rose-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <FileText className="h-5 w-5 text-[#21C285]" /> Operational Details
         </h3>
