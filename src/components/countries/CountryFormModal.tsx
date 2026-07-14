@@ -10,6 +10,111 @@ interface CountryFormModalProps {
   onSuccess: () => void
 }
 
+const InputField = ({ name, label, defaultValue }: { name: string, label: string, defaultValue?: string }) => (
+  <div className="space-y-1">
+    <label className="text-xs font-bold text-[#5C6478] uppercase">{label}</label>
+    <input
+      type="text"
+      name={name}
+      defaultValue={defaultValue || ''}
+      className="w-full px-4 py-2.5 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638] transition-all"
+    />
+  </div>
+)
+
+const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { title: string, items: string[], setItems: (items: string[]) => void, placeholder?: string }) => (
+  <div className="mb-6">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="font-bold text-[#4855E4]">{title}</h3>
+      <button
+        type="button"
+        onClick={() => setItems([...items, ''])}
+        className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+      >
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+    <div className="space-y-3">
+      {items.map((item, idx) => (
+        <div key={idx} className="flex gap-2">
+          <input
+            type="text"
+            value={item}
+            onChange={(e) => {
+              const newItems = [...items]
+              newItems[idx] = e.target.value
+              setItems(newItems)
+            }}
+            className="flex-1 px-4 py-2 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638]"
+            placeholder={placeholder}
+          />
+          <button
+            type="button"
+            onClick={() => setItems(items.filter((_, i) => i !== idx))}
+            className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      {items.length === 0 && <p className="text-xs text-[#8891A3]">No items added.</p>}
+    </div>
+  </div>
+)
+
+const UniversitiesList = ({ universities, setUniversities }: { universities: {name: string, location: string}[], setUniversities: (unis: any) => void }) => (
+  <div className="mb-6">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="font-bold text-[#4855E4]">Universities</h3>
+      <button
+        type="button"
+        onClick={() => setUniversities([...universities, { name: '', location: '' }])}
+        className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
+      >
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+    <div className="space-y-4">
+      {universities.map((uni, idx) => (
+        <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
+          <div className="flex-1 space-y-3">
+            <input
+              type="text"
+              value={uni.name}
+              onChange={(e) => {
+                const newUnis = [...universities]
+                newUnis[idx].name = e.target.value
+                setUniversities(newUnis)
+              }}
+              className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
+              placeholder="University Name"
+            />
+            <input
+              type="text"
+              value={uni.location}
+              onChange={(e) => {
+                const newUnis = [...universities]
+                newUnis[idx].location = e.target.value
+                setUniversities(newUnis)
+              }}
+              className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
+              placeholder="Location (e.g. Pafos, Cyprus)"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setUniversities(universities.filter((_, i) => i !== idx))}
+            className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] mt-2"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      {universities.length === 0 && <p className="text-xs text-[#8891A3]">No universities added.</p>}
+    </div>
+  </div>
+)
+
 export default function CountryFormModal({ country, onClose, onSuccess }: CountryFormModalProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -59,18 +164,6 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
     })
   }
 
-  const InputField = ({ name, label, defaultValue }: { name: string, label: string, defaultValue?: string }) => (
-    <div className="space-y-1">
-      <label className="text-xs font-bold text-[#5C6478] uppercase">{label}</label>
-      <input
-        type="text"
-        name={name}
-        defaultValue={defaultValue || ''}
-        className="w-full px-4 py-2.5 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638] transition-all"
-      />
-    </div>
-  )
-
   const tabs = [
     { id: 'general', label: 'General Info' },
     { id: 'requirements', label: 'Requirements' },
@@ -78,99 +171,6 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
     { id: 'visa', label: 'Visa & Life' },
     { id: 'lists', label: 'Lists & Univ.' }
   ]
-
-  const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { title: string, items: string[], setItems: (items: string[]) => void, placeholder?: string }) => (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-[#4855E4]">{title}</h3>
-        <button
-          type="button"
-          onClick={() => setItems([...items, ''])}
-          className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      </div>
-      <div className="space-y-3">
-        {items.map((item, idx) => (
-          <div key={idx} className="flex gap-2">
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => {
-                const newItems = [...items]
-                newItems[idx] = e.target.value
-                setItems(newItems)
-              }}
-              className="flex-1 px-4 py-2 bg-[#E7ECF3] border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF] text-[#202638]"
-              placeholder={placeholder}
-            />
-            <button
-              type="button"
-              onClick={() => setItems(items.filter((_, i) => i !== idx))}
-              className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
-        {items.length === 0 && <p className="text-xs text-[#8891A3]">No items added.</p>}
-      </div>
-    </div>
-  )
-
-  const UniversitiesList = () => (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-[#4855E4]">Universities</h3>
-        <button
-          type="button"
-          onClick={() => setUniversities([...universities, { name: '', location: '' }])}
-          className="p-1.5 rounded-lg bg-[#E7ECF3] text-[#4855E4] shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF]"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      </div>
-      <div className="space-y-4">
-        {universities.map((uni, idx) => (
-          <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-[#E7ECF3] shadow-[inset_3px_3px_6px_#AEB9C9,inset_-3px_-3px_6px_#FFFFFF]">
-            <div className="flex-1 space-y-3">
-              <input
-                type="text"
-                value={uni.name}
-                onChange={(e) => {
-                  const newUnis = [...universities]
-                  newUnis[idx].name = e.target.value
-                  setUniversities(newUnis)
-                }}
-                className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
-                placeholder="University Name"
-              />
-              <input
-                type="text"
-                value={uni.location}
-                onChange={(e) => {
-                  const newUnis = [...universities]
-                  newUnis[idx].location = e.target.value
-                  setUniversities(newUnis)
-                }}
-                className="w-full px-4 py-2 bg-transparent border-b border-[#AEB9C9]/50 text-sm focus:outline-none focus:border-[#4855E4] text-[#202638]"
-                placeholder="Location (e.g. Pafos, Cyprus)"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => setUniversities(universities.filter((_, i) => i !== idx))}
-              className="p-2 rounded-xl bg-[#E7ECF3] text-red-500 shadow-[2px_2px_4px_#AEB9C9,-2px_-2px_4px_#FFFFFF] hover:shadow-[inset_2px_2px_4px_#AEB9C9,inset_-2px_-2px_4px_#FFFFFF] mt-2"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
-        {universities.length === 0 && <p className="text-xs text-[#8891A3]">No universities added.</p>}
-      </div>
-    </div>
-  )
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -288,7 +288,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
                 <div>
                   <DynamicList title="University Checklist" items={universityChecklist} setItems={setUniversityChecklist} placeholder="Required document" />
                   <DynamicList title="Visa/Embassy Checklist" items={visaChecklist} setItems={setVisaChecklist} placeholder="Required document" />
-                  <UniversitiesList />
+                  <UniversitiesList universities={universities} setUniversities={setUniversities} />
                 </div>
               </div>
             </div>
