@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -67,6 +67,12 @@ export default function DashboardNavClient({
       href: '/dashboard/settings',
       label: 'Settings',
       icon: Settings,
+      show: isAdminOrManager,
+    },
+    {
+      href: '/dashboard/countries',
+      label: 'Countries',
+      icon: Globe,
       show: isAdminOrManager,
     },
   ]

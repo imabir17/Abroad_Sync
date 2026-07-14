@@ -45,6 +45,7 @@ ALTER TABLE "Lead" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Interaction" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Task" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Application" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Country" ENABLE ROW LEVEL SECURITY;
 
 -- 4. Clean up any existing policies
 DROP POLICY IF EXISTS "Users can view their own company" ON "Company";
@@ -55,6 +56,8 @@ DROP POLICY IF EXISTS "Users can manage leads in their company" ON "Lead";
 DROP POLICY IF EXISTS "Users can manage interactions in their company" ON "Interaction";
 DROP POLICY IF EXISTS "Users can manage tasks in their company" ON "Task";
 DROP POLICY IF EXISTS "Users can manage applications in their company" ON "Application";
+DROP POLICY IF EXISTS "Users can view countries in their company" ON "Country";
+DROP POLICY IF EXISTS "Admins can manage countries in their company" ON "Country";
 
 -- 5. "Company" table policies
 CREATE POLICY "Users can view their own company" ON "Company"
@@ -112,4 +115,15 @@ CREATE POLICY "Users can manage applications in their company" ON "Application"
             WHERE "Lead".id = "Application"."leadId"
               AND "Lead"."companyId" = get_my_company_id()
         )
+    );
+
+-- 11. "Country" table policies
+CREATE POLICY "Users can view countries in their company" ON "Country"
+    FOR SELECT TO authenticated
+    USING ("companyId" = get_my_company_id());
+
+CREATE POLICY "Admins can manage countries in their company" ON "Country"
+    FOR ALL TO authenticated
+    USING (
+        "companyId" = get_my_company_id() AND (is_super_admin() OR (SELECT role FROM "User" WHERE id = auth.uid()::text) = 'Manager')
     );

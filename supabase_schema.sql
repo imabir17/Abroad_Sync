@@ -150,7 +150,51 @@ CREATE TRIGGER update_application_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- 8. Add Indexes for performance
+-- 8. Create "Country" table
+CREATE TABLE IF NOT EXISTS "Country" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "name" TEXT NOT NULL,
+    "academicRequirement" TEXT,
+    "studyGapAcceptance" TEXT,
+    "intakes" TEXT,
+    "applicationFee" TEXT,
+    "tuitionFees" TEXT,
+    "tuitionType" TEXT,
+    "scholarship" TEXT,
+    "courseDurationUg" TEXT,
+    "courseDurationPg" TEXT,
+    "sponsorBankStatement" TEXT,
+    "policeClearance" TEXT,
+    "insurance" TEXT,
+    "medical" TEXT,
+    "embassyFees" TEXT,
+    "biometricFee" TEXT,
+    "visaInterview" TEXT,
+    "embassyFace" TEXT,
+    "residencePermit" TEXT,
+    "livingCost" TEXT,
+    "workPermit" TEXT,
+    "jobOpportunity" TEXT,
+    "spouseAndKids" TEXT,
+    "accommodation" TEXT,
+    "processingDuration" TEXT,
+    "serviceCharge" TEXT,
+    "totalCost" TEXT,
+    "steps" JSONB DEFAULT '[]'::jsonb,
+    "visaChecklist" JSONB DEFAULT '[]'::jsonb,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS update_country_updated_at ON "Country";
+CREATE TRIGGER update_country_updated_at
+    BEFORE UPDATE ON "Country"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+
+-- 9. Add Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_company ON "User"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_company ON "Lead"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_assigned ON "Lead"("assignedCounselorId");
@@ -158,3 +202,4 @@ CREATE INDEX IF NOT EXISTS idx_interaction_lead ON "Interaction"("leadId");
 CREATE INDEX IF NOT EXISTS idx_task_counselor ON "Task"("counselorId");
 CREATE INDEX IF NOT EXISTS idx_task_lead ON "Task"("leadId");
 CREATE INDEX IF NOT EXISTS idx_application_lead ON "Application"("leadId");
+CREATE INDEX IF NOT EXISTS idx_country_company ON "Country"("companyId");
