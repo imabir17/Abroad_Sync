@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Globe, MapPin, Building2, CheckCircle2, ChevronRight, GraduationCap, Plane, Wallet, Briefcase, FileText } from 'lucide-react'
 
-export default async function CountryDetailsPage({ params }: { params: { id: string } }) {
-  const country = await getCountryById(params.id)
+export default async function CountryDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const country = await getCountryById(id)
   
   if (!country) {
     notFound()
