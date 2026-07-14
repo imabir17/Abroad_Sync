@@ -49,8 +49,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
   const [state, formAction, isPending] = useActionState(createLead, { error: '' })
 
-  const inputClass = "w-full bg-white border-2 border-white rounded-xl py-2.5 px-4 text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-200 shadow-[2px_2px_6px_rgba(0,0,0,0.02),inset_1px_1px_3px_rgba(0,0,0,0.03)] transition-all"
-  const selectClass = "w-full bg-white border-2 border-white text-base font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 shadow-[2px_2px_6px_rgba(0,0,0,0.02),inset_1px_1px_3px_rgba(0,0,0,0.03)] transition-all cursor-pointer"
+  const inputClass = "w-full bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl py-2.5 px-4 text-base font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] transition-all"
+  const selectClass = "w-full bg-[#1E1E1E] border border-[#3C3C3C] text-base font-bold text-white rounded-xl py-2.5 px-4 outline-none focus:border-[#007ACC] transition-all cursor-pointer"
 
   return (
     <form action={formAction} className="space-y-8">
@@ -62,9 +62,9 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
       
       {/* Personal Info */}
-      <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 relative">
-        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <User className="h-5 w-5 text-[#4855E4]" /> Personal Information
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6 relative">
+        <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+          <User className="h-5 w-5 text-[#007ACC]" /> Personal Information
         </h3>
         
         {duplicateWarning && (
@@ -76,7 +76,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="fullName" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Full Name *</label>
+            <label htmlFor="fullName" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name *</label>
             <input 
               type="text" 
               name="fullName" 
@@ -87,7 +87,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Email Address</label>
+            <label htmlFor="email" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
             <input 
               type="email" 
               name="email" 
@@ -99,12 +99,12 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             />
           </div>
           <div>
-            <label htmlFor="phone" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Phone Number *</label>
+            <label htmlFor="phone" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Phone Number *</label>
             <div className="flex gap-2.5">
               <select
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
-                className="w-[110px] bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-3 outline-none focus:bg-gray-50 transition-all cursor-pointer shrink-0"
+                className="w-[110px] bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white rounded-xl py-2.5 px-3 outline-none focus:border-[#007ACC] transition-all cursor-pointer shrink-0"
               >
                 <option value="+880">BD (+880)</option>
                 <option value="+91">IN (+91)</option>
@@ -138,13 +138,13 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Main Academic Setup */}
-      <div className="bg-emerald-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
-        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <GraduationCap className="h-5 w-5 text-[#12A8B5]" /> Academic & Language Setup
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">
+        <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 text-[#007ACC]" /> Academic & Language Setup
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="lastStudyLevel" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Last Completed Level</label>
+            <label htmlFor="lastStudyLevel" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Last Completed Level</label>
             <select 
               name="lastStudyLevel" 
               id="lastStudyLevel"
@@ -160,7 +160,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </select>
           </div>
           <div>
-            <label htmlFor="preferredStudyLevel" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Preferred Study Level</label>
+            <label htmlFor="preferredStudyLevel" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Preferred Study Level</label>
             <select 
               name="preferredStudyLevel" 
               id="preferredStudyLevel"
@@ -175,7 +175,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </select>
           </div>
           <div>
-            <label htmlFor="preferredCountry" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Preferred Country</label>
+            <label htmlFor="preferredCountry" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Preferred Country</label>
             <select 
               name="preferredCountry" 
               id="preferredCountry"
@@ -188,7 +188,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </select>
           </div>
           <div>
-            <label htmlFor="preferredCourse" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Preferred Course</label>
+            <label htmlFor="preferredCourse" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Preferred Course</label>
             <input 
               type="text" 
               name="preferredCourse" 
@@ -198,12 +198,12 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Preferred Intake</label>
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Preferred Intake</label>
             <div className="flex gap-3">
               <select 
                 name="preferredIntakeMonth" 
                 id="preferredIntakeMonth"
-                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
+                className="w-1/2 bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white rounded-xl py-2.5 px-4 outline-none focus:border-[#007ACC] transition-all cursor-pointer"
               >
                 <option value="">Month</option>
                 {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
@@ -213,7 +213,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <select 
                 name="preferredIntakeYear" 
                 id="preferredIntakeYear"
-                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
+                className="w-1/2 bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white rounded-xl py-2.5 px-4 outline-none focus:border-[#007ACC] transition-all cursor-pointer"
               >
                 <option value="">Year</option>
                 {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(y => (
@@ -224,8 +224,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
           </div>
 
           {/* English Proficiency */}
-          <div className="md:col-span-2 border-t border-gray-200 pt-5 mt-3">
-            <h4 className="text-xs font-bold text-gray-900 mb-4">English Proficiency Test</h4>
+          <div className="md:col-span-2 border-t border-[#3C3C3C] pt-5 mt-3">
+            <h4 className="text-xs font-bold text-white mb-4">English Proficiency Test</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="englishTestStatus" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Test Status</label>
@@ -280,13 +280,13 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
       {/* Dynamic Academic Details */}
       {(lastCompletedStage === 'SSC' || lastCompletedStage === 'HSC' || lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
-        <div className="bg-purple-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-base font-bold text-gray-900 mb-6 border-b border-gray-200 pb-2">Detailed Academic History</h3>
+        <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <h3 className="text-base font-bold text-white mb-6 border-b border-[#3C3C3C] pb-2">Detailed Academic History</h3>
           
           <div className="space-y-8">
             {/* SSC Details */}
             <div>
-              <h4 className="text-xs font-bold text-gray-900 mb-3">SSC / O-Levels</h4>
+              <h4 className="text-xs font-bold text-white mb-3">SSC / O-Levels</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Group/Background</label>
@@ -306,7 +306,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             {/* HSC Details */}
             {(lastCompletedStage === 'HSC' || lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h4 className="text-xs font-bold text-gray-900 mb-3">HSC / A-Levels</h4>
+                <h4 className="text-xs font-bold text-white mb-3">HSC / A-Levels</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Group/Background</label>
@@ -327,7 +327,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             {/* Bachelors Details */}
             {(lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h4 className="text-xs font-bold text-gray-900 mb-3">Bachelor&apos;s Degree</h4>
+                <h4 className="text-xs font-bold text-white mb-3">Bachelor&apos;s Degree</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Major/Subject</label>
@@ -348,7 +348,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             {/* Masters Details */}
             {(lastCompletedStage === 'Masters') && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h4 className="text-xs font-bold text-gray-900 mb-3">Master&apos;s Degree</h4>
+                <h4 className="text-xs font-bold text-white mb-3">Master&apos;s Degree</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Major/Subject</label>
@@ -370,12 +370,12 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
 
       {/* Work Experience */}
-      <div className="bg-orange-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
-        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">
+        <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
           <Briefcase className="h-5 w-5 text-[#FF7A52]" /> Professional Experience
         </h3>
         <div>
-          <label htmlFor="workExperience" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Work Experience Details</label>
+          <label htmlFor="workExperience" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Work Experience Details</label>
           <textarea 
             name="workExperience" 
             id="workExperience" 
@@ -387,13 +387,13 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Operational Details */}
-      <div className="bg-rose-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6">
-        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">
+        <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
           <FileText className="h-5 w-5 text-[#21C285]" /> Operational Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="sourceType" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Lead Source</label>
+            <label htmlFor="sourceType" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Lead Source</label>
             <select 
               name="sourceType" 
               id="sourceType"
@@ -414,7 +414,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
           </div>
           {sourceType === 'Other' && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-              <label htmlFor="customSource" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Specify Other Source</label>
+              <label htmlFor="customSource" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Specify Other Source</label>
               <input 
                 type="text" 
                 name="customSource" 
@@ -425,7 +425,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </div>
           )}
           <div>
-            <label htmlFor="budget" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Estimated Budget</label>
+            <label htmlFor="budget" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Estimated Budget</label>
             <input 
               type="text" 
               name="budget" 
@@ -435,7 +435,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             />
           </div>
           <div>
-            <label htmlFor="stage" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Pipeline Stage</label>
+            <label htmlFor="stage" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Pipeline Stage</label>
             <select 
               name="stage" 
               id="stage"
@@ -453,15 +453,15 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Lead Rating</label>
-            <div className="py-2.5 px-3 flex items-center bg-white border border-gray-200 rounded-xl h-[38px]">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Lead Rating</label>
+            <div className="py-2.5 px-3 flex items-center bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl h-[38px]">
               <StarRating rating={rating} onChange={(val) => setRating(val)} size={20} />
             </div>
             <input type="hidden" name="rating" value={rating} />
           </div>
           {isAdminOrManager && (
             <div className="md:col-span-2">
-              <label htmlFor="assignedCounselorId" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Assign to Counselor</label>
+              <label htmlFor="assignedCounselorId" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Assign to Counselor</label>
               <select 
                 name="assignedCounselorId" 
                 id="assignedCounselorId"
@@ -475,7 +475,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
             </div>
           )}
           <div className="md:col-span-2">
-            <label htmlFor="initialNote" className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Initial Note</label>
+            <label htmlFor="initialNote" className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Initial Note</label>
             <textarea 
               name="initialNote" 
               id="initialNote" 
@@ -487,10 +487,10 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 pt-5 border-t border-gray-200">
+      <div className="flex justify-end gap-4 pt-5 border-t border-[#3C3C3C]">
         <Link 
           href="/dashboard/leads" 
-          className="px-6 py-3 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-all rounded-xl"
+          className="px-6 py-3 bg-[#333333] border border-[#3C3C3C] text-xs font-bold text-white hover:bg-[#2A2D2E] transition-all rounded-xl"
         >
           Cancel
         </Link>
@@ -499,8 +499,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
           disabled={!!duplicateWarning || isPending} 
           className={`px-6 py-3 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 ${
             duplicateWarning 
-              ? 'bg-neutral-300 shadow-none cursor-not-allowed text-gray-400' 
-              : 'bg-blue-600 hover:shadow-lg active:translate-y-0.5'
+              ? 'bg-[#333333] shadow-none cursor-not-allowed text-gray-500 border border-[#3C3C3C]' 
+              : 'bg-[#0E639C] hover:bg-[#1177BB] active:translate-y-0.5'
           }`}
         >
           {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

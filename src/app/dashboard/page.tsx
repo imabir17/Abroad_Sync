@@ -128,31 +128,31 @@ export default async function DashboardPage() {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 font-display">Overview</h2>
-        <p className="text-xs text-gray-600 mt-1">Comprehensive real-time breakdown of student lead pipelines.</p>
+        <h2 className="text-2xl font-bold text-white font-display">Overview</h2>
+        <p className="text-xs text-gray-400 mt-1">Comprehensive real-time breakdown of student lead pipelines.</p>
       </div>
 
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-blue-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 hover:-translate-y-1.5 transition-all duration-300">
+        <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl p-6 hover:-translate-y-1.5 transition-all duration-300 shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-gray-600">Total Leads</h3>
-            <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-sm flex items-center justify-center text-white">
+            <h3 className="text-xs font-bold text-gray-400">Total Leads</h3>
+            <div className="w-8 h-8 rounded-lg bg-[#0E639C] flex items-center justify-center text-white">
               <Users className="h-4.5 w-4.5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-gray-900 font-display mt-4">{totalLeads}</p>
+          <p className="text-3xl font-black text-white font-display mt-4">{totalLeads}</p>
         </div>
 
-        <div className="bg-emerald-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-6 hover:-translate-y-1.5 transition-all duration-300">
+        <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl p-6 hover:-translate-y-1.5 transition-all duration-300 shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-gray-600">Pipeline Health</h3>
-            <div className="w-8 h-8 rounded-lg bg-teal-500 shadow-sm flex items-center justify-center text-white">
+            <h3 className="text-xs font-bold text-gray-400">Pipeline Health</h3>
+            <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white">
               <Activity className="h-4.5 w-4.5" />
             </div>
           </div>
-          <p className="text-3xl font-black text-gray-900 font-display mt-4">{conversionRate}%</p>
-          <p className="text-[10px] text-gray-400 mt-2 font-medium">Ratio of high potential leads (Very Good + Good)</p>
+          <p className="text-3xl font-black text-white font-display mt-4">{conversionRate}%</p>
+          <p className="text-[10px] text-gray-500 mt-2 font-medium">Ratio of high potential leads (Very Good + Good)</p>
         </div>
 
         {/* Tasks trigger */}
@@ -161,9 +161,9 @@ export default async function DashboardPage() {
 
       {/* Agenda list for non Super Admins */}
       {user.role !== 'Super Admin' && (
-        <div className="bg-rose-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
-          <h3 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Clock className="w-4.5 h-4.5 text-[#FF7A52]" />
+        <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-8">
+          <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2">
+            <Clock className="w-4.5 h-4.5 text-[#007ACC]" />
             Today's Agenda
           </h3>
           <DashboardTasks tasks={allTasks} />
@@ -172,18 +172,18 @@ export default async function DashboardPage() {
 
       {/* Ratings Cards List */}
       <div>
-        <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <UserCheck className="h-5 w-5 text-[#21C285]" /> Lead Ratings
+        <h3 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+          <UserCheck className="h-5 w-5 text-teal-500" /> Lead Ratings
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {ratingsCards.map(rating => (
             <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.name)}`}>
-              <div className="bg-white border-4 border-white rounded-3xl shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-5 hover:border-gray-100 transition-all flex flex-col justify-between h-28">
+              <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-5 hover:border-[#555555] transition-all flex flex-col justify-between h-28">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-600">{rating.name}</span>
-                  <span className="w-2.5 h-2.5 rounded-full border border-white" style={{ backgroundColor: rating.color, boxShadow: `0 0 10px ${rating.color}40` }}></span>
+                  <span className="text-xs font-bold text-gray-400">{rating.name}</span>
+                  <span className="w-2.5 h-2.5 rounded-full border border-[#252526]" style={{ backgroundColor: rating.color }}></span>
                 </div>
-                <p className="text-2xl font-black text-gray-900 font-display">{rating.count}</p>
+                <p className="text-2xl font-black text-white font-display">{rating.count}</p>
               </div>
             </Link>
           ))}
@@ -191,12 +191,12 @@ export default async function DashboardPage() {
       </div>
 
       {/* Pipeline Snapshot Funnel */}
-      <div className="bg-indigo-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-8">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2 font-display">
-            <BarChart2 className="h-5 w-5 text-[#4855E4]" /> Pipeline Snapshot
+          <h3 className="text-base font-bold text-white flex items-center gap-2 font-display">
+            <BarChart2 className="h-5 w-5 text-[#007ACC]" /> Pipeline Snapshot
           </h3>
-          <Link href="/dashboard/pipeline" className="text-xs font-bold text-[#4855E4] hover:underline flex items-center gap-1">
+          <Link href="/dashboard/pipeline" className="text-xs font-bold text-[#007ACC] hover:underline flex items-center gap-1">
             Open Board →
           </Link>
         </div>
@@ -206,18 +206,17 @@ export default async function DashboardPage() {
             return (
               <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
                 <div className="flex items-center gap-4">
-                  <span className="w-24 text-xs font-bold text-gray-600 group-hover:text-gray-900 transition-colors truncate">{stage.name}</span>
-                  <div className="flex-1 h-3.5 bg-gray-100 border border-gray-200 rounded-full overflow-hidden">
+                  <span className="w-24 text-xs font-bold text-gray-400 group-hover:text-white transition-colors truncate">{stage.name}</span>
+                  <div className="flex-1 h-3.5 bg-[#3C3C3C] rounded-full overflow-hidden">
                     <div 
-                      className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-105" 
+                      className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-110" 
                       style={{ 
                         width: `${percentage}%`,
-                        backgroundColor: stage.color,
-                        boxShadow: `0 0 8px ${stage.color}40`
+                        backgroundColor: stage.color
                       }}
                     ></div>
                   </div>
-                  <span className="w-10 text-right text-xs font-bold text-gray-900">{stage.count}</span>
+                  <span className="w-10 text-right text-xs font-bold text-gray-300">{stage.count}</span>
                 </div>
               </Link>
             )
@@ -227,8 +226,8 @@ export default async function DashboardPage() {
 
       {/* Charts Panel */}
       {totalLeads > 0 && (
-        <div className="bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] p-8">
-          <h3 className="text-base font-bold text-gray-900 mb-6 font-display">Analytics Charts</h3>
+        <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-8">
+          <h3 className="text-base font-bold text-white mb-6 font-display">Analytics Charts</h3>
           <DashboardCharts ratingsData={ratingsChartData} stagesData={stagesChartData} />
         </div>
       )}

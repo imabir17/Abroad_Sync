@@ -79,20 +79,20 @@ export default function DashboardNavClient({
 
   // Render function to avoid unmounting/remounting subtree performance issues
   const renderSidebarContent = () => (
-    <div className="flex flex-col h-full bg-white text-gray-900">
+    <div className="flex flex-col h-full bg-[#252526] text-gray-300">
       {/* Brand area */}
-      <div className="h-20 flex items-center justify-between px-6 border-b border-gray-200 shrink-0">
+      <div className="h-20 flex items-center justify-between px-6 border-b border-[#3C3C3C] shrink-0">
         <div className="flex items-center gap-2.5 font-bold text-base">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#007ACC] flex items-center justify-center">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M2 12L22 4L14 22L11 14L2 12Z" fill="white"/>
             </svg>
           </div>
-          <span className="font-bold tracking-tight text-lg text-gray-900 font-display">AbroadSync</span>
+          <span className="font-bold tracking-tight text-lg text-white font-display">AbroadSync</span>
         </div>
         <button
           onClick={() => setIsMobileOpen(false)}
-          className="lg:hidden p-2 rounded-xl bg-white border border-gray-200 active:bg-gray-50 text-gray-600 hover:text-gray-900 transition-all"
+          className="lg:hidden p-2 rounded-xl bg-[#333333] border border-[#3C3C3C] text-gray-400 hover:text-white transition-all"
           aria-label="Close sidebar menu"
         >
           <X className="w-4 h-4" />
@@ -114,13 +114,13 @@ export default function DashboardNavClient({
                   onClick={() => setIsMobileOpen(false)}
                   className={`flex items-center px-4 py-3 text-xs font-bold rounded-xl transition-all duration-200 group ${
                     isActive
-                      ? 'text-gray-900 bg-gray-50 border border-gray-200'
-                      : 'text-gray-600 hover:text-gray-900 hover:shadow-sm border border-transparent hover:border-gray-200'
+                      ? 'text-white bg-[#37373D]'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2A2D2E]'
                   }`}
                 >
                   <Icon
                     className={`mr-3 h-4.5 w-4.5 transition-colors ${
-                      isActive ? 'text-[#4855E4]' : 'text-gray-400 group-hover:text-[#4855E4]'
+                      isActive ? 'text-[#007ACC]' : 'text-gray-500 group-hover:text-[#007ACC]'
                     }`}
                   />
                   {item.label}
@@ -131,22 +131,22 @@ export default function DashboardNavClient({
       </div>
       
       {/* Profile & Logout card */}
-      <div className="p-4 border-t border-gray-200 shrink-0">
-        <div className="flex items-center p-3 rounded-2xl bg-white border border-gray-300 shadow-sm mb-4">
+      <div className="p-4 border-t border-[#3C3C3C] shrink-0">
+        <div className="flex items-center p-3 rounded-2xl bg-[#333333] mb-4">
           <div className="flex-shrink-0">
-            <div className="h-9 w-9 rounded-xl bg-blue-600 shadow-sm flex items-center justify-center text-white font-bold text-sm">
+            <div className="h-9 w-9 rounded-xl bg-[#007ACC] flex items-center justify-center text-white font-bold text-sm">
               {user.fullName.charAt(0)}
             </div>
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-xs font-bold text-gray-900 truncate">{user.fullName}</p>
+            <p className="text-xs font-bold text-white truncate">{user.fullName}</p>
             <p className="text-[10px] font-semibold text-gray-400 truncate">{user.role}</p>
           </div>
         </div>
         <form action={logoutAction}>
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-bold rounded-xl text-red-500 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 active:translate-y-0.5 transition-all duration-150"
+            className="flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-bold rounded-xl text-red-400 bg-[#333333] hover:bg-[#2A2D2E] hover:text-red-300 transition-all duration-150"
           >
             <LogOut className="h-4.5 w-4.5" />
             Sign out
@@ -157,9 +157,9 @@ export default function DashboardNavClient({
   )
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden w-full">
+    <div className="flex h-screen bg-[#1E1E1E] text-gray-300 overflow-hidden w-full">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 shrink-0 border-r border-gray-200 bg-white">
+      <aside className="hidden lg:block w-64 shrink-0 border-r border-[#3C3C3C] bg-[#252526]">
         {renderSidebarContent()}
       </aside>
 
@@ -172,26 +172,26 @@ export default function DashboardNavClient({
             className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
           />
           {/* Drawer Panel */}
-          <aside className="relative w-64 max-w-xs flex flex-col bg-white border-r border-gray-200 shadow-2xl animate-in slide-in-from-left duration-200">
+          <aside className="relative w-64 max-w-xs flex flex-col bg-[#252526] border-r border-[#3C3C3C] shadow-2xl animate-in slide-in-from-left duration-200">
             {renderSidebarContent()}
           </aside>
         </div>
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#1E1E1E]">
         {/* Header */}
-        <header className="h-16 border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-white/80 backdrop-blur-md shrink-0">
+        <header className="h-16 border-b border-[#3C3C3C] flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-[#1E1E1E] shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2.5 rounded-xl bg-white border border-gray-200 active:bg-gray-50 text-gray-600 hover:text-gray-900 transition-all"
+              className="lg:hidden p-2.5 rounded-xl bg-[#333333] border border-[#3C3C3C] text-gray-400 hover:text-white transition-all"
               aria-label="Open sidebar menu"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h2 className="text-sm sm:text-base font-bold text-gray-600 truncate">
-              Welcome back, <span className="text-gray-900">{user.fullName.split(' ')[0]}</span>
+            <h2 className="text-sm sm:text-base font-bold text-gray-400 truncate">
+              Welcome back, <span className="text-white">{user.fullName.split(' ')[0]}</span>
             </h2>
           </div>
         </header>

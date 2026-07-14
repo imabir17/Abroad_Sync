@@ -12,12 +12,12 @@ interface CountryFormModalProps {
 
 const InputField = ({ name, label, defaultValue }: { name: string, label: string, defaultValue?: string }) => (
   <div className="space-y-1">
-    <label className="text-xs font-bold text-gray-600 uppercase">{label}</label>
+    <label className="text-xs font-bold text-gray-400 uppercase">{label}</label>
     <input
       type="text"
       name={name}
       defaultValue={defaultValue || ''}
-      className="w-full px-4 py-2.5 bg-white border-2 border-white rounded-xl text-sm focus:outline-none focus:border-blue-200 shadow-sm text-gray-900 transition-all"
+      className="w-full px-4 py-2.5 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl text-sm focus:outline-none focus:border-[#007ACC] shadow-sm text-white transition-all"
     />
   </div>
 )
@@ -25,11 +25,11 @@ const InputField = ({ name, label, defaultValue }: { name: string, label: string
 const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { title: string, items: string[], setItems: (items: string[]) => void, placeholder?: string }) => (
   <div className="mb-6">
     <div className="flex items-center justify-between mb-4">
-      <h3 className="font-bold text-[#4855E4]">{title}</h3>
+      <h3 className="font-bold text-[#007ACC]">{title}</h3>
       <button
         type="button"
         onClick={() => setItems([...items, ''])}
-        className="p-1.5 rounded-lg bg-white text-blue-600 border border-gray-200 hover:bg-gray-50"
+        className="p-1.5 rounded-lg bg-[#333333] text-gray-400 border border-[#3C3C3C] hover:text-white hover:bg-[#2A2D2E]"
       >
         <Plus className="w-4 h-4" />
       </button>
@@ -45,13 +45,13 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
               newItems[idx] = e.target.value
               setItems(newItems)
             }}
-            className="flex-1 px-4 py-2 bg-white border-2 border-white rounded-xl text-sm focus:outline-none focus:border-blue-200 shadow-sm text-gray-900"
+            className="flex-1 px-4 py-2 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl text-sm focus:outline-none focus:border-[#007ACC] shadow-sm text-white"
             placeholder={placeholder}
           />
           <button
             type="button"
             onClick={() => setItems(items.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50"
+            className="p-2 rounded-xl bg-[#333333] text-red-400 border border-[#3C3C3C] hover:bg-[#2A2D2E]"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -65,18 +65,18 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
 const UniversitiesList = ({ universities, setUniversities }: { universities: {name: string, location: string}[], setUniversities: (unis: any) => void }) => (
   <div className="mb-6">
     <div className="flex items-center justify-between mb-4">
-      <h3 className="font-bold text-[#4855E4]">Universities</h3>
+      <h3 className="font-bold text-[#007ACC]">Universities</h3>
       <button
         type="button"
         onClick={() => setUniversities([...universities, { name: '', location: '' }])}
-        className="p-1.5 rounded-lg bg-white text-blue-600 border border-gray-200 hover:bg-gray-50"
+        className="p-1.5 rounded-lg bg-[#333333] text-gray-400 border border-[#3C3C3C] hover:text-white hover:bg-[#2A2D2E]"
       >
         <Plus className="w-4 h-4" />
       </button>
     </div>
     <div className="space-y-4">
       {universities.map((uni, idx) => (
-        <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-white border border-gray-300 shadow-sm">
+        <div key={idx} className="flex gap-3 items-start p-4 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] shadow-sm">
           <div className="flex-1 space-y-3">
             <input
               type="text"
@@ -86,7 +86,7 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
                 newUnis[idx].name = e.target.value
                 setUniversities(newUnis)
               }}
-              className="w-full px-4 py-2 bg-transparent border-b border-gray-200 text-sm focus:outline-none focus:border-[#4855E4] text-gray-900"
+              className="w-full px-4 py-2 bg-transparent border-b border-[#3C3C3C] text-sm focus:outline-none focus:border-[#007ACC] text-white"
               placeholder="University Name"
             />
             <input
@@ -97,14 +97,14 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
                 newUnis[idx].location = e.target.value
                 setUniversities(newUnis)
               }}
-              className="w-full px-4 py-2 bg-transparent border-b border-gray-200 text-sm focus:outline-none focus:border-[#4855E4] text-gray-900"
+              className="w-full px-4 py-2 bg-transparent border-b border-[#3C3C3C] text-sm focus:outline-none focus:border-[#007ACC] text-white"
               placeholder="Location (e.g. Pafos, Cyprus)"
             />
           </div>
           <button
             type="button"
             onClick={() => setUniversities(universities.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 mt-2"
+            className="p-2 rounded-xl bg-[#333333] text-red-400 border border-[#3C3C3C] hover:bg-[#2A2D2E] mt-2"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -176,21 +176,21 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-5xl bg-slate-50 border-4 border-white rounded-[2rem] shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 shrink-0">
-          <h2 className="text-xl font-bold text-gray-900 font-display">
+      <div className="relative w-full max-w-5xl bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between p-6 border-b border-[#3C3C3C] shrink-0">
+          <h2 className="text-xl font-bold text-white font-display">
             {country ? 'Edit Country Guide' : 'Add New Country Guide'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:bg-gray-50 transition-all"
+            className="p-2 rounded-xl bg-[#333333] text-gray-400 hover:text-white border border-[#3C3C3C] hover:bg-[#2A2D2E] transition-all"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Custom Tabs */}
-        <div className="px-6 pt-4 flex gap-2 overflow-x-auto custom-scrollbar shrink-0 border-b border-gray-200 pb-4">
+        <div className="px-6 pt-4 flex gap-2 overflow-x-auto custom-scrollbar shrink-0 border-b border-[#3C3C3C] pb-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -198,8 +198,8 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? 'bg-white text-blue-600 border-2 border-white shadow-sm'
-                  : 'bg-transparent text-gray-600 hover:text-gray-900 border-2 border-transparent hover:bg-white/50'
+                  ? 'bg-[#37373D] text-white border border-[#3C3C3C] shadow-sm'
+                  : 'bg-transparent text-gray-400 hover:text-white border border-transparent hover:bg-[#2A2D2E]'
               }`}
             >
               {tab.label}
@@ -237,8 +237,8 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
                 <InputField name="courseDurationPg" label="Course Duration PG" defaultValue={country?.courseDurationPg} />
                 <InputField name="processingDuration" label="Processing Duration" defaultValue={country?.processingDuration} />
                 
-                <div className="col-span-full border-b border-gray-200 pb-2 mt-4">
-                  <h3 className="font-bold text-[#4855E4]">English Language Tests</h3>
+                <div className="col-span-full border-b border-[#3C3C3C] pb-2 mt-4">
+                  <h3 className="font-bold text-[#007ACC]">English Language Tests</h3>
                 </div>
                 <InputField name="ieltsRequirement" label="IELTS Requirement" defaultValue={country?.ieltsRequirement} />
                 <InputField name="pteRequirement" label="PTE Requirement" defaultValue={country?.pteRequirement} />
@@ -296,11 +296,11 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
           </form>
         </div>
 
-        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 shrink-0 bg-slate-50/50">
+        <div className="p-6 border-t border-[#3C3C3C] flex justify-end gap-3 shrink-0 bg-[#252526]">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.8)] border-2 border-white hover:bg-gray-50 active:scale-95 transition-all"
+            className="px-6 py-2.5 rounded-xl font-bold text-gray-300 bg-[#333333] border border-[#3C3C3C] hover:bg-[#2A2D2E] hover:text-white active:scale-95 transition-all"
             disabled={isPending}
           >
             Cancel
@@ -309,7 +309,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
             type="submit"
             form="country-form"
             disabled={isPending}
-            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-[4px_4px_10px_rgba(0,0,0,0.05),inset_1px_1px_2px_rgba(255,255,255,0.3)] border-2 border-blue-500 hover:brightness-110 active:scale-95 transition-all disabled:opacity-70"
+            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-[#0E639C] border border-[#0E639C] hover:bg-[#1177BB] active:scale-95 transition-all disabled:opacity-70"
           >
             <Save className="w-4 h-4" />
             {isPending ? 'Saving...' : 'Save Guide'}

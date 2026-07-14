@@ -21,7 +21,7 @@ export default function CountriesClient({
   const router = useRouter()
 
   const CARD_COLORS = [
-    'bg-blue-50', 'bg-emerald-50', 'bg-purple-50', 'bg-orange-50', 'bg-rose-50', 'bg-indigo-50'
+    'bg-[#252526]'
   ]
 
   const filteredCountries = countries.filter(c => 
@@ -68,14 +68,14 @@ export default function CountriesClient({
             placeholder="Search countries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4855E4]/50 border border-gray-300 shadow-sm text-gray-900 placeholder:text-gray-400 transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[#252526] border border-[#3C3C3C] rounded-xl text-sm focus:outline-none focus:border-[#007ACC] text-white placeholder:text-gray-400 shadow-md transition-all"
           />
         </div>
         
         {isAdminOrManager && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-sm border border-gray-200 hover:shadow-inner active:scale-[0.98] transition-all"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0E639C] hover:bg-[#1177BB] text-white text-sm font-bold rounded-xl shadow-md transition-all"
           >
             <Plus className="w-4 h-4" />
             Add Country
@@ -85,9 +85,9 @@ export default function CountriesClient({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCountries.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-200 border-dashed">
-            <Globe className="w-12 h-12 mx-auto mb-3 text-[#AEB9C9]" />
-            <p className="text-lg font-bold">No countries found</p>
+          <div className="col-span-full py-12 text-center text-gray-400 bg-[#252526] rounded-2xl border border-[#3C3C3C] border-dashed">
+            <Globe className="w-12 h-12 mx-auto mb-3 text-gray-500" />
+            <p className="text-lg font-bold text-white">No countries found</p>
             <p className="text-sm">Try adjusting your search or add a new country.</p>
           </div>
         ) : (
@@ -95,14 +95,14 @@ export default function CountriesClient({
             <div 
               key={country.id} 
               onClick={() => router.push(`/dashboard/countries/${country.id}`)}
-              className={`${CARD_COLORS[idx % CARD_COLORS.length]} rounded-[2rem] p-6 border-4 border-white shadow-[8px_8px_16px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.7),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] flex flex-col cursor-pointer hover:scale-[1.02] transition-transform`}
+              className="bg-[#252526] rounded-2xl p-6 border border-[#3C3C3C] hover:border-[#555555] shadow-md flex flex-col cursor-pointer hover:-translate-y-1 transition-all"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner">
-                    <Globe className="w-5 h-5 text-[#4855E4]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#007ACC] flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900">{country.name}</h3>
+                  <h3 className="font-bold text-lg text-white">{country.name}</h3>
                 </div>
                 
                 {isAdminOrManager && (
@@ -112,7 +112,7 @@ export default function CountriesClient({
                         e.stopPropagation();
                         handleEdit(country);
                       }}
-                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-blue-600 border border-gray-200 hover:bg-blue-50 transition-all"
+                      className="p-2 rounded-lg bg-[#333333] text-gray-400 hover:text-white border border-[#3C3C3C] hover:bg-[#2A2D2E] transition-all"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -122,7 +122,7 @@ export default function CountriesClient({
                         handleDelete(country.id);
                       }}
                       disabled={isDeleting === country.id}
-                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-red-600 border border-gray-200 hover:bg-red-50 transition-all disabled:opacity-50"
+                      className="p-2 rounded-lg bg-[#333333] text-gray-400 hover:text-red-400 border border-[#3C3C3C] hover:bg-[#2A2D2E] transition-all disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -132,25 +132,25 @@ export default function CountriesClient({
               
               <div className="flex-1 space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
-                    <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Academic Req</p>
-                    <p className="font-semibold text-gray-900 truncate">{country.academicRequirement || 'N/A'}</p>
+                  <div className="p-3 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C]">
+                    <p className="text-[10px] uppercase font-bold text-gray-500 mb-1">Academic Req</p>
+                    <p className="font-semibold text-gray-300 truncate">{country.academicRequirement || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
-                    <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Study Gap</p>
-                    <p className="font-semibold text-gray-900 truncate">{country.studyGapAcceptance || 'N/A'}</p>
+                  <div className="p-3 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C]">
+                    <p className="text-[10px] uppercase font-bold text-gray-500 mb-1">Study Gap</p>
+                    <p className="font-semibold text-gray-300 truncate">{country.studyGapAcceptance || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
-                    <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Total Cost</p>
-                    <p className="font-semibold text-gray-900 truncate">{country.totalCost || 'N/A'}</p>
+                  <div className="p-3 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C]">
+                    <p className="text-[10px] uppercase font-bold text-gray-500 mb-1">Total Cost</p>
+                    <p className="font-semibold text-gray-300 truncate">{country.totalCost || 'N/A'}</p>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/60 border border-white shadow-sm">
-                    <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Intakes</p>
-                    <p className="font-semibold text-gray-900 truncate">{country.intakes || 'N/A'}</p>
+                  <div className="p-3 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C]">
+                    <p className="text-[10px] uppercase font-bold text-gray-500 mb-1">Intakes</p>
+                    <p className="font-semibold text-gray-300 truncate">{country.intakes || 'N/A'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-xs font-semibold text-gray-600 pt-2 border-t border-gray-200">
+                <div className="flex items-center gap-4 text-xs font-semibold text-gray-400 pt-2 border-t border-[#3C3C3C]">
                   <div className="flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5" />
                     {Array.isArray(country.steps) ? country.steps.length : 0} Steps
