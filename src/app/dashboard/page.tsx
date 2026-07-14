@@ -137,7 +137,7 @@ export default async function DashboardPage() {
         <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-gray-600">Total Leads</h3>
-            <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-sm flex items-center justify-center text-white">
               <Users className="h-4.5 w-4.5" />
             </div>
           </div>
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
         <div className="neo-raised p-6 hover:-translate-y-1.5 transition-all duration-300">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-gray-600">Pipeline Health</h3>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3FC7CE] to-[#0F8A94] shadow-[3px_3px_6px_#AEB9C9,-3px_3px_6px_#FFFFFF] flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-lg bg-teal-500 shadow-sm flex items-center justify-center text-white">
               <Activity className="h-4.5 w-4.5" />
             </div>
           </div>
@@ -207,11 +207,11 @@ export default async function DashboardPage() {
               <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
                 <div className="flex items-center gap-4">
                   <span className="w-24 text-xs font-bold text-gray-600 group-hover:text-gray-900 transition-colors truncate">{stage.name}</span>
-                  <div className="flex-1 h-3.5 bg-white bg-gray-50 border border-gray-200 rounded-full overflow-hidden">
+                  <div className="flex-1 h-3.5 bg-gray-100 border border-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-105" 
                       style={{ 
-                        width: `${percentage}%`, 
+                        width: `${percentage}%`,
                         backgroundColor: stage.color,
                         boxShadow: `0 0 8px ${stage.color}40`
                       }}

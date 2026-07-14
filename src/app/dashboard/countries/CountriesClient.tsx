@@ -81,7 +81,7 @@ export default function CountriesClient({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCountries.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-600 bg-white rounded-2xl bg-gray-50 border border-gray-200">
+          <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-200 border-dashed">
             <Globe className="w-12 h-12 mx-auto mb-3 text-[#AEB9C9]" />
             <p className="text-lg font-bold">No countries found</p>
             <p className="text-sm">Try adjusting your search or add a new country.</p>
@@ -108,7 +108,7 @@ export default function CountriesClient({
                         e.stopPropagation();
                         handleEdit(country);
                       }}
-                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-[#4855E4] border border-gray-200 active:bg-gray-50 border border-gray-200 transition-all"
+                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-blue-600 border border-gray-200 hover:bg-blue-50 transition-all"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -118,7 +118,7 @@ export default function CountriesClient({
                         handleDelete(country.id);
                       }}
                       disabled={isDeleting === country.id}
-                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-red-500 border border-gray-200 active:bg-gray-50 border border-gray-200 transition-all disabled:opacity-50"
+                      className="p-2 rounded-lg bg-white text-gray-600 hover:text-red-600 border border-gray-200 hover:bg-red-50 transition-all disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -128,19 +128,19 @@ export default function CountriesClient({
               
               <div className="flex-1 space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-white rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Academic Req</p>
                     <p className="font-semibold text-gray-900 truncate">{country.academicRequirement || 'N/A'}</p>
                   </div>
-                  <div className="p-3 bg-white rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Study Gap</p>
                     <p className="font-semibold text-gray-900 truncate">{country.studyGapAcceptance || 'N/A'}</p>
                   </div>
-                  <div className="p-3 bg-white rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Total Cost</p>
                     <p className="font-semibold text-gray-900 truncate">{country.totalCost || 'N/A'}</p>
                   </div>
-                  <div className="p-3 bg-white rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Intakes</p>
                     <p className="font-semibold text-gray-900 truncate">{country.intakes || 'N/A'}</p>
                   </div>

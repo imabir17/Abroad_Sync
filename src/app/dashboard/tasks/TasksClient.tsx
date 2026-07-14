@@ -185,8 +185,8 @@ export default function TasksClient({
     }
   })
 
-  const inputClass = "w-full bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-4 text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+  const inputClass = "w-full bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-xs font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
+  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
 
   const renderTaskRow = (task: any) => {
     const isCompleted = task.status === 'Completed'
@@ -197,7 +197,7 @@ export default function TasksClient({
     return (
       <div 
         key={task.id} 
-        className={`flex items-center gap-4 p-4 mb-3.5 bg-white rounded-2xl shadow-sm border border-gray-200 border border-gray-200 group transition-all duration-300 ${
+        className={`flex items-center gap-4 p-4 mb-3.5 bg-white rounded-2xl shadow-sm border border-gray-200 group transition-all duration-300 ${
           isCompleted ? 'opacity-60' : ''
         }`}
       >
@@ -208,8 +208,8 @@ export default function TasksClient({
           disabled={!isAdminOrManager && currentUser.id !== task.counselorId}
           className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer border-none transition-all duration-200 ${
             isCompleted 
-              ? 'bg-gradient-to-br from-[#1FAE73] to-[#158a5c] shadow-[2px_2px_6px_rgba(21,138,92,0.4)] text-white'
-              : 'bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] text-transparent hover:text-gray-400'
+              ? 'bg-gradient-to-br from-[#1FAE73] to-[#158a5c] shadow-sm text-white'
+              : 'bg-white border border-gray-200 text-transparent hover:bg-gray-50'
           }`}
           aria-label={isCompleted ? "Mark task as pending" : "Mark task as completed"}
         >
@@ -306,7 +306,7 @@ export default function TasksClient({
             <span className="text-[10px] bg-[#4855E4]/10 px-2 py-0.5 rounded-full">{todayTasks.length}</span>
           </div>
           {todayTasks.length === 0 ? (
-            <div className="neo-raised p-6 text-center text-xs font-bold text-gray-400">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center text-xs font-bold text-gray-400">
               No tasks scheduled for today.
             </div>
           ) : (
@@ -339,7 +339,7 @@ export default function TasksClient({
         )}
 
         {activeTasks.length === 0 && (
-          <div className="neo-raised p-12 text-center text-xs font-bold text-gray-400">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-xs font-bold text-gray-400">
             No tasks found. Create a task to get started!
           </div>
         )}
@@ -353,7 +353,7 @@ export default function TasksClient({
               <h3 className="text-base font-bold text-gray-900 font-display">Assign Task</h3>
               <button 
                 onClick={() => setIsModalOpen(false)} 
-                className="p-1.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 border border-gray-200 text-gray-600 transition-all"
+                className="p-1.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 transition-all"
                 aria-label="Close task creation panel"
               >
                 <X className="h-4 w-4" />
@@ -408,7 +408,7 @@ export default function TasksClient({
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)} 
-                  className="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-all"
                 >
                   Cancel
                 </button>

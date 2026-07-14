@@ -29,7 +29,7 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
       <button
         type="button"
         onClick={() => setItems([...items, ''])}
-        className="p-1.5 rounded-lg bg-white text-[#4855E4] border border-gray-200 hover:bg-gray-50 border border-gray-200"
+        className="p-1.5 rounded-lg bg-white text-blue-600 border border-gray-200 hover:bg-gray-50"
       >
         <Plus className="w-4 h-4" />
       </button>
@@ -51,7 +51,7 @@ const DynamicList = ({ title, items, setItems, placeholder = "Add item..." }: { 
           <button
             type="button"
             onClick={() => setItems(items.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 border border-gray-200"
+            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -69,7 +69,7 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
       <button
         type="button"
         onClick={() => setUniversities([...universities, { name: '', location: '' }])}
-        className="p-1.5 rounded-lg bg-white text-[#4855E4] border border-gray-200 hover:bg-gray-50 border border-gray-200"
+        className="p-1.5 rounded-lg bg-white text-blue-600 border border-gray-200 hover:bg-gray-50"
       >
         <Plus className="w-4 h-4" />
       </button>
@@ -104,7 +104,7 @@ const UniversitiesList = ({ universities, setUniversities }: { universities: {na
           <button
             type="button"
             onClick={() => setUniversities(universities.filter((_, i) => i !== idx))}
-            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 border border-gray-200 mt-2"
+            className="p-2 rounded-xl bg-white text-red-500 border border-gray-200 hover:bg-gray-50 mt-2"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -183,7 +183,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white text-gray-600 hover:text-gray-900 border border-gray-200 active:bg-gray-50 border border-gray-200 transition-all"
+            className="p-2 rounded-xl bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:bg-gray-50 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -199,7 +199,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.id
                   ? 'bg-blue-600 text-white border border-gray-200'
-                  : 'bg-white text-gray-600 hover:text-gray-900 shadow-[inset_2px_2px_4px_#FFFFFF,inset_-2px_-2px_4px_#AEB9C9]'
+                  : 'bg-white text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200'
               }`}
             >
               {tab.label}
@@ -300,7 +300,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 border border-gray-200 active:scale-95 transition-all"
+            className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all"
             disabled={isPending}
           >
             Cancel
@@ -309,7 +309,7 @@ export default function CountryFormModal({ country, onClose, onSuccess }: Countr
             type="submit"
             form="country-form"
             disabled={isPending}
-            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-sm border border-gray-200 hover:shadow-inner active:scale-95 transition-all disabled:opacity-70"
+            className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-white bg-blue-600 shadow-sm border border-transparent hover:shadow-md active:scale-95 transition-all disabled:opacity-70"
           >
             <Save className="w-4 h-4" />
             {isPending ? 'Saving...' : 'Save Guide'}

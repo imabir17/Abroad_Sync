@@ -108,8 +108,8 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
               onClick={() => setActiveStageName(stage.name)}
               className={`px-4 py-2 text-[11px] font-bold rounded-xl whitespace-nowrap transition-all duration-150 shrink-0 border-none ${
                 isActive
-                  ? 'text-gray-900 bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF]'
-                  : 'text-gray-600 bg-white border border-gray-200 hover:text-gray-900'
+                  ? 'text-gray-900 bg-white border border-gray-200'
+                  : 'text-gray-600 bg-white border border-gray-100 hover:text-gray-900'
               }`}
             >
               {stage.name} ({count})
@@ -135,8 +135,8 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                 isMobileHidden ? 'hidden lg:flex' : 'flex'
               } ${
                 isDraggingOverThis
-                  ? 'border-[#4855E4]/40 bg-[#DCE3ED]/30 bg-gray-50 border border-gray-200'
-                  : 'border-transparent shadow-[4px_4px_10px_#AEB9C9,-4px_-4px_10px_#FFFFFF]'
+                  ? 'border-blue-400 bg-gray-50'
+                  : 'border-gray-200 shadow-sm'
               }`}
             >
             {/* Column Header */}
@@ -147,7 +147,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                   {stage.name}
                 </span>
               </div>
-              <span className="text-[9px] font-bold text-gray-400 bg-[#DCE3ED] px-1.5 py-0.5 rounded-full shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] shrink-0">
+              <span className="text-[9px] font-bold text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded-full shrink-0">
                 {stageLeads.length}
               </span>
             </div>
@@ -168,7 +168,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                     draggable
                     onDragStart={(e) => handleDragStart(e, lead.id)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-white border border-gray-200 rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-sm border border-gray-200 transition-all duration-150 relative group border border-gray-200 ${
+                    className={`bg-white border border-gray-200 rounded-xl p-2.5 cursor-grab active:cursor-grabbing hover:scale-102 hover:shadow-md transition-all duration-150 relative group ${
                       isThisDragged ? 'opacity-30 scale-95 shadow-inner' : ''
                     }`}
                   >
@@ -185,7 +185,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                       
                       <Link 
                         href={`/dashboard/leads/${lead.id}`}
-                        className="p-0.5 rounded text-gray-400 hover:text-[#4855E4] hover:bg-[#DCE3ED]/50 transition-colors shrink-0"
+                        className="p-0.5 rounded text-gray-400 hover:text-blue-600 hover:bg-gray-50 transition-colors shrink-0"
                         title="View profile"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -215,7 +215,7 @@ export default function PipelineBoardClient({ initialLeads, stages }: PipelineBo
                         </div>
                       ) : (
                         <div 
-                          className="w-4.5 h-4.5 rounded-full bg-[#C7CFDC]/50 text-gray-400 flex items-center justify-center shadow-inner shrink-0"
+                          className="w-4.5 h-4.5 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center shadow-inner shrink-0"
                           title="Unassigned counselor"
                         >
                           <User className="w-2.5 h-2.5" />

@@ -40,7 +40,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
       <div className="flex items-center gap-4">
         <Link 
           href="/dashboard/countries" 
-          className="p-3 rounded-xl bg-white text-gray-600 hover:text-[#4855E4] shadow-sm border border-gray-200 active:bg-gray-50 border border-gray-200 transition-all"
+          className="p-3 rounded-xl bg-white text-gray-600 hover:text-blue-600 shadow-sm border border-gray-200 hover:bg-gray-50 transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -145,7 +145,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
               <div className="relative border-l-2 border-[#4855E4]/20 ml-3 space-y-6">
                 {country.steps.map((step: string, idx: number) => (
                   <div key={idx} className="relative pl-6">
-                    <div className="absolute w-6 h-6 rounded-full bg-[#4855E4] text-white flex items-center justify-center text-xs font-bold -left-[13px] -top-1 shadow-lg ring-4 ring-[#E7ECF3]">
+                    <div className="absolute w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold -left-[13px] -top-1 shadow-lg ring-4 ring-white">
                       {idx + 1}
                     </div>
                     <p className="text-sm font-semibold text-gray-900 leading-relaxed pt-0.5">{step}</p>
@@ -159,7 +159,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
             <Section title="University Checklist" icon={FileText}>
               <ul className="space-y-2">
                 {country.universityChecklist.map((item: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-white bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
+                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#4855E4]" />
                     {item}
                   </li>
@@ -172,7 +172,7 @@ export default async function CountryDetailsPage({ params }: { params: Promise<{
             <Section title="Visa Checklist" icon={FileText}>
               <ul className="space-y-2">
                 {country.visaChecklist.map((item: string, idx: number) => (
-                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-white bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
+                  <li key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-900">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#4855E4]" />
                     {item}
                   </li>

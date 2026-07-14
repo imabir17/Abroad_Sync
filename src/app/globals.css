@@ -9,23 +9,12 @@
 
 :root {
   color-scheme: light;
-  --bg: #E7ECF3;
-  --bg-deep: #DCE3ED;
-  --shadow-dark: #AEB9C9;
-  --shadow-light: #FFFFFF;
-  --text-1: #202638;
-  --text-2: #5C6478;
-  --text-3: #8891A3;
-  --accent: #4855E4;
-  --accent-light: #6E79F2;
-  --accent-dark: #333FC2;
-  --teal: #12A8B5;
-  --coral: #FF7A52;
-  --radius-lg: 28px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
-  --dist: 9px;
-  --blur: 18px;
+  --bg: #F9FAFB; /* gray-50 */
+  --text-1: #111827; /* gray-900 */
+  --accent: #2563EB; /* blue-600 */
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 8px;
 }
 
 body {
@@ -37,84 +26,68 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Neomorphic scrollbar */
+/* Minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
-  box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
-  border-radius: 5px;
+  background: transparent;
 }
  
 ::-webkit-scrollbar-thumb {
-  background: var(--bg);
-  box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
-  border-radius: 5px;
+  background: #D1D5DB; /* gray-300 */
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-deep);
-  box-shadow: 1px 1px 3px var(--shadow-dark), -1px -1px 3px var(--shadow-light);
+  background: #9CA3AF; /* gray-400 */
 }
 
-/* Neomorphic helper utility classes */
+/* Fallback minimal classes for components still using them */
 .neo-raised {
-  background: var(--bg);
+  background: #FFFFFF;
   border-radius: var(--radius-md);
-  box-shadow:
-    var(--dist) var(--dist) var(--blur) var(--shadow-dark),
-    calc(var(--dist) * -1) calc(var(--dist) * -1) var(--blur) var(--shadow-light);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
 }
 
 .neo-raised-lg {
-  background: var(--bg);
+  background: #FFFFFF;
   border-radius: var(--radius-lg);
-  box-shadow:
-    12px 12px 24px var(--shadow-dark),
-    -12px -12px 24px var(--shadow-light);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E5E7EB;
 }
 
 .neo-pressed {
-  background: var(--bg);
+  background: #F9FAFB;
   border-radius: var(--radius-sm);
-  box-shadow:
-    inset 4px 4px 8px var(--shadow-dark),
-    inset -4px -4px 8px var(--shadow-light);
+  border: 1px solid #E5E7EB;
 }
 
 .neo-pressed-input {
-  background: var(--bg);
+  background: #FFFFFF;
   border-radius: 12px;
-  box-shadow:
-    inset 3px 3px 6px var(--shadow-dark),
-    inset -3px -3px 6px var(--shadow-light);
+  border: 1px solid #D1D5DB;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .neo-flat {
-  background: var(--bg);
+  background: #FFFFFF;
   border-radius: var(--radius-sm);
-  box-shadow:
-    4px 4px 8px var(--shadow-dark),
-    -4px -4px 8px var(--shadow-light);
+  border: 1px solid #E5E7EB;
 }
 
 .neo-inline {
-  background: var(--bg);
+  background: #FFFFFF;
   border-radius: 999px;
-  box-shadow:
-    3px 3px 6px var(--shadow-dark),
-    -3px -3px 6px var(--shadow-light);
+  border: 1px solid #E5E7EB;
 }
 
 .neo-inline-pressed {
-  background: var(--bg);
+  background: #F3F4F6;
   border-radius: 999px;
-  box-shadow:
-    inset 3px 3px 6px var(--shadow-dark),
-    inset -3px -3px 6px var(--shadow-light);
 }
 
 @keyframes slide-in-from-bottom-4 {

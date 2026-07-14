@@ -170,8 +170,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
     }
   }
 
-  const inputClass = "w-full bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2 px-3 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+  const inputClass = "w-full bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
+  const selectClass = "w-full bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2 px-3 outline-none focus:bg-gray-50 transition-all cursor-pointer"
   
   return (
     <div className="space-y-8 pb-12">
@@ -181,8 +181,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
         <div className="lg:col-span-1 space-y-8">
           
           {/* File Opened Status Card */}
-          <div className={`neo-raised p-5 flex items-center justify-between transition-colors duration-300 ${
-            isFileOpened ? 'bg-emerald-500/5 shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF]' : ''
+          <div className={`bg-white rounded-2xl shadow-sm border border-gray-200 p-5 flex items-center justify-between transition-colors duration-300 ${
+            isFileOpened ? 'bg-emerald-50 border-emerald-200' : ''
           }`}>
             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               <FolderOpen className={`h-4.5 w-4.5 ${isFileOpened ? 'text-emerald-500' : 'text-gray-400'}`} />
@@ -201,7 +201,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Academic History Card */}
-          <div className="neo-raised p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-[#4855E4]" />
@@ -210,7 +210,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                 >
                   Edit
                 </button>
@@ -218,14 +218,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-all"
                     aria-label="Cancel editing academic history"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:bg-emerald-50 transition-all"
                     aria-label="Save academic history details"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -322,7 +322,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Preferences Card */}
-          <div className="neo-raised p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Globe className="h-5 w-5 text-[#12A8B5]" />
@@ -331,7 +331,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                 >
                   Edit
                 </button>
@@ -339,14 +339,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-all"
                     aria-label="Cancel editing preferences"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:bg-emerald-50 transition-all"
                     aria-label="Save preference changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -360,13 +360,13 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Intake</p>
                 {isEditing ? (
                   <div className="flex gap-2">
-                    <select value={intakeMonth} onChange={(e) => setIntakeMonth(e.target.value)} className="w-1/2 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
+                    <select value={intakeMonth} onChange={(e) => setIntakeMonth(e.target.value)} className="w-1/2 bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
                       <option value="">Month</option>
                       {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
                         <option key={m} value={m}>{m}</option>
                       ))}
                     </select>
-                    <select value={intakeYear} onChange={(e) => setIntakeYear(e.target.value)} className="w-1/2 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
+                    <select value={intakeYear} onChange={(e) => setIntakeYear(e.target.value)} className="w-1/2 bg-white border border-gray-200 rounded-xl py-2 px-3 text-xs font-semibold text-gray-600">
                       <option value="">Year</option>
                       {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(y => (
                         <option key={y} value={y}>{y}</option>
@@ -379,22 +379,22 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               </div>
               <div>
                 <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Level</p>
-                {isEditing ? <input name="preferredStudyLevel" value={formData.preferredStudyLevel} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredStudyLevel || 'Not specified'}</p>}
+                {isEditing ? <input name="preferredStudyLevel" value={formData.preferredStudyLevel} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-gray-50 p-2.5 rounded-xl border border-gray-100">{formData.preferredStudyLevel || 'Not specified'}</p>}
               </div>
               <div>
                 <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Country</p>
-                {isEditing ? <input name="preferredCountry" value={formData.preferredCountry} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCountry || 'Not specified'}</p>}
+                {isEditing ? <input name="preferredCountry" value={formData.preferredCountry} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-gray-50 p-2.5 rounded-xl border border-gray-100">{formData.preferredCountry || 'Not specified'}</p>}
               </div>
               <div>
                 <p className="text-[10px] font-bold text-gray-400 mb-1">Preferred Course</p>
-                {isEditing ? <input name="preferredCourse" value={formData.preferredCourse} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-[#DCE3ED]/30 p-2.5 rounded-xl">{formData.preferredCourse || 'Not specified'}</p>}
+                {isEditing ? <input name="preferredCourse" value={formData.preferredCourse} onChange={handleEditChange} className={inputClass} /> : <p className="text-xs text-gray-900 font-bold bg-gray-50 p-2.5 rounded-xl border border-gray-100">{formData.preferredCourse || 'Not specified'}</p>}
               </div>
             </div>
           </div>
 
           {/* Professional Experience Card */}
           {(formData.workExperience || isEditing) && (
-            <div className="neo-raised p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-[#FF7A52]" />
@@ -403,7 +403,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 {!isEditing ? (
                   <button 
                     onClick={() => setIsEditing(true)} 
-                    className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                    className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                   >
                     Edit
                   </button>
@@ -411,14 +411,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setIsEditing(false)} 
-                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-all"
                       aria-label="Cancel editing experience details"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
                     <button 
                       onClick={saveDetails} 
-                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-[#21C285] hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                      className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:bg-emerald-50 transition-all"
                       aria-label="Save experience details changes"
                     >
                       <Save className="h-3.5 w-3.5" />
@@ -431,7 +431,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           )}
 
           {/* English Proficiency Card */}
-          <div className="neo-raised p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#21C285]" />
@@ -440,7 +440,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                 >
                   Edit
                 </button>
@@ -448,14 +448,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-all"
                     aria-label="Cancel editing English proficiency"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:bg-emerald-50 transition-all"
                     aria-label="Save English proficiency changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -482,17 +482,17 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             ) : (
               formData.englishTestStatus === 'Appeared' ? (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3.5 rounded-xl bg-white bg-gray-50 border border-gray-200 text-center">
+                  <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Test Type</p>
                     <p className="text-base font-black text-gray-900 font-display">{formData.englishTestType || '-'}</p>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-white bg-gray-50 border border-gray-200 text-center">
+                  <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Overall Score</p>
                     <p className="text-base font-black text-gray-900 font-display">{formData.englishTestScore || '-'}</p>
                   </div>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-white bg-gray-50 border border-gray-200 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                   <div>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Test Status</p>
                     <p className="text-xs font-bold text-gray-900">{formData.englishTestStatus || 'Not specified'}</p>
@@ -503,7 +503,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           </div>
 
           {/* Budget & Origin Card */}
-          <div className="neo-raised p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-[#FF7A52]" />
@@ -512,7 +512,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {!isEditing && canEdit ? (
                 <button 
                   onClick={() => setIsEditing(true)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                 >
                   Edit
                 </button>
@@ -520,14 +520,14 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditing(false)} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-all"
                     aria-label="Cancel editing origin and budget details"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                   <button 
                     onClick={saveDetails} 
-                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:shadow-[inset_1px_1px_2px_#AEB9C9,inset_-1px_-1px_2px_#FFFFFF] transition-all"
+                    className="p-1.5 rounded-lg bg-white border border-gray-200 text-emerald-500 hover:bg-emerald-50 transition-all"
                     aria-label="Save origin and budget changes"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -536,7 +536,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               ) : null}
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-xl bg-white bg-gray-50 border border-gray-200">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Source</p>
                 {isEditing ? (
                   <select name="source" value={formData.source} onChange={handleEditChange} className={selectClass}>
@@ -554,7 +554,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   <p className="text-xs font-bold text-gray-900">{formData.source || 'Unknown'}</p>
                 )}
               </div>
-              <div className="p-3 rounded-xl bg-white bg-gray-50 border border-gray-200">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Budget</p>
                 {isEditing ? (
                   <input name="budget" value={formData.budget} onChange={handleEditChange} className={inputClass} placeholder="e.g. $20k" />
@@ -570,8 +570,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
         <div className="lg:col-span-2 space-y-8">
           
           {/* Consultation Notes Timeline */}
-          <div className="neo-raised flex flex-col h-[400px]">
-            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-[#DCE3ED]/20">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-[400px]">
+            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <MessageSquare className="h-4.5 w-4.5 text-[#4855E4]" />
                 Activity Timeline
@@ -587,7 +587,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="bg-white bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
+                    <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
                       <div className="flex justify-between items-start mb-2 border-b border-gray-200 pb-1.5">
                         <p className="font-bold text-[#4855E4]">Initial Inquiry Note</p>
                         <p className="text-[10px] text-gray-400">{new Date(lead.createdAt).toLocaleString()}</p>
@@ -606,7 +606,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="bg-white bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
+                    <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl text-xs text-gray-600">
                       <div className="flex justify-between items-start mb-2 border-b border-gray-200 pb-1.5">
                         <p className="font-bold text-gray-900">
                           {interaction.counselor ? `${interaction.counselor.fullName} ${interaction.counselor.role ? `(${interaction.counselor.role})` : ''}` : 'System'}
@@ -627,13 +627,13 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             </div>
             
             {canEdit && (
-              <div className="p-4 border-t border-gray-200 bg-[#DCE3ED]/25">
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <div className="flex gap-3">
                   <textarea 
                     value={noteContent}
                     onChange={(e) => setNoteContent(e.target.value)}
                     placeholder="Add a consultation note..." 
-                    className="flex-1 bg-white bg-gray-50 border border-gray-200 border-none rounded-xl p-3 text-xs font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none resize-none h-12 transition-all duration-200 focus:h-24"
+                    className="flex-1 bg-white border border-gray-200 rounded-xl p-3 text-xs font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 resize-none h-12 transition-all duration-200 focus:h-24"
                   ></textarea>
                   <button 
                     onClick={handlePostNote}
@@ -649,7 +649,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
           {/* Follow-Up Tasks Card */}
           {canEdit && (
-            <div className="neo-raised p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <Clock className="h-5 w-5 text-[#FF7A52]" />
@@ -657,7 +657,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 </h3>
                 <button 
                   onClick={() => setIsAddingTask(!isAddingTask)} 
-                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
                 >
                   {isAddingTask ? 'Cancel' : '+ Add Task'}
                 </button>
@@ -695,7 +695,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                   </div>
                 ) : (
                   lead.tasks?.map((task: any) => (
-                    <div key={task.id} className={`flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:bg-gray-50 border border-gray-200'}`}>
+                    <div key={task.id} className={`flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:bg-gray-50'}`}>
                       <input 
                         type="checkbox" 
                         disabled={!canEdit}
@@ -726,7 +726,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
       </div>
       
       {/* Applications list */}
-      <div className="neo-raised p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Building className="h-5 w-5 text-[#12A8B5]" /> Applications
@@ -734,7 +734,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
           {canEdit && (
             <button 
               onClick={() => setIsAddingApp(!isAddingApp)} 
-              className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-[#4855E4] hover:bg-gray-50 border border-gray-200 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold text-blue-600 hover:bg-gray-50 transition-all"
             >
               {isAddingApp ? 'Cancel' : '+ Add Application'}
             </button>
@@ -780,7 +780,7 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               {lead.applications.map((app: any) => (
                 <div key={app.id} className="p-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex flex-col justify-between min-h-36">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 bg-white bg-gray-50 border border-gray-200 text-[#12A8B5] rounded-full">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 bg-gray-50 border border-gray-200 text-[#12A8B5] rounded-full">
                       {app.country}
                     </span>
                     {app.status !== 'Pending' && (

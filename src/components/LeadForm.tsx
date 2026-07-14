@@ -49,8 +49,8 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
   const [state, formAction, isPending] = useActionState(createLead, { error: '' })
 
-  const inputClass = "w-full bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] border-none rounded-xl py-2.5 px-4 text-base font-semibold text-gray-900 placeholder-[#8891A3] focus:outline-none transition-all"
-  const selectClass = "w-full bg-white border border-gray-200 text-base font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+  const inputClass = "w-full bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
+  const selectClass = "w-full bg-white border border-gray-200 text-base font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
 
   return (
     <form action={formAction} className="space-y-8">
@@ -62,7 +62,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
       
       {/* Personal Info */}
-      <div className="neo-raised p-6 relative">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <User className="h-5 w-5 text-[#4855E4]" /> Personal Information
         </h3>
@@ -104,7 +104,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <select
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
-                className="w-[110px] bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-3 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer shrink-0"
+                className="w-[110px] bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-3 outline-none focus:bg-gray-50 transition-all cursor-pointer shrink-0"
               >
                 <option value="+880">BD (+880)</option>
                 <option value="+91">IN (+91)</option>
@@ -138,7 +138,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Main Academic Setup */}
-      <div className="neo-raised p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <GraduationCap className="h-5 w-5 text-[#12A8B5]" /> Academic & Language Setup
         </h3>
@@ -203,7 +203,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <select 
                 name="preferredIntakeMonth" 
                 id="preferredIntakeMonth"
-                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
               >
                 <option value="">Month</option>
                 {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
@@ -213,7 +213,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
               <select 
                 name="preferredIntakeYear" 
                 id="preferredIntakeYear"
-                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer"
+                className="w-1/2 bg-white border border-gray-200 text-xs font-bold text-gray-600 rounded-xl py-2.5 px-4 outline-none focus:bg-gray-50 transition-all cursor-pointer"
               >
                 <option value="">Year</option>
                 {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i).map(y => (
@@ -280,7 +280,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
 
       {/* Dynamic Academic Details */}
       {(lastCompletedStage === 'SSC' || lastCompletedStage === 'HSC' || lastCompletedStage === 'Bachelors' || lastCompletedStage === 'Masters') && (
-        <div className="neo-raised p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-base font-bold text-gray-900 mb-6 border-b border-gray-200 pb-2">Detailed Academic History</h3>
           
           <div className="space-y-8">
@@ -370,7 +370,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       )}
 
       {/* Work Experience */}
-      <div className="neo-raised p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <Briefcase className="h-5 w-5 text-[#FF7A52]" /> Professional Experience
         </h3>
@@ -387,7 +387,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       </div>
 
       {/* Operational Details */}
-      <div className="neo-raised p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           <FileText className="h-5 w-5 text-[#21C285]" /> Operational Details
         </h3>
@@ -454,7 +454,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
           </div>
           <div>
             <label className="block text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">Lead Rating</label>
-            <div className="py-2.5 px-3 flex items-center bg-white shadow-[inset_2.5px_2.5px_5px_#AEB9C9,inset_-2.5px_-2.5px_5px_#FFFFFF] rounded-xl h-[38px]">
+            <div className="py-2.5 px-3 flex items-center bg-white border border-gray-200 rounded-xl h-[38px]">
               <StarRating rating={rating} onChange={(val) => setRating(val)} size={20} />
             </div>
             <input type="hidden" name="rating" value={rating} />
@@ -490,7 +490,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
       <div className="flex justify-end gap-4 pt-5 border-t border-gray-200">
         <Link 
           href="/dashboard/leads" 
-          className="px-6 py-3 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 border border-gray-200 transition-all rounded-xl"
+          className="px-6 py-3 bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-all rounded-xl"
         >
           Cancel
         </Link>
@@ -500,7 +500,7 @@ export function LeadForm({ counselors, isAdminOrManager, stages = [] }: { counse
           className={`px-6 py-3 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 ${
             duplicateWarning 
               ? 'bg-neutral-300 shadow-none cursor-not-allowed text-gray-400' 
-              : 'bg-blue-600 hover:shadow-[5px_5px_12px_rgba(51,63,194,0.35)] active:translate-y-0.5'
+              : 'bg-blue-600 hover:shadow-lg active:translate-y-0.5'
           }`}
         >
           {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
