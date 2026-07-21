@@ -190,9 +190,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Pipeline Snapshot Funnel */}
-      <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
+      {/* Pipeline Snapshot Cards */}
+      <div>
+        <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold text-white flex items-center gap-2 font-display">
             <BarChart2 className="h-5 w-5 text-[#007ACC]" /> Pipeline Snapshot
           </h3>
@@ -200,27 +200,18 @@ export default async function DashboardPage() {
             Open Board →
           </Link>
         </div>
-        <div className="space-y-5">
-          {stagesCards.map(stage => {
-            const percentage = totalLeads > 0 ? Math.round((stage.count / totalLeads) * 100) : 0
-            return (
-              <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
-                <div className="flex items-center gap-4">
-                  <span className="w-24 text-xs font-bold text-gray-400 group-hover:text-white transition-colors truncate">{stage.name}</span>
-                  <div className="flex-1 h-3.5 bg-[#3C3C3C] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-110" 
-                      style={{ 
-                        width: `${percentage}%`,
-                        backgroundColor: stage.color
-                      }}
-                    ></div>
-                  </div>
-                  <span className="w-10 text-right text-xs font-bold text-gray-300">{stage.count}</span>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          {stagesCards.map(stage => (
+            <Link key={stage.name} href={`/dashboard/pipeline`} className="block group">
+              <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-5 hover:border-[#555555] transition-all flex flex-col justify-between h-28">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-400 truncate pr-2" title={stage.name}>{stage.name}</span>
+                  <span className="w-2.5 h-2.5 rounded-full border border-[#252526] shrink-0" style={{ backgroundColor: stage.color }}></span>
                 </div>
-              </Link>
-            )
-          })}
+                <p className="text-2xl font-black text-white font-display">{stage.count}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
 
