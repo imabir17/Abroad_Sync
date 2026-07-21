@@ -64,15 +64,15 @@ export default function DashboardNavClient({
       show: user.role === 'Super Admin',
     },
     {
-      href: '/dashboard/settings',
-      label: 'Settings',
-      icon: Settings,
-      show: isAdminOrManager,
-    },
-    {
       href: '/dashboard/countries',
       label: 'Countries',
       icon: Globe,
+      show: isAdminOrManager,
+    },
+    {
+      href: '/dashboard/settings',
+      label: 'Settings',
+      icon: Settings,
       show: isAdminOrManager,
     },
   ]
