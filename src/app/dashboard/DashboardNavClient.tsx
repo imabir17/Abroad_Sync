@@ -67,7 +67,7 @@ export default function DashboardNavClient({
       href: '/dashboard/countries',
       label: 'Countries',
       icon: Globe,
-      show: isAdminOrManager,
+      show: true,
     },
     {
       href: '/dashboard/settings',
