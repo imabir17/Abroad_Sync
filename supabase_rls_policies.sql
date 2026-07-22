@@ -216,4 +216,17 @@ CREATE TRIGGER enforce_lead_limit
     FOR EACH ROW
     EXECUTE FUNCTION check_lead_limit();
 
+-- 15. Enable RLS on LeadForm table
+ALTER TABLE "LeadForm" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can view active lead forms" ON "LeadForm";
+DROP POLICY IF EXISTS "Company members manage lead forms" ON "LeadForm";
+
+CREATE POLICY "Anyone can view active lead forms" ON "LeadForm"
+    FOR SELECT TO anon, authenticated USING ("isActive" = true);
+
+CREATE POLICY "Company members manage lead forms" ON "LeadForm"
+    FOR ALL TO authenticated USING ("companyId" = get_my_company_id());
+
+
 

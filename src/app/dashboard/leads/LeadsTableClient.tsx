@@ -6,8 +6,9 @@ import { useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
-import { Users, ExternalLink, Phone, Mail } from 'lucide-react'
+import { Users, ExternalLink, Phone, Mail, FileSpreadsheet, Plus } from 'lucide-react'
 import { StarRating } from '@/components/StarRating'
+import { BulkImportModal } from '@/components/BulkImportModal'
 
 // SWR Client Fetcher
 const leadsFetcher = async ([, paramsString]: [string, string]) => {
@@ -101,6 +102,7 @@ export default function LeadsTableClient({
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [transferCounselorId, setTransferCounselorId] = useState('')
   const [isTransferring, setIsTransferring] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   const searchParams = useSearchParams()
   const paramsString = searchParams.toString()
@@ -147,6 +149,21 @@ export default function LeadsTableClient({
 
   return (
     <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md overflow-hidden">
+      {/* Top Action Toolbar: Bulk Import Button */}
+      <div className="bg-[#1E1E1E] px-6 py-3.5 flex items-center justify-between border-b border-[#3C3C3C]">
+        <div className="text-xs text-gray-400 font-medium">
+          Showing <span className="text-white font-bold">{activeLeads.length}</span> leads
+        </div>
+
+        <button
+          onClick={() => setIsImportModalOpen(true)}
+          className="px-4 py-2 bg-[#252526] hover:bg-[#3C3C3C] text-white text-xs font-bold rounded-xl border border-[#3C3C3C] shadow-sm transition-all flex items-center gap-1.5"
+        >
+          <FileSpreadsheet className="w-4 h-4 text-[#007ACC]" />
+          Bulk Import Excel / CSV
+        </button>
+      </div>
+
       {/* Bulk Transfer Action Bar */}
       {isAdminOrManager && selectedLeadIds.length > 0 && (
         <div className="bg-[#1E1E1E] px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#3C3C3C] animate-in fade-in duration-300">
@@ -351,6 +368,12 @@ export default function LeadsTableClient({
           </div>
         )}
       </div>
+
+      <BulkImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => mutate()}
+      />
     </div>
   )
 }

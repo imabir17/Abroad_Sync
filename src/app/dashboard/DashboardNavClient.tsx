@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -37,6 +37,12 @@ export default function DashboardNavClient({
       href: '/dashboard/leads',
       label: 'Leads',
       icon: Users,
+      show: true,
+    },
+    {
+      href: '/dashboard/forms',
+      label: 'QR Forms & Events',
+      icon: QrCode,
       show: true,
     },
     {

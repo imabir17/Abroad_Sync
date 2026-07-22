@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS "Lead" (
     
     "workExperience" TEXT,
     "source" TEXT,
+    "eventTag" TEXT,
     "budget" TEXT,
     "initialNote" TEXT,
     "stage" TEXT NOT NULL DEFAULT 'New',
@@ -94,6 +95,9 @@ CREATE TABLE IF NOT EXISTS "Lead" (
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migration statement for Lead table
+ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "eventTag" TEXT;
 
 DROP TRIGGER IF EXISTS update_lead_updated_at ON "Lead";
 CREATE TRIGGER update_lead_updated_at
@@ -351,10 +355,32 @@ CREATE TABLE IF NOT EXISTS "SubscriptionNotification" (
     "sentAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 17. Add Indexes for performance
+-- 17. Create "LeadForm" table (Custom Public Lead Forms & QR Event Tracking)
+CREATE TABLE IF NOT EXISTS "LeadForm" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "eventTag" TEXT,
+    "fieldsConfig" JSONB DEFAULT '{}'::jsonb,
+    "assignedCounselorId" TEXT REFERENCES "User"("id") ON DELETE SET NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "submissionsCount" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS update_leadform_updated_at ON "LeadForm";
+CREATE TRIGGER update_leadform_updated_at
+    BEFORE UPDATE ON "LeadForm"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 18. Add Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_company ON "User"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_company ON "Lead"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_assigned ON "Lead"("assignedCounselorId");
+CREATE INDEX IF NOT EXISTS idx_lead_eventtag ON "Lead"("companyId", "eventTag");
 CREATE INDEX IF NOT EXISTS idx_interaction_lead ON "Interaction"("leadId");
 CREATE INDEX IF NOT EXISTS idx_task_counselor ON "Task"("counselorId");
 CREATE INDEX IF NOT EXISTS idx_task_lead ON "Task"("leadId");
@@ -368,4 +394,5 @@ CREATE INDEX IF NOT EXISTS idx_subscription_company ON "Subscription"("companyId
 CREATE INDEX IF NOT EXISTS idx_subscription_status_period ON "Subscription"("status", "currentPeriodEnd");
 CREATE INDEX IF NOT EXISTS idx_payment_subscription ON "Payment"("subscriptionId");
 CREATE INDEX IF NOT EXISTS idx_payment_status ON "Payment"("status");
+CREATE INDEX IF NOT EXISTS idx_leadform_company ON "LeadForm"("companyId");
 
