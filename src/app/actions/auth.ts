@@ -112,6 +112,45 @@ export async function provisionCompany() {
     return { alreadyProvisioned: true, companyId: existing.companyId }
   }
 
+  // Intercept invited users: If user email has a pending invite, attach to existing company
+  if (user.email) {
+    const { data: pendingInvite } = await admin
+      .from('Invite')
+      .select('*')
+      .ilike('email', user.email.trim())
+      .eq('status', 'Pending')
+      .maybeSingle()
+
+    if (pendingInvite) {
+      const fullName = user.user_metadata?.fullName || user.user_metadata?.full_name || user.email.split('@')[0]
+      const { error: userErr } = await admin.from('User').insert({
+        id: user.id,
+        email: user.email.toLowerCase(),
+        fullName,
+        role: pendingInvite.role,
+        status: 'Active',
+        companyId: pendingInvite.companyId,
+      })
+
+      if (!userErr) {
+        await admin.from('Invite').update({ status: 'Accepted' }).eq('id', pendingInvite.id)
+        await admin.auth.admin.updateUserById(user.id, {
+          app_metadata: { companyId: pendingInvite.companyId, role: pendingInvite.role }
+        })
+
+        await admin.from('ActivityLog').insert({
+          companyId: pendingInvite.companyId,
+          actorId: user.id,
+          action: 'invite.accepted',
+          entityType: 'User',
+          entityId: user.id,
+        })
+
+        return { alreadyProvisioned: true, companyId: pendingInvite.companyId }
+      }
+    }
+  }
+
   const companyName = user.user_metadata?.pendingCompanyName || user.user_metadata?.companyName || 'My Coaching Center'
 
   const { data: company, error: companyErr } = await admin
