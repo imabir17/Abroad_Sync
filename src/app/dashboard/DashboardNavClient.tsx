@@ -79,7 +79,7 @@ export default function DashboardNavClient({
       href: '/dashboard/billing',
       label: 'Billing & Plans',
       icon: CreditCard,
-      show: true,
+      show: isAdminOrManager,
     },
     {
       href: '/dashboard/settings',

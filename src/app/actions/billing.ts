@@ -9,6 +9,10 @@ export async function getSubscriptionDetails() {
   const user = await getUserSession()
   if (!user) return { error: 'Not authenticated' }
 
+  if (user.role === 'Counselor') {
+    return { error: 'Access denied: Counselors do not have permission to access billing.' }
+  }
+
   const admin = createAdminClient()
 
   // Get current subscription & plan

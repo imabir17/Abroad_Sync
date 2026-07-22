@@ -7,6 +7,10 @@ export default async function BillingPage() {
   const user = await getUserSession()
   if (!user) redirect('/login')
 
+  if (user.role === 'Counselor') {
+    redirect('/dashboard')
+  }
+
   const details = await getSubscriptionDetails()
 
   if ('error' in details) {
