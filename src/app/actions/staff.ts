@@ -62,7 +62,6 @@ export async function createStaff(formData: FormData) {
       id: authData.user.id,
       fullName,
       email,
-      password: 'pending-invite', // Placeholder until user configures password
       role,
       companyId: user.companyId
     })
