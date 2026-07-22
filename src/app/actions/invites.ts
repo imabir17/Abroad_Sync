@@ -20,6 +20,35 @@ export async function createInvite(email: string, role: 'Manager' | 'Counselor')
     return { error: 'Cannot invite a Super Admin via invite link.' }
   }
 
+  // Enforce seat limits from Subscription & Plan
+  const { data: sub } = await admin
+    .from('Subscription')
+    .select('status, overrideUserLimit, Plan(userLimit)')
+    .eq('companyId', me.companyId)
+    .maybeSingle()
+
+  if (sub) {
+    if (sub.status === 'suspended') {
+      return { error: 'Your subscription is suspended. Please renew your subscription to invite team members.' }
+    }
+
+    const effectiveLimit = sub.overrideUserLimit !== null && sub.overrideUserLimit !== undefined
+      ? sub.overrideUserLimit
+      : (sub.Plan as any)?.userLimit
+
+    if (effectiveLimit !== null && effectiveLimit !== undefined && effectiveLimit !== -1) {
+      const [activeUsersRes, pendingInvitesRes] = await Promise.all([
+        admin.from('User').select('*', { count: 'exact', head: true }).eq('companyId', me.companyId).eq('status', 'Active'),
+        admin.from('Invite').select('*', { count: 'exact', head: true }).eq('companyId', me.companyId).eq('status', 'Pending')
+      ])
+
+      const totalSeatsUsed = (activeUsersRes.count ?? 0) + (pendingInvitesRes.count ?? 0)
+      if (totalSeatsUsed >= effectiveLimit) {
+        return { error: `Seat limit reached (${totalSeatsUsed}/${effectiveLimit} used). Upgrade your plan to add more team members.` }
+      }
+    }
+  }
+
   // Check if email already belongs to an active user in any company
   const { data: existingUser } = await admin.from('User').select('id, companyId').eq('email', email).maybeSingle()
   if (existingUser) {

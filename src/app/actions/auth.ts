@@ -139,6 +139,25 @@ export async function provisionCompany() {
     entityId: company.id,
   })
 
+  // Provision default Branch & Free Subscription
+  const { data: branch } = await admin
+    .from('Branch')
+    .insert({ companyId: company.id, name: 'Main Branch', isDefault: true })
+    .select()
+    .single()
+
+  const { data: freePlan } = await admin.from('Plan').select('id').eq('name', 'Free').maybeSingle()
+
+  if (branch && freePlan) {
+    await admin.from('Subscription').insert({
+      branchId: branch.id,
+      companyId: company.id,
+      planId: freePlan.id,
+      status: 'active',
+      currentPeriodEnd: null,
+    })
+  }
+
   await admin.auth.admin.updateUserById(user.id, {
     app_metadata: { companyId: company.id, role: 'Super Admin' },
   })

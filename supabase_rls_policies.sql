@@ -137,3 +137,83 @@ CREATE POLICY "Company members can read activity log" ON "ActivityLog"
     FOR SELECT TO authenticated
     USING ("companyId" = get_my_company_id());
 
+-- 14. Enable RLS on Billing & Subscription tables
+ALTER TABLE "Plan" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Branch" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Subscription" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "PaymentMethodConfig" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Payment" ENABLE ROW LEVEL SECURITY;
+
+-- Clean up existing billing policies
+DROP POLICY IF EXISTS "Anyone authenticated can read active plans" ON "Plan";
+DROP POLICY IF EXISTS "Company members read their branches" ON "Branch";
+DROP POLICY IF EXISTS "Company members read their subscription" ON "Subscription";
+DROP POLICY IF EXISTS "Anyone authenticated can read active payment methods" ON "PaymentMethodConfig";
+DROP POLICY IF EXISTS "Company members submit payments" ON "Payment";
+DROP POLICY IF EXISTS "Company members read their own payments" ON "Payment";
+
+-- Policies for Billing tables
+CREATE POLICY "Anyone authenticated can read active plans" ON "Plan"
+    FOR SELECT TO authenticated USING ("isActive" = true AND "isPublic" = true);
+
+CREATE POLICY "Company members read their branches" ON "Branch"
+    FOR SELECT TO authenticated USING ("companyId" = get_my_company_id());
+
+CREATE POLICY "Company members read their subscription" ON "Subscription"
+    FOR SELECT TO authenticated USING ("companyId" = get_my_company_id());
+
+CREATE POLICY "Anyone authenticated can read active payment methods" ON "PaymentMethodConfig"
+    FOR SELECT TO authenticated USING ("isActive" = true);
+
+CREATE POLICY "Company members submit payments" ON "Payment"
+    FOR INSERT TO authenticated WITH CHECK ("companyId" = get_my_company_id());
+
+CREATE POLICY "Company members read their own payments" ON "Payment"
+    FOR SELECT TO authenticated USING ("companyId" = get_my_company_id());
+
+-- Helper function: Check if current company subscription is writable (not suspended)
+CREATE OR REPLACE FUNCTION is_company_writable()
+RETURNS boolean AS $$
+DECLARE
+    v_status text;
+BEGIN
+    SELECT status INTO v_status FROM "Subscription" WHERE "companyId" = get_my_company_id();
+    RETURN v_status IS NULL OR v_status IN ('active', 'grace');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger Function: Enforce Monthly Lead Quotas based on Plan / Override Limits
+CREATE OR REPLACE FUNCTION check_lead_limit()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_limit INTEGER;
+    v_count INTEGER;
+BEGIN
+    SELECT COALESCE(s."overrideLeadLimit", p."leadLimitPerMonth")
+    INTO v_limit
+    FROM "Subscription" s JOIN "Plan" p ON p.id = s."planId"
+    WHERE s."companyId" = NEW."companyId" AND s.status IN ('active', 'grace');
+
+    IF v_limit IS NULL OR v_limit = -1 THEN
+        RETURN NEW; -- unlimited
+    END IF;
+
+    SELECT count(*) INTO v_count FROM "Lead"
+    WHERE "companyId" = NEW."companyId"
+      AND "createdAt" >= date_trunc('month', timezone('utc'::text, now()));
+
+    IF v_count >= v_limit THEN
+        RAISE EXCEPTION 'Monthly lead limit reached for this plan. Upgrade to add more leads.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS enforce_lead_limit ON "Lead";
+CREATE TRIGGER enforce_lead_limit
+    BEFORE INSERT ON "Lead"
+    FOR EACH ROW
+    EXECUTE FUNCTION check_lead_limit();
+
+

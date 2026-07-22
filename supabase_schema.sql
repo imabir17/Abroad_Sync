@@ -242,7 +242,116 @@ CREATE TABLE IF NOT EXISTS "ActivityLog" (
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 11. Add Indexes for performance
+-- 11. Create "Plan" table
+CREATE TABLE IF NOT EXISTS "Plan" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "name" TEXT NOT NULL,
+    "billingCycle" TEXT NOT NULL,
+    "priceUsd" NUMERIC(10,2) NOT NULL,
+    "setupFeeUsd" NUMERIC(10,2) NOT NULL DEFAULT 0,
+    "userLimit" INTEGER,
+    "leadLimitPerMonth" INTEGER,
+    "isPublic" BOOLEAN NOT NULL DEFAULT true,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS update_plan_updated_at ON "Plan";
+CREATE TRIGGER update_plan_updated_at
+    BEFORE UPDATE ON "Plan"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Seed default plans
+INSERT INTO "Plan" ("name", "billingCycle", "priceUsd", "setupFeeUsd", "userLimit", "leadLimitPerMonth", "isPublic")
+VALUES
+  ('Free',          'free',    0,   0,  2,   100,  true),
+  ('Basic Monthly', 'monthly', 35,  20, 20,  NULL, true),
+  ('Pro Monthly',   'monthly', 70,  20, 100, NULL, true),
+  ('Basic Yearly',  'yearly',  399, 0,  20,  NULL, true),
+  ('Pro Yearly',    'yearly',  799, 0,  100, NULL, true),
+  ('Custom',        'custom',  0,   0,  NULL, NULL, false)
+ON CONFLICT DO NOTHING;
+
+-- 12. Create "Branch" table
+CREATE TABLE IF NOT EXISTS "Branch" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "name" TEXT NOT NULL DEFAULT 'Main Branch',
+    "isDefault" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 13. Create "Subscription" table
+CREATE TABLE IF NOT EXISTS "Subscription" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "branchId" TEXT NOT NULL REFERENCES "Branch"("id") ON DELETE CASCADE,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "planId" TEXT NOT NULL REFERENCES "Plan"("id"),
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "overrideUserLimit" INTEGER,
+    "overrideLeadLimit" INTEGER,
+    "isCustom" BOOLEAN NOT NULL DEFAULT false,
+    "currentPeriodStart" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+    "currentPeriodEnd" TIMESTAMP WITH TIME ZONE,
+    "graceEndsAt" TIMESTAMP WITH TIME ZONE,
+    "setupFeePaid" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS update_subscription_updated_at ON "Subscription";
+CREATE TRIGGER update_subscription_updated_at
+    BEFORE UPDATE ON "Subscription"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 14. Create "PaymentMethodConfig" table
+CREATE TABLE IF NOT EXISTS "PaymentMethodConfig" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "method" TEXT NOT NULL UNIQUE,
+    "number" TEXT NOT NULL,
+    "accountType" TEXT,
+    "instructions" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true
+);
+
+-- Seed default receiving payment numbers
+INSERT INTO "PaymentMethodConfig" ("method", "number", "accountType", "instructions")
+VALUES
+  ('bKash',  '+8801700000000', 'Merchant', 'Send Money or Payment to this Merchant number. Use your Company Name as reference.'),
+  ('Nagad',  '+8801700000000', 'Personal', 'Send Money to this personal Nagad number.'),
+  ('Rocket', '+8801700000000', 'Personal', 'Send Money to this personal Rocket number.')
+ON CONFLICT DO NOTHING;
+
+-- 15. Create "Payment" table
+CREATE TABLE IF NOT EXISTS "Payment" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "subscriptionId" TEXT NOT NULL REFERENCES "Subscription"("id") ON DELETE CASCADE,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "planId" TEXT NOT NULL REFERENCES "Plan"("id"),
+    "amountUsd" NUMERIC(10,2) NOT NULL,
+    "includesSetupFee" BOOLEAN NOT NULL DEFAULT false,
+    "method" TEXT NOT NULL,
+    "transactionNumber" TEXT NOT NULL,
+    "submittedById" TEXT REFERENCES "User"("id") ON DELETE SET NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "reviewedById" TEXT REFERENCES "User"("id") ON DELETE SET NULL,
+    "reviewedAt" TIMESTAMP WITH TIME ZONE,
+    "reviewNotes" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 16. Create "SubscriptionNotification" table
+CREATE TABLE IF NOT EXISTS "SubscriptionNotification" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "subscriptionId" TEXT NOT NULL REFERENCES "Subscription"("id") ON DELETE CASCADE,
+    "type" TEXT NOT NULL,
+    "sentAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 17. Add Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_company ON "User"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_company ON "Lead"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_assigned ON "Lead"("assignedCounselorId");
@@ -254,3 +363,9 @@ CREATE INDEX IF NOT EXISTS idx_country_company ON "Country"("companyId");
 CREATE INDEX IF NOT EXISTS idx_invite_company ON "Invite"("companyId");
 CREATE INDEX IF NOT EXISTS idx_invite_token ON "Invite"("token");
 CREATE INDEX IF NOT EXISTS idx_activitylog_company ON "ActivityLog"("companyId");
+CREATE UNIQUE INDEX IF NOT EXISTS idx_subscription_branch ON "Subscription"("branchId");
+CREATE INDEX IF NOT EXISTS idx_subscription_company ON "Subscription"("companyId");
+CREATE INDEX IF NOT EXISTS idx_subscription_status_period ON "Subscription"("status", "currentPeriodEnd");
+CREATE INDEX IF NOT EXISTS idx_payment_subscription ON "Payment"("subscriptionId");
+CREATE INDEX IF NOT EXISTS idx_payment_status ON "Payment"("status");
+
