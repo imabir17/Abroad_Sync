@@ -303,8 +303,8 @@ export default function StaffClient({
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-start gap-3">
                   <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold">Invitation Created & Email Sent!</p>
-                    <p className="text-[11px] opacity-90 mt-0.5">An invitation email has been dispatched to <span className="font-bold text-white">{inviteEmail}</span>. You can also copy the direct link below:</p>
+                    <p className="font-bold">Invitation Created!</p>
+                    <p className="text-[11px] opacity-90 mt-0.5">Share this invite link with <span className="font-bold text-white">{inviteEmail}</span>:</p>
                   </div>
                 </div>
                 <div className="p-3 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl text-xs font-mono text-gray-300 break-all flex items-center justify-between gap-2">

@@ -73,25 +73,8 @@ export async function createInvite(email: string, role: 'Manager' | 'Counselor')
 
   if (error) return { error: 'Failed to create invite: ' + error.message }
 
-  // Send invitation link directly to recipient email address
-  let emailSent = false
-  try {
-    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    siteUrl = siteUrl.includes('http') ? siteUrl : `https://${siteUrl}`
-    const inviteUrl = `${siteUrl.replace(/\/$/, '')}/invite/accept?token=${invite.token}`
-
-    const { error: sendErr } = await admin.auth.admin.inviteUserByEmail(email, {
-      redirectTo: inviteUrl,
-    })
-
-    if (!sendErr) {
-      emailSent = true
-    } else {
-      console.warn('inviteUserByEmail note:', sendErr.message)
-    }
-  } catch (err: any) {
-    console.warn('Failed to send invite email:', err)
-  }
+  // Automated email sending disabled per user request
+  const emailSent = false
 
   await admin.from('ActivityLog').insert({
     companyId: me.companyId,
