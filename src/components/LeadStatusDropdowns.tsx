@@ -68,15 +68,15 @@ export function LeadStatusDropdowns({
     }
   }
 
-  const selectClass = "bg-white text-xs font-bold text-gray-900 rounded-xl outline-none focus:bg-gray-50 border border-gray-200 transition-all cursor-pointer h-[26px] border-none pr-2 bg-transparent"
+  const selectClass = "bg-[#1E1E1E] text-xs font-bold text-white rounded-xl outline-none border-none pr-2 transition-all cursor-pointer h-[26px]"
 
   return (
     <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-      {isPending && <span className="text-[10px] font-bold text-gray-400 animate-pulse shrink-0">Saving...</span>}
+      {isPending && <span className="text-[10px] font-bold text-[#12A8B5] animate-pulse shrink-0">Saving...</span>}
       
       {/* Dynamic Stage selector */}
-      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-1.5 h-[42px]">
-        <span className="text-xs font-bold text-gray-600">Stage:</span>
+      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl px-3.5 py-1.5 h-[42px]">
+        <span className="text-xs font-bold text-gray-400">Stage:</span>
         <select 
           onChange={handleStageChange}
           disabled={isPending || !canEdit}
@@ -85,19 +85,19 @@ export function LeadStatusDropdowns({
         >
           {stages.length > 0 ? (
             stages.map(s => (
-              <option key={s.id} value={s.name}>{s.name}</option>
+              <option key={s.id} value={s.name} className="bg-[#1E1E1E] text-white">{s.name}</option>
             ))
           ) : (
             LEAD_STAGES.map(stage => (
-              <option key={stage} value={stage}>{stage}</option>
+              <option key={stage} value={stage} className="bg-[#1E1E1E] text-white">{stage}</option>
             ))
           )}
         </select>
       </div>
 
       {/* Star rating selector */}
-      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2.5 bg-white border border-gray-200 rounded-xl px-4 py-1.5 h-[42px]">
-        <span className="text-xs font-bold text-gray-600">Rating:</span>
+      <div className="flex-1 md:flex-initial flex items-center justify-between md:justify-start gap-2.5 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl px-4 py-1.5 h-[42px]">
+        <span className="text-xs font-bold text-gray-400">Rating:</span>
         <StarRating 
           rating={localRating} 
           onChange={handleRatingSelect} 

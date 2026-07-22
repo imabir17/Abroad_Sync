@@ -59,7 +59,7 @@ export function StarRating({ rating, onChange, editable = true, size = 16 }: Sta
               className={`transition-colors duration-150 ${
                 isFilled
                   ? 'fill-[#FFB020] text-[#FFB020]'
-                  : 'text-[#C7CFDC] fill-transparent'
+                  : 'text-gray-500 fill-transparent'
               }`}
             />
           </button>
