@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient as createServerClient } from '@/utils/supabase/server'
-import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -23,46 +23,37 @@ export async function login(prevState: any, formData: FormData) {
     return { error: error.message }
   }
 
-  // Provision Super Admin profile in database if missing
   if (authData?.user) {
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return { error: 'Failed to authenticate admin client: SUPABASE_SERVICE_ROLE_KEY is not defined.' }
-    }
-
-    // Verify key format to prevent silent RLS blockages
+    let supabaseAdmin
     try {
-      const parts = process.env.SUPABASE_SERVICE_ROLE_KEY.split('.')
-      if (parts.length >= 2) {
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString())
-        if (payload.role !== 'service_role') {
-          return { error: `Invalid SUPABASE_SERVICE_ROLE_KEY: The key provided has the role '${payload.role}' instead of 'service_role'. Please check your Vercel environment variables.` }
-        }
-      }
-    } catch (e) {
-      return { error: 'Failed to validate SUPABASE_SERVICE_ROLE_KEY format. Please ensure it is copy-pasted correctly.' }
+      supabaseAdmin = createAdminClient()
+    } catch (e: any) {
+      return { error: e.message || 'Failed to initialize admin client' }
     }
 
-    // Use admin client to bypass RLS for profile verification and insertion
-    const supabaseAdmin = createSupabaseAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    )
-
-    // Verify profile existence safely
+    // Verify profile existence & status safely
     const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('User')
-      .select('id')
-      .eq('email', email)
+      .select('id, status, companyId')
+      .eq('id', authData.user.id)
       .maybeSingle()
 
     if (checkError) {
       return { error: 'Failed to verify user profile: ' + checkError.message }
     }
 
+    if (existingUser && existingUser.status === 'Deactivated') {
+      await supabase.auth.signOut()
+      return { error: 'Your account has been deactivated. Please contact your company administrator.' }
+    }
+
     if (!existingUser) {
+      // Check user_metadata for company name or fallback
+      const companyName = authData.user.user_metadata?.pendingCompanyName || authData.user.user_metadata?.companyName || 'My Coaching Center'
+      
       const { data: company, error: companyError } = await supabaseAdmin
         .from('Company')
-        .insert({ name: 'My Company' })
+        .insert({ name: companyName })
         .select()
         .single()
 
@@ -75,9 +66,9 @@ export async function login(prevState: any, formData: FormData) {
         .insert({
           id: authData.user.id,
           email,
-          fullName: authData.user.user_metadata?.full_name || 'Admin User',
+          fullName: authData.user.user_metadata?.fullName || authData.user.user_metadata?.full_name || 'Admin User',
           role: 'Super Admin',
-          password: 'set-by-supabase-auth',
+          status: 'Active',
           companyId: company.id
         })
 
@@ -85,7 +76,15 @@ export async function login(prevState: any, formData: FormData) {
         return { error: 'Failed to create user profile: ' + userError.message }
       }
 
-      // Store tenant context in JWT app_metadata to enable high-performance RLS check paths
+      await supabaseAdmin.from('ActivityLog').insert({
+        companyId: company.id,
+        actorId: authData.user.id,
+        action: 'company.created',
+        entityType: 'Company',
+        entityId: company.id,
+      })
+
+      // Store tenant context in JWT app_metadata
       await supabaseAdmin.auth.admin.updateUserById(
         authData.user.id,
         { app_metadata: { companyId: company.id, role: 'Super Admin' } }
@@ -94,6 +93,57 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   redirect('/dashboard')
+}
+
+export async function provisionCompany() {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const admin = createAdminClient()
+
+  // Guard against double-provisioning if this route is hit twice
+  const { data: existing } = await admin.from('User').select('id, companyId, status').eq('id', user.id).maybeSingle()
+  if (existing) {
+    if (existing.status === 'Deactivated') {
+      await supabase.auth.signOut()
+      throw new Error('Your account is deactivated.')
+    }
+    return { alreadyProvisioned: true, companyId: existing.companyId }
+  }
+
+  const companyName = user.user_metadata?.pendingCompanyName || user.user_metadata?.companyName || 'My Coaching Center'
+
+  const { data: company, error: companyErr } = await admin
+    .from('Company')
+    .insert({ name: companyName })
+    .select()
+    .single()
+  if (companyErr) throw companyErr
+
+  const { error: userErr } = await admin.from('User').insert({
+    id: user.id,
+    email: user.email!,
+    fullName: user.user_metadata?.fullName || user.user_metadata?.full_name || 'Admin User',
+    role: 'Super Admin',
+    status: 'Active',
+    companyId: company.id,
+  })
+  if (userErr) throw userErr
+
+  await admin.from('ActivityLog').insert({
+    companyId: company.id,
+    actorId: user.id,
+    action: 'company.created',
+    entityType: 'Company',
+    entityId: company.id,
+  })
+
+  await admin.auth.admin.updateUserById(user.id, {
+    app_metadata: { companyId: company.id, role: 'Super Admin' },
+  })
+
+  return { companyId: company.id }
 }
 
 export async function logout() {

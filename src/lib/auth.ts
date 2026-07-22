@@ -1,5 +1,5 @@
 import { createClient as createServerClient } from '@/utils/supabase/server'
-import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function getUserSession() {
   const supabase = await createServerClient()
@@ -10,35 +10,31 @@ export async function getUserSession() {
     return null
   }
   
-  // Fetch profile via admin client to bypass RLS and avoid recursive policy check overhead
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('getUserSession: SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables.')
+  try {
+    const supabaseAdmin = createAdminClient()
+
+    const { data: dbUser, error: dbError } = await supabaseAdmin
+      .from('User')
+      .select('*, company:Company(*)')
+      .eq('id', user.id)
+      .maybeSingle()
+    
+    if (dbError) {
+      console.error('getUserSession Database Error:', {
+        message: dbError.message,
+        details: dbError.details,
+        hint: dbError.hint,
+        code: dbError.code
+      })
+    }
+    
+    if (dbError || !dbUser || dbUser.status === 'Deactivated') {
+      return null
+    }
+    
+    return dbUser
+  } catch (err) {
+    console.error('getUserSession Admin Client Error:', err)
     return null
   }
-
-  const supabaseAdmin = createSupabaseAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
-
-  const { data: dbUser, error: dbError } = await supabaseAdmin
-    .from('User')
-    .select('*, company:Company(*)')
-    .eq('email', user.email)
-    .single()
-  
-  if (dbError) {
-    console.error('getUserSession Database Error:', {
-      message: dbError.message,
-      details: dbError.details,
-      hint: dbError.hint,
-      code: dbError.code
-    })
-  }
-  
-  if (dbError || !dbUser) {
-    return null
-  }
-  
-  return dbUser
 }

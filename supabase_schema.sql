@@ -29,11 +29,15 @@ CREATE TABLE IF NOT EXISTS "User" (
     "email" TEXT UNIQUE NOT NULL,
     "fullName" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'Counselor',
-    "password" TEXT NOT NULL, -- Used as a placeholder / local fallback
     "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "status" TEXT NOT NULL DEFAULT 'Active',
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migrations for existing User table
+ALTER TABLE "User" DROP COLUMN IF EXISTS "password";
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'Active';
 
 DROP TRIGGER IF EXISTS update_user_updated_at ON "User";
 CREATE TRIGGER update_user_updated_at
@@ -206,7 +210,39 @@ CREATE TRIGGER update_country_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 
--- 9. Add Indexes for performance
+-- 9. Create "Invite" table
+CREATE TABLE IF NOT EXISTS "Invite" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "email" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'Counselor', -- 'Manager' or 'Counselor'. Never 'Super Admin' via invite.
+    "token" TEXT UNIQUE NOT NULL DEFAULT gen_random_uuid()::text,
+    "invitedById" TEXT REFERENCES "User"("id") ON DELETE SET NULL,
+    "status" TEXT NOT NULL DEFAULT 'Pending', -- Pending, Accepted, Revoked
+    "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (timezone('utc'::text, now()) + interval '7 days'),
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS update_invite_updated_at ON "Invite";
+CREATE TRIGGER update_invite_updated_at
+    BEFORE UPDATE ON "Invite"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 10. Create "ActivityLog" table
+CREATE TABLE IF NOT EXISTS "ActivityLog" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "actorId" TEXT REFERENCES "User"("id") ON DELETE SET NULL,
+    "action" TEXT NOT NULL, -- 'company.created', 'user.invited', 'invite.accepted', 'user.role_changed', 'user.deactivated'
+    "entityType" TEXT,
+    "entityId" TEXT,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 11. Add Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_company ON "User"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_company ON "Lead"("companyId");
 CREATE INDEX IF NOT EXISTS idx_lead_assigned ON "Lead"("assignedCounselorId");
@@ -215,3 +251,6 @@ CREATE INDEX IF NOT EXISTS idx_task_counselor ON "Task"("counselorId");
 CREATE INDEX IF NOT EXISTS idx_task_lead ON "Task"("leadId");
 CREATE INDEX IF NOT EXISTS idx_application_lead ON "Application"("leadId");
 CREATE INDEX IF NOT EXISTS idx_country_company ON "Country"("companyId");
+CREATE INDEX IF NOT EXISTS idx_invite_company ON "Invite"("companyId");
+CREATE INDEX IF NOT EXISTS idx_invite_token ON "Invite"("token");
+CREATE INDEX IF NOT EXISTS idx_activitylog_company ON "ActivityLog"("companyId");

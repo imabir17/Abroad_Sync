@@ -6,24 +6,33 @@ import StaffClient from './StaffClient'
 export default async function StaffManagementPage() {
   const user = await getUserSession()
   
-  // Only Super Admin can access this page
-  if (!user || user.role !== 'Super Admin') {
+  // Super Admin and Manager can access staff management
+  if (!user || !['Super Admin', 'Manager'].includes(user.role)) {
     redirect('/dashboard')
   }
 
   const supabase = await createClient()
 
-  const { data: usersData } = await supabase
-    .from('User')
-    .select('id, fullName, email, role')
-    .eq('companyId', user.companyId)
-    .order('createdAt', { ascending: false })
+  const [usersRes, invitesRes] = await Promise.all([
+    supabase
+      .from('User')
+      .select('id, fullName, email, role, status, createdAt')
+      .eq('companyId', user.companyId)
+      .order('createdAt', { ascending: false }),
+    supabase
+      .from('Invite')
+      .select('*')
+      .eq('companyId', user.companyId)
+      .eq('status', 'Pending')
+      .order('createdAt', { ascending: false })
+  ])
 
-  const users = usersData || []
+  const users = usersRes.data || []
+  const invites = invitesRes.data || []
 
   return (
     <>
-      <StaffClient initialUsers={users} />
+      <StaffClient initialUsers={users} initialInvites={invites} currentUserRole={user.role} currentUserId={user.id} />
     </>
   )
 }

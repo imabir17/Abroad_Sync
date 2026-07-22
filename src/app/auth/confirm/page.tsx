@@ -15,7 +15,8 @@ function ConfirmPageContent() {
     const verify = async () => {
       const token_hash = searchParams.get('token_hash')
       const type = searchParams.get('type')
-      const next = searchParams.get('next') ?? '/update-password'
+      const defaultNext = type === 'signup' ? '/onboarding/complete' : '/update-password'
+      const next = searchParams.get('next') ?? defaultNext
 
       if (!token_hash || !type) {
         setStatus('error')

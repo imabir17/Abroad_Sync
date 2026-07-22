@@ -6,34 +6,24 @@ RETURNS text AS $$
     DECLARE
         cid text;
     BEGIN
-        -- Try to read from JWT app_metadata (O(1) in-memory check)
-        cid := (auth.jwt() -> 'app_metadata'::text ->> 'companyId')::text;
+        -- Check database query to ensure user exists and status is Active
+        SELECT "companyId" INTO cid FROM "User" WHERE id = auth.uid()::text AND status = 'Active';
         IF cid IS NOT NULL THEN
             RETURN cid;
         END IF;
 
-        -- Fall back to database query if JWT is missing the claim
-        SELECT "companyId" INTO cid FROM "User" WHERE id = auth.uid()::text;
-        RETURN cid;
+        -- Fall back to JWT app_metadata claim if DB returns null
+        RETURN (auth.jwt() -> 'app_metadata'::text ->> 'companyId')::text;
     END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 2. Create a helper function to verify if the current user is a Super Admin (JWT-first, fallback to DB)
 CREATE OR REPLACE FUNCTION is_super_admin()
 RETURNS boolean AS $$
-    DECLARE
-        u_role text;
     BEGIN
-        -- Try to read from JWT app_metadata (O(1) in-memory check)
-        u_role := (auth.jwt() -> 'app_metadata'::text ->> 'role')::text;
-        IF u_role IS NOT NULL THEN
-            RETURN u_role = 'Super Admin';
-        END IF;
-
-        -- Fall back to database query
         RETURN EXISTS (
             SELECT 1 FROM "User" 
-            WHERE id = auth.uid()::text AND role = 'Super Admin'
+            WHERE id = auth.uid()::text AND role = 'Super Admin' AND status = 'Active'
         );
     END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -46,6 +36,8 @@ ALTER TABLE "Interaction" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Task" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Application" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Country" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Invite" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ActivityLog" ENABLE ROW LEVEL SECURITY;
 
 -- 4. Clean up any existing policies
 DROP POLICY IF EXISTS "Users can view their own company" ON "Company";
@@ -58,6 +50,8 @@ DROP POLICY IF EXISTS "Users can manage tasks in their company" ON "Task";
 DROP POLICY IF EXISTS "Users can manage applications in their company" ON "Application";
 DROP POLICY IF EXISTS "Users can view countries in their company" ON "Country";
 DROP POLICY IF EXISTS "Admins can manage countries in their company" ON "Country";
+DROP POLICY IF EXISTS "Super Admins and Managers can manage invites" ON "Invite";
+DROP POLICY IF EXISTS "Company members can read activity log" ON "ActivityLog";
 
 -- 5. "Company" table policies
 CREATE POLICY "Users can view their own company" ON "Company"
@@ -125,5 +119,21 @@ CREATE POLICY "Users can view countries in their company" ON "Country"
 CREATE POLICY "Admins can manage countries in their company" ON "Country"
     FOR ALL TO authenticated
     USING (
-        "companyId" = get_my_company_id() AND (is_super_admin() OR (SELECT role FROM "User" WHERE id = auth.uid()::text) = 'Manager')
+        "companyId" = get_my_company_id() AND (is_super_admin() OR (SELECT role FROM "User" WHERE id = auth.uid()::text AND status = 'Active') = 'Manager')
     );
+
+-- 12. "Invite" table policies (Super Admin & Manager)
+CREATE POLICY "Super Admins and Managers can manage invites" ON "Invite"
+    FOR ALL TO authenticated
+    USING (
+        "companyId" = get_my_company_id()
+        AND (is_super_admin() OR EXISTS (
+            SELECT 1 FROM "User" WHERE id = auth.uid()::text AND role = 'Manager' AND status = 'Active'
+        ))
+    );
+
+-- 13. "ActivityLog" table policies
+CREATE POLICY "Company members can read activity log" ON "ActivityLog"
+    FOR SELECT TO authenticated
+    USING ("companyId" = get_my_company_id());
+
