@@ -9,20 +9,28 @@ export default async function SaasAdminPage() {
 
   const admin = createAdminClient()
 
-  // Fetch pending payments
-  const { data: pendingPayments } = await admin
+  // Fetch pending payments with explicit FK join
+  const { data: pendingPayments, error: pendingErr } = await admin
     .from('Payment')
-    .select('*, company:Company(*), plan:Plan(*), submitter:User(*)')
+    .select('*, company:Company(*), plan:Plan(*), submitter:User!submittedById(*)')
     .eq('status', 'pending')
     .order('createdAt', { ascending: true })
 
-  // Fetch recent processed payments
-  const { data: recentPayments } = await admin
+  if (pendingErr) {
+    console.error('SaasAdminPage pendingPayments error:', pendingErr)
+  }
+
+  // Fetch recent processed payments with explicit FK join
+  const { data: recentPayments, error: recentErr } = await admin
     .from('Payment')
-    .select('*, company:Company(*), plan:Plan(*)')
+    .select('*, company:Company(*), plan:Plan(*), submitter:User!submittedById(*)')
     .neq('status', 'pending')
     .order('createdAt', { ascending: false })
     .limit(20)
+
+  if (recentErr) {
+    console.error('SaasAdminPage recentPayments error:', recentErr)
+  }
 
   // Fetch all tenant subscriptions
   const { data: subscriptions } = await admin
