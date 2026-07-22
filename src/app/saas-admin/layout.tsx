@@ -10,13 +10,11 @@ export default async function SaasAdminLayout({
 }) {
   const user = await getUserSession()
 
-  // Basic check to ensure the user is logged in
-  if (!user) {
-    redirect('/login')
+  // Restrict access strictly to Platform Admin email
+  const platformAdminEmail = 'sheikhabirrahaman@gmail.com'
+  if (!user || user.email?.toLowerCase() !== platformAdminEmail) {
+    redirect('/dashboard')
   }
-
-  // NOTE: In a real production app, you might want to hardcode your email here
-  // e.g., if (user.email !== 'owner@abroadsync.com') redirect('/dashboard')
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#202638] font-sans">

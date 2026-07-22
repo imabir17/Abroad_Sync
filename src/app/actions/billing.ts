@@ -133,10 +133,13 @@ export async function submitPayment(planId: string, method: string, transactionN
 // Platform Admin Actions
 // ----------------------------------------------------
 
+const PLATFORM_ADMIN_EMAILS = ['sheikhabirrahaman@gmail.com']
+
 async function verifyPlatformAdmin() {
   const user = await getUserSession()
-  if (!user) throw new Error('Not authenticated')
-  // In production, restrict to allowed admin emails or Super Admin role
+  if (!user || !user.email || !PLATFORM_ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+    throw new Error('Unauthorized: Platform admin privileges required.')
+  }
   return user
 }
 
