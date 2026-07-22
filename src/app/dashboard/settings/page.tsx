@@ -13,8 +13,15 @@ export default async function SettingsPage() {
   // Fetch customizable pipeline stages
   const stages = await getStagesAction()
 
-  // Fetch active leads' stage distribution to calculate migration targets
+  // Fetch company details
   const supabase = await createClient()
+  const { data: company } = await supabase
+    .from('Company')
+    .select('id, name, logoUrl')
+    .eq('id', user.companyId)
+    .single()
+
+  // Fetch active leads' stage distribution to calculate migration targets
   const { data: leads } = await supabase
     .from('Lead')
     .select('stage')
@@ -37,7 +44,11 @@ export default async function SettingsPage() {
         <p className="text-xs text-gray-400">Manage your agency workspace parameters, customizable stages, and rules.</p>
       </div>
 
-      <SettingsClient initialStages={stages} stageLeadCounts={stageLeadCounts} />
+      <SettingsClient
+        initialStages={stages}
+        stageLeadCounts={stageLeadCounts}
+        initialCompany={company || { id: user.companyId, name: '', logoUrl: null }}
+      />
     </div>
   )
 }

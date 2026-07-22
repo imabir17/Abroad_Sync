@@ -85,10 +85,16 @@ export default function PublicFormClient({ form }: { form: any }) {
         {/* Form Header */}
         <div className="bg-gradient-to-br from-[#4855E4] to-[#333FC2] p-8 text-white relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xs font-bold tracking-wider uppercase opacity-90">{form.company?.name || 'AbroadSync'}</span>
+            {form.company?.logoUrl ? (
+              <div className="w-12 h-12 rounded-xl bg-white p-1 shadow-md flex items-center justify-center overflow-hidden shrink-0">
+                <img src={form.company.logoUrl} alt={form.company.name} className="w-full h-full object-contain" />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+            )}
+            <span className="text-xs md:text-sm font-bold tracking-wider uppercase opacity-90">{form.company?.name || 'AbroadSync'}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold font-display mb-2">{form.title}</h1>
           {form.description && (

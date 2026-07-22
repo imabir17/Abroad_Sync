@@ -25,9 +25,11 @@ interface DownloadPDFButtonProps {
   report: CounselorReportData
   dateRange: string
   filename: string
+  companyName?: string
+  companyLogoUrl?: string | null
 }
 
-export function DownloadPDFButton({ report, dateRange, filename }: DownloadPDFButtonProps) {
+export function DownloadPDFButton({ report, dateRange, filename, companyName, companyLogoUrl }: DownloadPDFButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const handleDownload = () => {
@@ -36,21 +38,34 @@ export function DownloadPDFButton({ report, dateRange, filename }: DownloadPDFBu
     try {
       const doc = new jsPDF()
 
-      // 1. Header
-      doc.setFontSize(22)
-      doc.setTextColor(30, 58, 138) // Tailwind blue-900
-      doc.text('Counselor Performance Report', 14, 22)
+      // 1. Header with Agency Branding & Logo
+      if (companyLogoUrl) {
+        try {
+          const format = companyLogoUrl.includes('image/png') ? 'PNG' : 'JPEG'
+          doc.addImage(companyLogoUrl, format, 160, 10, 24, 24)
+        } catch (err) {
+          console.warn('Could not embed company logo in PDF:', err)
+        }
+      }
 
-      doc.setFontSize(14)
-      doc.setTextColor(55, 65, 81) // Tailwind gray-700
-      doc.text(`Counselor: ${report.counselorName}`, 14, 32)
+      doc.setFontSize(9)
+      doc.setTextColor(14, 99, 156) // Accent Blue
+      doc.text(companyName || 'AbroadSync Agency', 14, 16)
+
+      doc.setFontSize(20)
+      doc.setTextColor(30, 58, 138)
+      doc.text('Counselor Performance Report', 14, 26)
+
+      doc.setFontSize(12)
+      doc.setTextColor(55, 65, 81)
+      doc.text(`Counselor: ${report.counselorName}`, 14, 34)
       
-      doc.setFontSize(10)
-      doc.setTextColor(107, 114, 128) // Tailwind gray-500
-      doc.text(`Period: ${dateRange}`, 14, 38)
+      doc.setFontSize(9)
+      doc.setTextColor(107, 114, 128)
+      doc.text(`Period: ${dateRange}`, 14, 40)
 
-      doc.setDrawColor(229, 231, 235) // Tailwind gray-200
-      doc.line(14, 43, 196, 43)
+      doc.setDrawColor(229, 231, 235)
+      doc.line(14, 45, 196, 45)
 
       // 2. Metrics Summary Table
       doc.setFontSize(14)

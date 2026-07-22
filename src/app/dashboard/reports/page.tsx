@@ -1,5 +1,6 @@
 import { getUserSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
 import { generateReports, getAllCounselors } from '@/app/actions/reports'
 import { ReportFilters } from '@/components/ReportFilters'
 import { ReportCharts } from '@/components/ReportCharts'
@@ -48,6 +49,13 @@ export default async function ReportsPage({
     endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999)
   }
 
+  const supabase = await createClient()
+  const { data: company } = await supabase
+    .from('Company')
+    .select('name, logoUrl')
+    .eq('id', user.companyId)
+    .single()
+
   const reports = await generateReports(startDate, endDate, targetCounselorId)
   const counselors = await getAllCounselors()
 
@@ -85,6 +93,8 @@ export default async function ReportsPage({
                     report={report}
                     dateRange={`${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`}
                     filename={`${report.counselorName}-Performance-Report.pdf`} 
+                    companyName={company?.name}
+                    companyLogoUrl={company?.logoUrl}
                   />
                 </div>
               </div>

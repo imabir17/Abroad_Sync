@@ -140,7 +140,7 @@ export async function getPublicLeadForm(formId: string) {
 
   const { data: form } = await admin
     .from('LeadForm')
-    .select('*, company:Company(name)')
+    .select('*, company:Company(id, name, logoUrl)')
     .eq('id', formId)
     .maybeSingle()
 

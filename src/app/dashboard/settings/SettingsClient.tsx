@@ -9,6 +9,7 @@ import {
   reorderStagesAction, 
   PipelineStage 
 } from '@/app/actions/stages'
+import { updateCompanyProfile } from '@/app/actions/company'
 import { 
   ArrowUp, 
   ArrowDown, 
@@ -18,21 +19,70 @@ import {
   X, 
   Plus, 
   AlertTriangle,
-  Loader2 
+  Loader2,
+  Building2,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react'
 
 interface SettingsClientProps {
   initialStages: PipelineStage[]
   stageLeadCounts: { [key: string]: number }
+  initialCompany: { id: string; name: string; logoUrl?: string | null }
 }
 
-export default function SettingsClient({ initialStages, stageLeadCounts }: SettingsClientProps) {
+export default function SettingsClient({ initialStages, stageLeadCounts, initialCompany }: SettingsClientProps) {
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
+
+  // Company Profile State
+  const [companyName, setCompanyName] = useState(initialCompany?.name || '')
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(initialCompany?.logoUrl || null)
+  const [isSavingCompany, setIsSavingCompany] = useState(false)
+  const [companySuccessMsg, setCompanySuccessMsg] = useState('')
+  const [companyErrorMsg, setCompanyErrorMsg] = useState('')
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Logo image file size must be under 2MB.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      if (evt.target?.result) {
+        setCompanyLogoUrl(evt.target.result as string)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleSaveCompany = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingCompany(true)
+    setCompanySuccessMsg('')
+    setCompanyErrorMsg('')
+
+    const res = await updateCompanyProfile({
+      name: companyName,
+      logoUrl: companyLogoUrl,
+    })
+    setIsSavingCompany(false)
+
+    if (res.error) {
+      setCompanyErrorMsg(res.error)
+    } else {
+      setCompanySuccessMsg('Company name and logo updated successfully!')
+      setTimeout(() => setCompanySuccessMsg(''), 3000)
+    }
+  }
 
   const [stages, setStages] = useState<PipelineStage[]>(initialStages)
   const [newStageName, setNewStageName] = useState('')
@@ -177,6 +227,115 @@ export default function SettingsClient({ initialStages, stageLeadCounts }: Setti
           <span>{errorMsg}</span>
         </div>
       )}
+
+      {/* Company Branding & Logo Settings */}
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[#007ACC]/20 text-[#007ACC] flex items-center justify-center">
+            <Building2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-white font-display">Company Profile & Logo</h3>
+            <p className="text-xs text-gray-400">Customize your agency name and official logo displayed on QR inquiry forms and PDF student reports.</p>
+          </div>
+        </div>
+
+        {companySuccessMsg && (
+          <div className="mb-4 p-3.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-xs font-semibold text-emerald-400">
+            {companySuccessMsg}
+          </div>
+        )}
+
+        {companyErrorMsg && (
+          <div className="mb-4 p-3.5 rounded-xl bg-red-950/50 border border-red-500/40 text-xs font-semibold text-red-400">
+            {companyErrorMsg}
+          </div>
+        )}
+
+        <form onSubmit={handleSaveCompany} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {/* Company Name */}
+            <div>
+              <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
+                Agency / Company Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="e.g. AbroadSync Education Consultancy"
+                className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] transition-all"
+              />
+            </div>
+
+            {/* Company Logo Upload & Preview */}
+            <div>
+              <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
+                Official Agency Logo
+              </label>
+
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-2xl bg-[#1E1E1E] border border-[#3C3C3C] flex items-center justify-center overflow-hidden shrink-0">
+                  {companyLogoUrl ? (
+                    <img src={companyLogoUrl} alt="Company Logo" className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <ImageIcon className="w-8 h-8 text-gray-500" />
+                  )}
+                </div>
+
+                <div className="space-y-2 flex-1">
+                  <div className="relative inline-block">
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                      onChange={handleLogoUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] hover:bg-[#3C3C3C] text-white text-xs font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-[#007ACC]" />
+                      Upload New Logo
+                    </button>
+                  </div>
+
+                  {companyLogoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setCompanyLogoUrl(null)}
+                      className="block text-xs text-red-400 hover:underline font-semibold"
+                    >
+                      Remove Logo
+                    </button>
+                  )}
+
+                  <p className="text-[11px] text-gray-400">Recommended: PNG or SVG with transparent background (Max 2MB).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-[#3C3C3C]">
+            <button
+              type="submit"
+              disabled={isSavingCompany}
+              className="px-6 py-2.5 rounded-xl bg-[#0E639C] hover:bg-[#1177BB] text-white text-xs font-bold shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
+            >
+              {isSavingCompany ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Saving Settings...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" /> Save Company Profile
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         

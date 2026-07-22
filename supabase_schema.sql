@@ -13,9 +13,12 @@ $$ language 'plpgsql';
 CREATE TABLE IF NOT EXISTS "Company" (
     "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     "name" TEXT NOT NULL,
+    "logoUrl" TEXT,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE "Company" ADD COLUMN IF NOT EXISTS "logoUrl" TEXT;
 
 DROP TRIGGER IF EXISTS update_company_updated_at ON "Company";
 CREATE TRIGGER update_company_updated_at
