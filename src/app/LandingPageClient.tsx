@@ -24,6 +24,7 @@ import {
 export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [landingCycle, setLandingCycle] = useState<'monthly' | 'yearly'>('monthly')
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -206,9 +207,9 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
                 <Link href="/login" className="px-5 py-2.5 rounded-full text-sm font-bold text-[#202638] bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all duration-200">
                   Sign In
                 </Link>
-                <a href="#pricing" className="px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150">
+                <Link href="/signup" className="px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150">
                   Get Started
-                </a>
+                </Link>
               </>
             )}
           </div>
@@ -272,13 +273,13 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
                 >
                   Sign In
                 </Link>
-                <a 
-                  href="#pricing" 
+                <Link 
+                  href="/signup" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="py-3.5 text-center rounded-full font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2]"
                 >
                   Get Started
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -300,9 +301,9 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
               AbroadSync replaces the spreadsheet chaos of student recruitment with one pipeline — academic history, test scores, university applications, and counselor follow-ups, all in sync.
             </p>
             <div className="hero-actions reveal in d2 flex flex-wrap gap-4 items-center mb-10">
-              <a href="#pricing" className="px-7 py-3.5 rounded-full text-base font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150">
+              <Link href="/signup" className="px-7 py-3.5 rounded-full text-base font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150">
                 Start free trial
-              </a>
+              </Link>
               <a href="#pipeline" className="px-7 py-3.5 rounded-full text-base font-bold text-[#202638] bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all duration-200">
                 See the pipeline ↓
               </a>
@@ -661,56 +662,159 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
       {/* Pricing and CTA section */}
       <section id="pricing" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 reveal">
+          <div className="text-center mb-12 reveal">
             <span className="text-[11px] font-bold font-mono text-[#333FC2] tracking-widest block mb-3">PRICING PLANS</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#202638]">Simple, transparent pricing.</h2>
-            <p className="text-[#5C6478] text-sm md:text-base mt-3 max-w-xl mx-auto">
-              One flat rate for full CRM access across your agency branches. No scaling user seat costs.
+            <h2 className="text-3xl md:text-5xl font-bold text-[#202638] font-display">Simple, transparent pricing.</h2>
+            <p className="text-[#5C6478] text-sm md:text-base mt-3 max-w-xl mx-auto font-medium">
+              Start free with no credit card required. Upgrade anytime as your agency grows.
             </p>
+
+            {/* Monthly / Yearly Toggle */}
+            <div className="mt-8 inline-flex p-1.5 neo-pressed items-center gap-2">
+              <button
+                onClick={() => setLandingCycle('monthly')}
+                className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
+                  landingCycle === 'monthly'
+                    ? 'bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white shadow-md'
+                    : 'text-[#5C6478] hover:text-[#202638]'
+                }`}
+              >
+                Monthly Billing
+              </button>
+              <button
+                onClick={() => setLandingCycle('yearly')}
+                className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  landingCycle === 'yearly'
+                    ? 'bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white shadow-md'
+                    : 'text-[#5C6478] hover:text-[#202638]'
+                }`}
+              >
+                <span>Yearly Billing</span>
+                <span className="px-2 py-0.5 bg-[#12A8B5] text-white text-[9px] font-extrabold rounded-full">Save & Free Setup</span>
+              </button>
+            </div>
           </div>
 
-          <div className="max-w-md mx-auto rounded-[2.5rem] bg-[#E7ECF3] shadow-[var(--dist)_var(--dist)_var(--blur)_#AEB9C9,calc(var(--dist)*-1)_calc(var(--dist)*-1)_var(--blur)_#FFFFFF] p-8 md:p-12 relative overflow-hidden reveal">
-            {/* Limited offer tag */}
-            <div className="absolute top-0 right-0 bg-[#FF7A52] text-white text-[9px] font-bold tracking-wider py-1.5 px-4 rounded-bl-2xl shadow-sm">
-              LIMITED TIME OFFER
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch reveal">
+            {/* Free Tier Card */}
+            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
+              <div>
+                <span className="text-xs font-bold text-[#12A8B5] uppercase tracking-wider block mb-2 font-mono">STARTER</span>
+                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Free</h3>
+                <div className="flex items-baseline gap-1 mb-4">
+                  <span className="text-4xl font-black text-[#202638] font-display">$0</span>
+                  <span className="text-[#5C6478] font-medium text-xs">/ lifetime</span>
+                </div>
+                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Perfect for new agencies getting started with student recruitment.</p>
+                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>2 Team Seats (1 Manager + 1 Counselor)</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>100 Student Leads / month</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>Full Application & Lead Pipeline</span>
+                  </div>
+                </div>
+              </div>
+              <Link
+                href="/signup"
+                className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
+              >
+                Sign Up Free
+              </Link>
             </div>
 
-            <div className="text-center mb-8 pt-4">
-              <h3 className="text-xl font-bold text-[#202638] mb-2 font-display">Full Access License</h3>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-[#8891A3] font-bold text-xl line-through">$449</span>
-                <span className="text-4xl font-black text-[#4855E4] font-display">$349</span>
-                <span className="text-[#5C6478] font-medium text-xs">USD / year</span>
+            {/* Basic Plan Card */}
+            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-[#6E79F2]/30 shadow-[14px_14px_30px_#AEB9C9,-12px_-12px_26px_#FFFFFF]">
+              <div className="absolute top-0 right-0 bg-[#4855E4] text-white text-[9px] font-bold tracking-wider py-1 px-3 rounded-bl-xl">
+                POPULAR
               </div>
-              <p className="text-[#12A8B5] font-semibold text-xs bg-[#12A8B5]/10 inline-block px-3 py-1 rounded-full">Save $100 annually</p>
+              <div>
+                <span className="text-xs font-bold text-[#4855E4] uppercase tracking-wider block mb-2 font-mono">GROWING AGENCIES</span>
+                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Basic</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-black text-[#4855E4] font-display">
+                    {landingCycle === 'monthly' ? '$35' : '$399'}
+                  </span>
+                  <span className="text-[#5C6478] font-medium text-xs">
+                    / {landingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
+                </div>
+                {landingCycle === 'monthly' ? (
+                  <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 one-time setup fee</p>
+                ) : (
+                  <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
+                )}
+                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Ideal for established consultancy teams expanding counselor operations.</p>
+                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>20 Team Seats</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span className="font-bold text-[#202638]">Unlimited Leads / month</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>bKash / Nagad / Rocket Payment</span>
+                  </div>
+                </div>
+              </div>
+              <Link
+                href="/signup"
+                className="w-full py-3.5 rounded-full bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white font-bold text-center text-xs hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)] transition-all"
+              >
+                Get Started with Basic
+              </Link>
             </div>
 
-            <div className="space-y-4 mb-8">
-              <div className="flex items-start">
-                <CheckCircle2 className="w-5 h-5 text-[#12A8B5] mr-3 shrink-0 mt-0.5" />
-                <span className="text-xs text-[#5C6478]">Unlimited Counselors and Managers</span>
+            {/* Pro Plan Card */}
+            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
+              <div>
+                <span className="text-xs font-bold text-[#FF7A52] uppercase tracking-wider block mb-2 font-mono">ENTERPRISE SCALE</span>
+                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Pro</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-black text-[#202638] font-display">
+                    {landingCycle === 'monthly' ? '$70' : '$799'}
+                  </span>
+                  <span className="text-[#5C6478] font-medium text-xs">
+                    / {landingCycle === 'monthly' ? 'month' : 'year'}
+                  </span>
+                </div>
+                {landingCycle === 'monthly' ? (
+                  <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 one-time setup fee</p>
+                ) : (
+                  <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
+                )}
+                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Built for high-volume consultancies with multi-counselor branches.</p>
+                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>100 Team Seats</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span className="font-bold text-[#202638]">Unlimited Leads / month</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                    <span>Priority Support & Custom Branch Setup</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start">
-                <CheckCircle2 className="w-5 h-5 text-[#12A8B5] mr-3 shrink-0 mt-0.5" />
-                <span className="text-xs text-[#5C6478]">Complete CRM and Application Pipeline</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle2 className="w-5 h-5 text-[#12A8B5] mr-3 shrink-0 mt-0.5" />
-                <span className="text-xs text-[#5C6478]">Automated PDF Profile Exporter</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle2 className="w-5 h-5 text-[#12A8B5] mr-3 shrink-0 mt-0.5" />
-                <span className="text-xs text-[#5C6478]">Visual Team Performance Analytics</span>
-              </div>
+              <Link
+                href="/signup"
+                className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
+              >
+                Get Started with Pro
+              </Link>
             </div>
-
-            <a 
-              href="mailto:abroadsync@gmail.com" 
-              className="w-full py-3.5 rounded-full bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white font-bold text-center flex items-center justify-center hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)] active:translate-y-0.5 transition-all duration-150"
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Contact Sales to Get Started
-            </a>
           </div>
         </div>
       </section>
@@ -723,16 +827,16 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
             <div className="absolute w-72 h-72 rounded-full filter blur-[60px] opacity-[0.25] bg-[#4855E4] -top-24 -left-20 pointer-events-none"></div>
             <div className="absolute w-72 h-72 rounded-full filter blur-[60px] opacity-[0.25] bg-[#12A8B5] -bottom-24 -right-20 pointer-events-none"></div>
             
-            <h2 className="text-2xl md:text-4xl font-bold text-[#202638] mb-4">Stop tracking students in spreadsheets.</h2>
-            <p className="text-[#5C6478] text-sm md:text-base max-w-md mx-auto mb-8">
+            <h2 className="text-2xl md:text-4xl font-bold text-[#202638] mb-4 font-display">Stop tracking students in spreadsheets.</h2>
+            <p className="text-[#5C6478] text-sm md:text-base max-w-md mx-auto mb-8 font-medium">
               Set up your workspace in a few minutes and move your first lead through the pipeline today.
             </p>
-            <a 
-              href="mailto:abroadsync@gmail.com" 
+            <Link 
+              href="/signup" 
               className="px-8 py-3.5 rounded-full font-bold text-white bg-gradient-to-br from-[#6E79F2] to-[#333FC2] inline-flex items-center gap-2 hover:shadow-[9px_9px_20px_rgba(51,63,194,0.4),-7px_-7px_16px_rgba(255,255,255,0.8)] active:translate-y-0.5 transition-all duration-150"
             >
               Start free trial <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
