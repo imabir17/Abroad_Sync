@@ -49,6 +49,24 @@ export default async function SaasAdminPage() {
     .select('*')
     .order('name', { ascending: true })
 
+  // Fetch primary Super Admin user / email for each company
+  const { data: superAdmins } = await admin
+    .from('User')
+    .select('id, email, fullName, companyId')
+    .eq('role', 'Super Admin')
+
+  const tenantSuperAdminMap: Record<string, { email: string; fullName: string }> = {}
+  if (superAdmins) {
+    superAdmins.forEach((u) => {
+      if (u.companyId) {
+        tenantSuperAdminMap[u.companyId] = {
+          email: u.email,
+          fullName: u.fullName || u.email,
+        }
+      }
+    })
+  }
+
   // Fetch staff count & monthly leads for each company in parallel
   const firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
   const tenantMetricsMap: Record<string, { activeUsers: number; monthlyLeads: number }> = {}
@@ -102,6 +120,7 @@ export default async function SaasAdminPage() {
       paymentConfigs={paymentConfigs || []}
       companies={companies || []}
       tenantMetricsMap={tenantMetricsMap}
+      tenantSuperAdminMap={tenantSuperAdminMap}
       plans={plans || []}
       auditLogs={auditLogs || []}
       coupons={coupons || []}

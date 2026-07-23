@@ -47,6 +47,7 @@ import {
   Sliders,
   ChevronRight,
   Sparkles,
+  Mail,
 } from 'lucide-react'
 
 interface SaasAdminClientProps {
@@ -56,6 +57,7 @@ interface SaasAdminClientProps {
   paymentConfigs: any[]
   companies: any[]
   tenantMetricsMap: Record<string, { activeUsers: number; monthlyLeads: number }>
+  tenantSuperAdminMap?: Record<string, { email: string; fullName: string }>
   plans: any[]
   auditLogs: any[]
   coupons: any[]
@@ -69,6 +71,7 @@ export default function SaasAdminClient({
   paymentConfigs: initialConfigs,
   companies: initialCompanies,
   tenantMetricsMap,
+  tenantSuperAdminMap = {},
   plans: initialPlans,
   auditLogs: initialAuditLogs,
   coupons: initialCoupons,
@@ -407,11 +410,14 @@ export default function SaasAdminClient({
     }
   }
 
-  const filteredCompanies = companies.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.id.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredCompanies = companies.filter((c) => {
+    const search = searchTerm.toLowerCase()
+    const nameMatch = c.name.toLowerCase().includes(search)
+    const idMatch = c.id.toLowerCase().includes(search)
+    const ownerEmail = tenantSuperAdminMap[c.id]?.email?.toLowerCase() || ''
+    const emailMatch = ownerEmail.includes(search)
+    return nameMatch || idMatch || emailMatch
+  })
 
   const inputClass =
     'w-full bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl py-2.5 px-3 text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] transition-all'
@@ -757,7 +763,7 @@ export default function SaasAdminClient({
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Search tenant name or ID..."
+                placeholder="Search tenant name, email, or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-white border border-gray-300 rounded-xl py-2 pl-9 pr-4 text-xs font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
@@ -780,6 +786,10 @@ export default function SaasAdminClient({
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h4 className="text-base font-bold text-gray-900">{company.name}</h4>
+                        <div className="flex items-center gap-1.5 text-xs text-[#007ACC] font-bold mt-1">
+                          <Mail className="w-3.5 h-3.5 text-[#007ACC] shrink-0" />
+                          <span className="truncate">{tenantSuperAdminMap[company.id]?.email || 'No Admin Email'}</span>
+                        </div>
                         <p className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {company.id}</p>
                       </div>
 
@@ -1482,7 +1492,11 @@ export default function SaasAdminClient({
             <div className="flex items-center justify-between pb-4 border-b border-gray-200">
               <div>
                 <h3 className="text-base font-bold text-gray-900">{tenantDetails.company?.name}</h3>
-                <p className="text-[11px] text-gray-500 font-mono">ID: {tenantDetails.company?.id}</p>
+                <div className="flex items-center gap-1.5 text-xs text-[#007ACC] font-bold mt-0.5">
+                  <Mail className="w-3.5 h-3.5 text-[#007ACC] shrink-0" />
+                  <span>{tenantSuperAdminMap[tenantDetails.company?.id]?.email || 'No Admin Email'}</span>
+                </div>
+                <p className="text-[11px] text-gray-500 font-mono mt-0.5">ID: {tenantDetails.company?.id}</p>
               </div>
               <button
                 onClick={() => setSelectedTenantId(null)}
