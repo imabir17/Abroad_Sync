@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient as createServerClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUserSession } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
@@ -17,6 +18,33 @@ export async function createStaff(formData: FormData) {
 
   if (!fullName || !email || !role) {
     return { error: 'All fields are required' }
+  }
+
+  const admin = createAdminClient()
+
+  // Enforce Seat Limit based on Subscription / Plan (with SaaS Admin Override capability)
+  const { data: sub } = await admin
+    .from('Subscription')
+    .select('*, plan:Plan(*)')
+    .eq('companyId', user.companyId)
+    .maybeSingle()
+
+  const maxSeatLimit = sub?.isCustom && sub?.overrideUserLimit === null
+    ? null
+    : (sub?.overrideUserLimit ?? sub?.plan?.userLimit ?? null)
+
+  if (maxSeatLimit !== null) {
+    const [usersRes, invitesRes] = await Promise.all([
+      admin.from('User').select('*', { count: 'exact', head: true }).eq('companyId', user.companyId).eq('status', 'Active'),
+      admin.from('Invite').select('*', { count: 'exact', head: true }).eq('companyId', user.companyId).eq('status', 'Pending'),
+    ])
+
+    const currentSeats = (usersRes.count ?? 0) + (invitesRes.count ?? 0)
+    if (currentSeats >= maxSeatLimit) {
+      return {
+        error: `Seat limit reached (${currentSeats}/${maxSeatLimit}). Upgrade your subscription plan or contact SaaS Platform Admin for a custom seat override.`
+      }
+    }
   }
 
   const supabase = await createServerClient()

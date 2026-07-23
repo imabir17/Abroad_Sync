@@ -4,10 +4,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  try {
-    const admin = createAdminClient()
-    const now = new Date()
+  const admin = createAdminClient()
+  const now = new Date()
 
+  try {
     const { data: subs, error } = await admin
       .from('Subscription')
       .select('*, company:Company(*)')
@@ -15,6 +15,7 @@ export async function GET(request: Request) {
       .not('currentPeriodEnd', 'is', null)
 
     if (error) {
+      await logCronExecution(admin, 'failed', 0, { error: error.message })
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -55,6 +56,8 @@ export async function GET(request: Request) {
       processedCount++
     }
 
+    await logCronExecution(admin, 'success', processedCount, { timestamp: now.toISOString() })
+
     return NextResponse.json({
       success: true,
       processedSubscriptions: processedCount,
@@ -62,6 +65,7 @@ export async function GET(request: Request) {
     })
   } catch (err: any) {
     console.error('Subscription cron error:', err)
+    await logCronExecution(admin, 'failed', 0, { errorMessage: err.message || 'Cron execution failed' })
     return NextResponse.json({ error: err.message || 'Cron execution failed' }, { status: 500 })
   }
 }
@@ -90,4 +94,18 @@ async function notifyOnce(admin: any, sub: any, type: string) {
     entityId: sub.id,
     metadata: { status: sub.status, currentPeriodEnd: sub.currentPeriodEnd },
   })
+}
+
+async function logCronExecution(admin: any, status: string, processedCount: number, details: any) {
+  try {
+    await admin.from('CronLog').insert({
+      jobName: 'subscriptions',
+      status,
+      processedCount,
+      details,
+      errorMessage: details?.error || details?.errorMessage || null,
+    })
+  } catch (err) {
+    console.error('Failed to log cron execution:', err)
+  }
 }
