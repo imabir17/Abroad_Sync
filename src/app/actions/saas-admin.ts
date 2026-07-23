@@ -256,7 +256,7 @@ export async function bulkConfirmPayments(paymentIds: string[]) {
         currentPeriodStart: now.toISOString(),
         currentPeriodEnd: endDate.toISOString(),
         graceEndsAt: null,
-        setupFeePaid: payment.includesSetupFee ? true : undefined,
+        setupFeePaid: payment.Plan?.billingCycle !== 'free' ? true : undefined,
       })
       .eq('id', payment.subscriptionId)
 

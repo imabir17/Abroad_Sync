@@ -154,8 +154,21 @@ export async function submitPayment(
   if (!targetPlan) return { error: 'Selected plan not found.' }
 
   // Logical Setup Fee check:
-  // Customers pay setup fee ONLY if switching to monthly AND setup has never been paid AND they were on free tier
-  const isExistingPaidCustomer = Boolean(sub.setupFeePaid || (sub.plan && sub.plan.billingCycle !== 'free'))
+  // Customer pays setup fee ONLY when going from Free plan to a Monthly plan.
+  // If customer bought a Yearly plan first, or was on any paid plan (yearly/monthly), or has confirmed payment history, setup fee is $0 / waived.
+  const { data: pastConfirmed } = await admin
+    .from('Payment')
+    .select('id')
+    .eq('companyId', user.companyId)
+    .eq('status', 'confirmed')
+    .limit(1)
+
+  const hasPastConfirmedPayment = Boolean(pastConfirmed && pastConfirmed.length > 0)
+  const isExistingPaidCustomer = Boolean(
+    sub.setupFeePaid ||
+    hasPastConfirmedPayment ||
+    (sub.plan && sub.plan.billingCycle !== 'free')
+  )
   const includesSetupFee = targetPlan.billingCycle === 'monthly' && !isExistingPaidCustomer
   const baseSetupFee = includesSetupFee ? Number(targetPlan.setupFeeUsd || 0) : 0
   const basePlanPrice = Number(targetPlan.priceUsd || 0)
@@ -279,7 +292,7 @@ export async function confirmPayment(paymentId: string) {
       currentPeriodStart: now.toISOString(),
       currentPeriodEnd: endDate.toISOString(),
       graceEndsAt: null,
-      setupFeePaid: payment.includesSetupFee ? true : undefined,
+      setupFeePaid: payment.Plan?.billingCycle !== 'free' ? true : undefined,
     })
     .eq('id', payment.subscriptionId)
 

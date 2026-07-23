@@ -77,9 +77,13 @@ export default function BillingClient({
   const selectedMethodObj = paymentMethods.find((m) => m.method === selectedMethod) || paymentMethods[0]
 
   // Setup fee logic:
-  // Customers NEVER pay setup fee if they've already paid it OR if they are an existing paid subscriber
+  // Customers pay setup fee ONLY when going from Free to Monthly.
+  // If they bought Yearly first, or have confirmed payment history, setup fee is $0 / waived.
+  const hasConfirmedPaymentHistory = payments.some((p) => p.status === 'confirmed')
   const isExistingPaidCustomer = Boolean(
-    subscription?.setupFeePaid || (subscription?.plan && subscription?.plan?.billingCycle !== 'free')
+    subscription?.setupFeePaid ||
+    hasConfirmedPaymentHistory ||
+    (subscription?.plan && subscription?.plan?.billingCycle !== 'free')
   )
   const isYearly = selectedPlanObj?.billingCycle === 'yearly'
   const isMonthly = selectedPlanObj?.billingCycle === 'monthly'
