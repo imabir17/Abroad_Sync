@@ -33,8 +33,10 @@ import {
   PlusCircle,
   Clock,
   ShieldCheck,
-  User
+  User,
+  Bell
 } from 'lucide-react'
+import PushNotificationToggle from '@/components/PushNotificationToggle'
 
 interface SettingsClientProps {
   initialStages: PipelineStage[]
@@ -296,6 +298,22 @@ export default function SettingsClient({
           <span>{errorMsg}</span>
         </div>
       )}
+
+      {/* Web Push Notifications Settings Card */}
+      <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+              <Bell className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white font-display">Browser Push Notifications</h3>
+              <p className="text-xs text-gray-400">Receive instant push alerts when students are assigned to you, consultation notes are posted, or tasks are assigned.</p>
+            </div>
+          </div>
+          <PushNotificationToggle />
+        </div>
+      </div>
 
       {/* Company Branding & Logo Settings */}
       <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl shadow-md p-6">

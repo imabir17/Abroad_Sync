@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { getUserSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { sendPushNotification } from '@/app/actions/push'
 
 export async function createLead(prevState: any, formData: FormData) {
   const user = await getUserSession()
@@ -148,6 +149,14 @@ export async function createLead(prevState: any, formData: FormData) {
     entityId: newLead.id,
     metadata: { fullName: newLead.fullName, stage, assignedCounselorId }
   })
+
+  if (assignedCounselorId && assignedCounselorId !== user.id) {
+    await sendPushNotification(assignedCounselorId, {
+      title: '🎓 New Lead Assigned',
+      body: `You have been assigned student ${fullName}.`,
+      url: `/dashboard/leads/${newLead.id}`,
+    })
+  }
 
   revalidatePath('/dashboard/leads')
   redirect(`/dashboard/leads/${newLead.id}`)
@@ -322,7 +331,7 @@ export async function createInteraction(leadId: string, content: string) {
   const supabase = await createClient()
   const { data: lead } = await supabase
     .from('Lead')
-    .select('id')
+    .select('id, fullName, assignedCounselorId')
     .eq('id', leadId)
     .eq('companyId', user.companyId)
     .single()
@@ -348,6 +357,14 @@ export async function createInteraction(leadId: string, content: string) {
     entityId: leadId,
     metadata: { contentSnippet: content.slice(0, 120) }
   })
+
+  if (lead.assignedCounselorId && lead.assignedCounselorId !== user.id) {
+    await sendPushNotification(lead.assignedCounselorId, {
+      title: '📝 New Consultation Note',
+      body: `${user.fullName || 'A team member'} added a note on student ${lead.fullName || ''}.`,
+      url: `/dashboard/leads/${leadId}`,
+    })
+  }
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }
@@ -389,6 +406,14 @@ export async function transferLead(leadId: string, newCounselorId: string) {
     .eq('id', leadId)
 
   if (updateError) throw new Error('Failed to transfer lead: ' + updateError.message)
+
+  if (newCounselorId && newCounselorId !== user.id) {
+    await sendPushNotification(newCounselorId, {
+      title: '🔄 Lead Transferred to You',
+      body: `A student lead has been transferred to your account.`,
+      url: `/dashboard/leads/${leadId}`,
+    })
+  }
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   revalidatePath('/dashboard/leads')

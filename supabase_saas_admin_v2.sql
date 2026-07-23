@@ -75,3 +75,19 @@ CREATE INDEX IF NOT EXISTS idx_cronlog_job ON "CronLog"("jobName", "executedAt" 
 -- 6. Add Coupon columns to "Payment" table
 ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "couponCode" TEXT;
 ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "discountAmount" NUMERIC(10,2) DEFAULT 0;
+
+-- 7. Create "PushSubscription" table for Web Push Notifications
+CREATE TABLE IF NOT EXISTS "PushSubscription" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "userId" TEXT NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+    "endpoint" TEXT UNIQUE NOT NULL,
+    "p256dh" TEXT NOT NULL,
+    "auth" TEXT NOT NULL,
+    "userAgent" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_pushsub_user ON "PushSubscription"("userId");
+CREATE INDEX IF NOT EXISTS idx_pushsub_company ON "PushSubscription"("companyId");
+
