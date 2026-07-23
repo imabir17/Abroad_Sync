@@ -626,25 +626,23 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               )}
             </div>
             
-            {canEdit && (
-              <div className="p-4 border-t border-[#3C3C3C] bg-[#1E1E1E] rounded-b-xl">
-                <div className="flex gap-3">
-                  <textarea 
-                    value={noteContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    placeholder="Add a consultation note..." 
-                    className="flex-1 bg-[#252526] border border-[#3C3C3C] rounded-xl p-3 text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] resize-none h-12 transition-all duration-200 focus:h-24"
-                  ></textarea>
-                  <button 
-                    onClick={handlePostNote}
-                    disabled={isPostingNote}
-                    className="px-5 rounded-xl bg-[#0E639C] text-white text-xs font-bold shadow-md hover:bg-[#1177BB] active:translate-y-0.5 transition-all duration-150 h-12 self-end"
-                  >
-                    Post
-                  </button>
-                </div>
+            <div className="p-4 border-t border-[#3C3C3C] bg-[#1E1E1E] rounded-b-xl">
+              <div className="flex gap-3">
+                <textarea 
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  placeholder="Add a consultation note..." 
+                  className="flex-1 bg-[#252526] border border-[#3C3C3C] rounded-xl p-3 text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] resize-none h-12 transition-all duration-200 focus:h-24"
+                ></textarea>
+                <button 
+                  onClick={handlePostNote}
+                  disabled={isPostingNote}
+                  className="px-5 rounded-xl bg-[#0E639C] text-white text-xs font-bold shadow-md hover:bg-[#1177BB] active:translate-y-0.5 transition-all duration-150 h-12 self-end"
+                >
+                  Post
+                </button>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Follow-Up Tasks Card */}

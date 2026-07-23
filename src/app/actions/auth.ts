@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient as createServerClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserSession } from '@/lib/auth'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -34,7 +35,7 @@ export async function login(prevState: any, formData: FormData) {
     // Verify profile existence & status safely
     const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('User')
-      .select('id, status, companyId')
+      .select('id, status, companyId, role, fullName')
       .eq('id', authData.user.id)
       .maybeSingle()
 
@@ -84,11 +85,30 @@ export async function login(prevState: any, formData: FormData) {
         entityId: company.id,
       })
 
+      await supabaseAdmin.from('ActivityLog').insert({
+        companyId: company.id,
+        actorId: authData.user.id,
+        action: 'user.login',
+        entityType: 'User',
+        entityId: authData.user.id,
+        metadata: { email, role: 'Super Admin' },
+      })
+
       // Store tenant context in JWT app_metadata
       await supabaseAdmin.auth.admin.updateUserById(
         authData.user.id,
         { app_metadata: { companyId: company.id, role: 'Super Admin' } }
       )
+    } else {
+      // Log login event for active user
+      await supabaseAdmin.from('ActivityLog').insert({
+        companyId: existingUser.companyId,
+        actorId: authData.user.id,
+        action: 'user.login',
+        entityType: 'User',
+        entityId: authData.user.id,
+        metadata: { email, fullName: existingUser.fullName, role: existingUser.role },
+      })
     }
   }
 
@@ -146,6 +166,15 @@ export async function provisionCompany() {
           entityId: user.id,
         })
 
+        await admin.from('ActivityLog').insert({
+          companyId: pendingInvite.companyId,
+          actorId: user.id,
+          action: 'user.login',
+          entityType: 'User',
+          entityId: user.id,
+          metadata: { email: user.email, role: pendingInvite.role },
+        })
+
         return { alreadyProvisioned: true, companyId: pendingInvite.companyId }
       }
     }
@@ -178,6 +207,15 @@ export async function provisionCompany() {
     entityId: company.id,
   })
 
+  await admin.from('ActivityLog').insert({
+    companyId: company.id,
+    actorId: user.id,
+    action: 'user.login',
+    entityType: 'User',
+    entityId: user.id,
+    metadata: { email: user.email, role: 'Super Admin' },
+  })
+
   // Provision default Branch & Free Subscription
   const { data: branch } = await admin
     .from('Branch')
@@ -205,6 +243,23 @@ export async function provisionCompany() {
 }
 
 export async function logout() {
+  const user = await getUserSession()
+  if (user) {
+    try {
+      const admin = createAdminClient()
+      await admin.from('ActivityLog').insert({
+        companyId: user.companyId,
+        actorId: user.id,
+        action: 'user.logout',
+        entityType: 'User',
+        entityId: user.id,
+        metadata: { email: user.email, fullName: user.fullName },
+      })
+    } catch (e) {
+      console.error('Logout activity logging failed:', e)
+    }
+  }
+
   const supabase = await createServerClient()
   await supabase.auth.signOut()
   redirect('/login')
@@ -258,7 +313,6 @@ export async function updatePassword(prevState: any, formData: FormData) {
   if (error) {
     return { error: error.message }
   }
-
 
   // Clear active session to enforce a clean re-login with the new password
   await supabase.auth.signOut()

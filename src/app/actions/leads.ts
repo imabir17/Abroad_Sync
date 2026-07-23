@@ -127,6 +127,15 @@ export async function createLead(prevState: any, formData: FormData) {
     return { error: 'Failed to create lead: ' + createError?.message }
   }
 
+  await supabase.from('ActivityLog').insert({
+    companyId: user.companyId,
+    actorId: user.id,
+    action: 'lead.created',
+    entityType: 'Lead',
+    entityId: newLead.id,
+    metadata: { fullName: newLead.fullName, stage, assignedCounselorId }
+  })
+
   revalidatePath('/dashboard/leads')
   redirect(`/dashboard/leads/${newLead.id}`)
 }
@@ -317,6 +326,15 @@ export async function createInteraction(leadId: string, content: string) {
     })
 
   if (insertError) throw new Error('Failed to create interaction: ' + insertError.message)
+
+  await supabase.from('ActivityLog').insert({
+    companyId: user.companyId,
+    actorId: user.id,
+    action: 'interaction.created',
+    entityType: 'Interaction',
+    entityId: leadId,
+    metadata: { contentSnippet: content.slice(0, 120) }
+  })
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }
