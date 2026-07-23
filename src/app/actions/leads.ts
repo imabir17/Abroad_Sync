@@ -127,6 +127,19 @@ export async function createLead(prevState: any, formData: FormData) {
     return { error: 'Failed to create lead: ' + createError?.message }
   }
 
+  const nowStr = new Date().toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+  const creatorName = user.fullName || user.email || 'System User'
+
+  await supabase.from('Interaction').insert({
+    leadId: newLead.id,
+    counselorId: user.id,
+    type: 'Note',
+    content: `📌 Student lead added to system by ${creatorName} on ${nowStr}.`,
+  })
+
   await supabase.from('ActivityLog').insert({
     companyId: user.companyId,
     actorId: user.id,

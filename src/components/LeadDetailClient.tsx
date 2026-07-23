@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { GraduationCap, Globe, CheckCircle2, MessageSquare, Clock, Building, Save, X, Wallet, FolderOpen, Send, Plus, Check } from 'lucide-react'
+import { GraduationCap, Globe, CheckCircle2, MessageSquare, Clock, Building, Save, X, Wallet, FolderOpen, Send, Plus, Check, UserPlus, UserCheck } from 'lucide-react'
 import { updateLeadDetails, createInteraction, createApplication, toggleFileOpened } from '@/app/actions/leads'
 import { createTask, updateTaskStatus } from '@/app/actions/tasks'
 
@@ -579,6 +579,31 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
             </div>
             
             <div ref={timelineContainerRef} className="flex-1 p-6 overflow-y-auto space-y-6">
+              {/* Automatic Lead Creation Post */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="h-8 w-8 rounded-xl bg-[#007ACC]/15 border border-[#007ACC]/30 flex items-center justify-center text-[#007ACC]">
+                    <UserPlus className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="bg-[#1E1E1E] border border-[#007ACC]/30 p-4 rounded-xl text-xs text-gray-300 shadow-sm">
+                    <div className="flex justify-between items-start mb-2 border-b border-[#3C3C3C] pb-1.5">
+                      <p className="font-bold text-[#007ACC] flex items-center gap-1.5">
+                        <UserPlus className="h-3.5 w-3.5" /> Lead Added to System
+                      </p>
+                      <p className="text-[10px] text-gray-400 font-mono">
+                        {new Date(lead.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                    </div>
+                    <p className="whitespace-pre-wrap leading-relaxed font-semibold text-gray-200">
+                      Student lead was added by <span className="text-white font-bold">{lead.createdBy?.fullName || lead.createdBy?.email || 'System User'}</span> on{' '}
+                      {new Date(lead.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {lead.initialNote && (
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">

@@ -2,11 +2,13 @@ import { getUserSession } from '@/lib/auth'
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Mail, Phone } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, UserCheck, UserPlus } from 'lucide-react'
 import { LeadStatusDropdowns } from '@/components/LeadStatusDropdowns'
 import LeadDetailClient from '@/components/LeadDetailClient'
 import TransferLeadButton from '@/components/TransferLeadButton'
 import { getStagesAction } from '@/app/actions/stages'
+
+export const dynamic = 'force-dynamic'
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const user = await getUserSession()
@@ -15,10 +17,10 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   const resolvedParams = await params
   const supabase = await createClient()
 
-  // Fetch the lead along with its related interactions, tasks, applications, and assigned counselor
+  // Fetch the lead along with its related interactions, tasks, applications, assigned counselor, and creator
   const { data: lead } = await supabase
     .from('Lead')
-    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*), interactions:Interaction(*, counselor:User(*)), tasks:Task(*, counselor:User(*)), applications:Application(*)')
+    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*), createdBy:User!Lead_createdById_fkey(*), interactions:Interaction(*, counselor:User(*)), tasks:Task(*, counselor:User(*)), applications:Application(*)')
     .eq('id', resolvedParams.id)
     .eq('companyId', user.companyId)
     .maybeSingle()
@@ -55,18 +57,24 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#252526] p-6 rounded-2xl border border-[#3C3C3C] shadow-md">
         <div className="flex items-center gap-4">
           <Link 
             href="/dashboard/leads" 
-            className="p-2.5 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] hover:bg-[#333333] text-gray-400 hover:text-white transition-all"
+            className="p-2.5 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] hover:bg-[#333333] text-gray-400 hover:text-white transition-all shrink-0"
             aria-label="Back to leads list"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div>
-            <h2 className="text-2xl font-bold text-white font-display">{lead.fullName}</h2>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5 text-xs text-gray-400 font-semibold">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white font-display">{lead.fullName}</h2>
+              <span className="px-3 py-1 rounded-xl bg-[#007ACC]/15 border border-[#007ACC]/40 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                <UserCheck className="h-3.5 w-3.5 text-[#007ACC]" />
+                Assigned Counselor: <span className="text-[#007ACC] font-extrabold">{lead.assignedCounselor?.fullName || 'Unassigned'}</span>
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-gray-400 font-semibold">
               <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-[#4855E4]" /> {lead.email || 'N/A'}</span>
               <span className="opacity-40">•</span>
               <span className="flex items-center gap-1.5">
@@ -90,6 +98,11 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
                     </a>
                   )
                 })()}
+              </span>
+              <span className="opacity-40">•</span>
+              <span className="flex items-center gap-1.5 text-gray-400 text-xs">
+                <UserPlus className="h-3.5 w-3.5 text-[#007ACC]" />
+                Added by: <span className="text-gray-200 font-bold">{lead.createdBy?.fullName || lead.createdBy?.email || 'System'}</span>
               </span>
             </div>
           </div>
