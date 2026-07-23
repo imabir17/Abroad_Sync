@@ -50,33 +50,45 @@ export async function savePushSubscription(subscription: {
     return { error: 'Invalid push subscription payload.' }
   }
 
-  const admin = createAdminClient()
+  try {
+    const admin = createAdminClient()
 
-  const { error } = await admin.from('PushSubscription').upsert(
-    {
-      companyId: user.companyId,
-      userId: user.id,
-      endpoint: subscription.endpoint,
-      p256dh: subscription.keys.p256dh,
-      auth: subscription.keys.auth,
-    },
-    { onConflict: 'endpoint' }
-  )
+    const { error } = await admin.from('PushSubscription').upsert(
+      {
+        companyId: user.companyId,
+        userId: user.id,
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+      },
+      { onConflict: 'endpoint' }
+    )
 
-  if (error) {
-    console.error('Error saving push subscription:', error)
-    return { error: error.message }
+    if (error) {
+      console.error('Error saving push subscription:', error.message)
+      if (error.code === '42P01' || error.message.includes('schema cache') || error.message.includes('PushSubscription')) {
+        return { error: 'PushSubscription table missing in database. Please run the SQL migration in Supabase.' }
+      }
+      return { error: error.message }
+    }
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('savePushSubscription error:', err)
+    return { error: 'PushSubscription table missing or database error. Please run SQL migration.' }
   }
-
-  return { success: true }
 }
 
 export async function removePushSubscription(endpoint: string) {
   const user = await getUserSession()
   if (!user) return { error: 'Not authenticated' }
 
-  const admin = createAdminClient()
-  await admin.from('PushSubscription').delete().eq('endpoint', endpoint).eq('userId', user.id)
+  try {
+    const admin = createAdminClient()
+    await admin.from('PushSubscription').delete().eq('endpoint', endpoint).eq('userId', user.id)
+  } catch (err) {
+    console.error('removePushSubscription error:', err)
+  }
 
   return { success: true }
 }
@@ -85,13 +97,21 @@ export async function getPushSubscriptionStatus() {
   const user = await getUserSession()
   if (!user) return { isSubscribed: false }
 
-  const admin = createAdminClient()
-  const { data: subs } = await admin
-    .from('PushSubscription')
-    .select('id')
-    .eq('userId', user.id)
+  try {
+    const admin = createAdminClient()
+    const { data: subs, error } = await admin
+      .from('PushSubscription')
+      .select('id')
+      .eq('userId', user.id)
 
-  return { isSubscribed: Boolean(subs && subs.length > 0) }
+    if (error) {
+      return { isSubscribed: false }
+    }
+
+    return { isSubscribed: Boolean(subs && subs.length > 0) }
+  } catch (err) {
+    return { isSubscribed: false }
+  }
 }
 
 export async function sendPushNotification(
@@ -104,12 +124,12 @@ export async function sendPushNotification(
 
     if (targetIds.length === 0) return
 
-    const { data: subs } = await admin
+    const { data: subs, error } = await admin
       .from('PushSubscription')
       .select('*')
       .in('userId', targetIds)
 
-    if (!subs || subs.length === 0) return
+    if (error || !subs || subs.length === 0) return
 
     const pushPayload = JSON.stringify({
       title: payload.title,

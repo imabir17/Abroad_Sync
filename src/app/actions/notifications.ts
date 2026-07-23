@@ -3,47 +3,55 @@
 import { getUserSession } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from './push'
-import { revalidatePath } from 'next/cache'
 
 export async function getUserNotifications() {
   const user = await getUserSession()
   if (!user) return { notifications: [], unreadCount: 0 }
 
-  const admin = createAdminClient()
-
-  // 30 days cutoff
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-
-  // Clean up notifications older than 30 days asynchronously
   try {
-    await admin
+    const admin = createAdminClient()
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+    // Clean up notifications older than 30 days asynchronously
+    try {
+      await admin
+        .from('Notification')
+        .delete()
+        .eq('userId', user.id)
+        .lt('createdAt', thirtyDaysAgo)
+    } catch (err) {
+      // Ignore cleanup error if table doesn't exist yet
+    }
+
+    const { data: notifications, error } = await admin
       .from('Notification')
-      .delete()
+      .select('*')
       .eq('userId', user.id)
-      .lt('createdAt', thirtyDaysAgo)
+      .gte('createdAt', thirtyDaysAgo)
+      .order('createdAt', { ascending: false })
+      .limit(100)
+
+    if (error) {
+      return { notifications: [], unreadCount: 0 }
+    }
+
+    const unreadCount = (notifications || []).filter((n) => !n.isRead).length
+    return { notifications: notifications || [], unreadCount }
   } catch (err) {
-    // Ignore cleanup error
+    return { notifications: [], unreadCount: 0 }
   }
-
-  const { data: notifications } = await admin
-    .from('Notification')
-    .select('*')
-    .eq('userId', user.id)
-    .gte('createdAt', thirtyDaysAgo)
-    .order('createdAt', { ascending: false })
-    .limit(100)
-
-  const unreadCount = (notifications || []).filter((n) => !n.isRead).length
-
-  return { notifications: notifications || [], unreadCount }
 }
 
 export async function markNotificationAsRead(id: string) {
   const user = await getUserSession()
   if (!user) return { error: 'Not authenticated' }
 
-  const admin = createAdminClient()
-  await admin.from('Notification').update({ isRead: true }).eq('id', id).eq('userId', user.id)
+  try {
+    const admin = createAdminClient()
+    await admin.from('Notification').update({ isRead: true }).eq('id', id).eq('userId', user.id)
+  } catch (err) {
+    // Ignore error if table is missing
+  }
 
   return { success: true }
 }
@@ -52,8 +60,12 @@ export async function markAllNotificationsAsRead() {
   const user = await getUserSession()
   if (!user) return { error: 'Not authenticated' }
 
-  const admin = createAdminClient()
-  await admin.from('Notification').update({ isRead: true }).eq('userId', user.id).eq('isRead', false)
+  try {
+    const admin = createAdminClient()
+    await admin.from('Notification').update({ isRead: true }).eq('userId', user.id).eq('isRead', false)
+  } catch (err) {
+    // Ignore error if table is missing
+  }
 
   return { success: true }
 }
@@ -100,7 +112,11 @@ export async function dispatchSystemNotification({
       isRead: false,
     }))
 
-    await admin.from('Notification').insert(rows)
+    try {
+      await admin.from('Notification').insert(rows)
+    } catch (dbErr) {
+      console.warn('Could not insert Notification row (table may need migration):', dbErr)
+    }
 
     // Trigger Web Push Notification
     await sendPushNotification(allTargetUserIds, { title, body, url })
@@ -117,12 +133,12 @@ export async function checkLeadInactivityAlerts() {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
     // Fetch active non-enrolled leads
-    const { data: leads } = await admin
+    const { data: leads, error } = await admin
       .from('Lead')
       .select('id, fullName, companyId, assignedCounselorId, contactedAt, createdAt, stage')
       .neq('stage', 'Enrolled')
 
-    if (!leads || leads.length === 0) return { checkedCount: 0, alertsSent: 0 }
+    if (error || !leads || leads.length === 0) return { checkedCount: 0, alertsSent: 0 }
 
     let alertsSent = 0
 
@@ -133,16 +149,19 @@ export async function checkLeadInactivityAlerts() {
       const daysDiff = Math.floor((now.getTime() - contactDate.getTime()) / (1000 * 3600 * 24))
 
       if (daysDiff >= 30) {
-        // Check if 30d inactivity notification was sent in last 7 days
-        const { data: existing30d } = await admin
-          .from('Notification')
-          .select('id')
-          .eq('type', 'inactivity_30d')
-          .eq('url', `/dashboard/leads/${lead.id}`)
-          .gte('createdAt', sevenDaysAgo)
-          .limit(1)
+        let existing30d: any[] = []
+        try {
+          const res = await admin
+            .from('Notification')
+            .select('id')
+            .eq('type', 'inactivity_30d')
+            .eq('url', `/dashboard/leads/${lead.id}`)
+            .gte('createdAt', sevenDaysAgo)
+            .limit(1)
+          existing30d = res.data || []
+        } catch (e) {}
 
-        if (!existing30d || existing30d.length === 0) {
+        if (existing30d.length === 0) {
           const targetUsers = lead.assignedCounselorId ? [lead.assignedCounselorId] : []
           await dispatchSystemNotification({
             companyId: lead.companyId,
@@ -155,16 +174,19 @@ export async function checkLeadInactivityAlerts() {
           alertsSent++
         }
       } else if (daysDiff >= 7) {
-        // Check if 7d inactivity notification was sent in last 5 days
-        const { data: existing7d } = await admin
-          .from('Notification')
-          .select('id')
-          .eq('type', 'inactivity_7d')
-          .eq('url', `/dashboard/leads/${lead.id}`)
-          .gte('createdAt', new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString())
-          .limit(1)
+        let existing7d: any[] = []
+        try {
+          const res = await admin
+            .from('Notification')
+            .select('id')
+            .eq('type', 'inactivity_7d')
+            .eq('url', `/dashboard/leads/${lead.id}`)
+            .gte('createdAt', new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString())
+            .limit(1)
+          existing7d = res.data || []
+        } catch (e) {}
 
-        if (!existing7d || existing7d.length === 0) {
+        if (existing7d.length === 0) {
           const targetUsers = lead.assignedCounselorId ? [lead.assignedCounselorId] : []
           await dispatchSystemNotification({
             companyId: lead.companyId,
