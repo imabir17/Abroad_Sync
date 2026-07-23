@@ -5,6 +5,7 @@ import { getUserSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { sendPushNotification } from '@/app/actions/push'
+import { dispatchSystemNotification } from '@/app/actions/notifications'
 
 export async function createLead(prevState: any, formData: FormData) {
   const user = await getUserSession()
@@ -349,6 +350,12 @@ export async function createInteraction(leadId: string, content: string) {
 
   if (insertError) throw new Error('Failed to create interaction: ' + insertError.message)
 
+  // Update contactedAt on the Lead when a comment/note is posted
+  await supabase
+    .from('Lead')
+    .update({ contactedAt: new Date().toISOString() })
+    .eq('id', leadId)
+
   await supabase.from('ActivityLog').insert({
     companyId: user.companyId,
     actorId: user.id,
@@ -358,13 +365,15 @@ export async function createInteraction(leadId: string, content: string) {
     metadata: { contentSnippet: content.slice(0, 120) }
   })
 
-  if (lead.assignedCounselorId && lead.assignedCounselorId !== user.id) {
-    await sendPushNotification(lead.assignedCounselorId, {
-      title: '📝 New Consultation Note',
-      body: `${user.fullName || 'A team member'} added a note on student ${lead.fullName || ''}.`,
-      url: `/dashboard/leads/${leadId}`,
-    })
-  }
+  const targetUsers = lead.assignedCounselorId && lead.assignedCounselorId !== user.id ? [lead.assignedCounselorId] : []
+  await dispatchSystemNotification({
+    companyId: user.companyId,
+    userIds: targetUsers,
+    title: '📝 New Consultation Note',
+    body: `${user.fullName || 'A team member'} added a note on student ${lead.fullName || ''}.`,
+    url: `/dashboard/leads/${leadId}`,
+    type: 'note',
+  })
 
   revalidatePath(`/dashboard/leads/${leadId}`)
   return { success: true }

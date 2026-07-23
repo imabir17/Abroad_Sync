@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { checkLeadInactivityAlerts } from '@/app/actions/notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,6 +9,8 @@ export async function GET(request: Request) {
   const now = new Date()
 
   try {
+    // Run 7-day and 30-day lead inactivity check
+    const inactivityResult = await checkLeadInactivityAlerts()
     const { data: subs, error } = await admin
       .from('Subscription')
       .select('*, company:Company(*)')

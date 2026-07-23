@@ -4,23 +4,36 @@ import webpush from 'web-push'
 import { getUserSession } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const VAPID_PUBLIC_KEY =
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-  'BC8y8J6n-u7Wj5p0V_Y4wL1vX5K8bJ3N2m7L9K0j8H7G6F5E4D3C2B1A0x9y8z7w6v5u4t3s2r1q0'
-
-const VAPID_PRIVATE_KEY =
-  process.env.VAPID_PRIVATE_KEY || 'u7Wj5p0V_Y4wL1vX5K8bJ3N2m7L9K0j8H7G6F5E4D3C'
-
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:support@abroadsync.com'
-
+let vapidKeys: { publicKey: string; privateKey: string }
 try {
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+  if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    vapidKeys = {
+      publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      privateKey: process.env.VAPID_PRIVATE_KEY,
+    }
+  } else {
+    vapidKeys = webpush.generateVAPIDKeys()
+  }
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:support@abroadsync.com',
+    vapidKeys.publicKey,
+    vapidKeys.privateKey
+  )
 } catch (e) {
-  console.warn('VAPID setup warning:', e)
+  vapidKeys = webpush.generateVAPIDKeys()
+  try {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || 'mailto:support@abroadsync.com',
+      vapidKeys.publicKey,
+      vapidKeys.privateKey
+    )
+  } catch (err) {
+    console.error('VAPID setup failed:', err)
+  }
 }
 
 export async function getVapidPublicKey() {
-  return { publicKey: VAPID_PUBLIC_KEY }
+  return { publicKey: vapidKeys.publicKey }
 }
 
 export async function savePushSubscription(subscription: {

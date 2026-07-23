@@ -2,7 +2,7 @@ import { getUserSession } from '@/lib/auth'
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Mail, Phone, UserCheck, UserPlus } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, UserCheck, UserPlus, Clock } from 'lucide-react'
 import { LeadStatusDropdowns } from '@/components/LeadStatusDropdowns'
 import LeadDetailClient from '@/components/LeadDetailClient'
 import TransferLeadButton from '@/components/TransferLeadButton'
@@ -67,11 +67,19 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-2xl font-bold text-white font-display">{lead.fullName}</h2>
               <span className="px-3 py-1 rounded-xl bg-[#007ACC]/15 border border-[#007ACC]/40 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
                 <UserCheck className="h-3.5 w-3.5 text-[#007ACC]" />
                 Assigned Counselor: <span className="text-[#007ACC] font-extrabold">{lead.assignedCounselor?.fullName || 'Unassigned'}</span>
+              </span>
+              <span className="px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                Last Contacted: <span className="text-white font-bold">
+                  {lead.contactedAt
+                    ? new Date(lead.contactedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+                    : 'Not Contacted Yet'}
+                </span>
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-gray-400 font-semibold">

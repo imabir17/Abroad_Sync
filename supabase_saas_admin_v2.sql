@@ -88,6 +88,20 @@ CREATE TABLE IF NOT EXISTS "PushSubscription" (
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_pushsub_user ON "PushSubscription"("userId");
-CREATE INDEX IF NOT EXISTS idx_pushsub_company ON "PushSubscription"("companyId");
+-- 8. Create "Notification" table for In-App Notifications & 30-Day History
+CREATE TABLE IF NOT EXISTS "Notification" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "companyId" TEXT NOT NULL REFERENCES "Company"("id") ON DELETE CASCADE,
+    "userId" TEXT NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "url" TEXT,
+    "type" TEXT NOT NULL DEFAULT 'info', -- 'info', 'warning', 'inactivity_7d', 'inactivity_30d', 'assignment', 'note'
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_notification_user ON "Notification"("userId", "createdAt" DESC);
+CREATE INDEX IF NOT EXISTS idx_notification_company ON "Notification"("companyId");
+
 

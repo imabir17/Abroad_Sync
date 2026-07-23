@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import NotificationCenter from '@/components/NotificationCenter'
 
 interface User {
   fullName: string
@@ -205,6 +206,10 @@ export default function DashboardNavClient({
             <h2 className="text-sm sm:text-base font-bold text-gray-400 truncate">
               Welcome back, <span className="text-white">{user.fullName.split(' ')[0]}</span>
             </h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
           </div>
         </header>
 
