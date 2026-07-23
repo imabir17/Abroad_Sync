@@ -1550,6 +1550,105 @@ export default function SaasAdminClient({
           </div>
         </div>
       )}
+      {/* MODAL: Create Coupon */}
+      {showCouponModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-200 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-gray-900">Create Promotional Coupon</h3>
+              <button
+                onClick={() => setShowCouponModal(false)}
+                className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveCoupon} className="space-y-4 text-xs">
+              <div>
+                <label className="font-bold text-gray-700">Coupon Code</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. SUMMER20"
+                  value={couponForm.code}
+                  onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2.5 mt-1 font-mono font-bold text-gray-900 uppercase"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-gray-700">Discount Type</label>
+                  <select
+                    value={couponForm.discountType}
+                    onChange={(e) =>
+                      setCouponForm({
+                        ...couponForm,
+                        discountType: e.target.value as 'percent' | 'fixed',
+                      })
+                    }
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2.5 mt-1 font-semibold text-gray-900"
+                  >
+                    <option value="percent">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount ($)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-gray-700">Discount Value</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={couponForm.discountValue}
+                    onChange={(e) => setCouponForm({ ...couponForm, discountValue: Number(e.target.value) })}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2.5 mt-1 font-semibold text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-gray-700">Max Usage Count (Optional)</label>
+                  <input
+                    type="number"
+                    placeholder="Unlimited"
+                    value={couponForm.maxUses}
+                    onChange={(e) => setCouponForm({ ...couponForm, maxUses: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2.5 mt-1 font-semibold text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-gray-700">Valid Until (Optional)</label>
+                  <input
+                    type="date"
+                    value={couponForm.validUntil}
+                    onChange={(e) => setCouponForm({ ...couponForm, validUntil: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-xl p-2.5 mt-1 font-semibold text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCouponModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loadingId === 'coupon-save'}
+                  className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 flex items-center gap-1.5"
+                >
+                  {loadingId === 'coupon-save' ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Create Coupon
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
