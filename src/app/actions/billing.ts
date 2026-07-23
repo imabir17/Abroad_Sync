@@ -22,7 +22,7 @@ export async function getSubscriptionDetails() {
     .eq('companyId', user.companyId)
     .maybeSingle()
 
-  // Get public plans
+  // Get public active plans
   const { data: plans } = await admin
     .from('Plan')
     .select('*')
@@ -70,7 +70,64 @@ export async function getSubscriptionDetails() {
   }
 }
 
-export async function submitPayment(planId: string, method: string, transactionNumber: string) {
+export async function validateCoupon(code: string, planId: string) {
+  const user = await getUserSession()
+  if (!user) return { error: 'Not authenticated' }
+
+  const cleanCode = code.trim().toUpperCase()
+  if (!cleanCode) return { error: 'Please enter a coupon code.' }
+
+  const admin = createAdminClient()
+
+  const { data: coupon } = await admin
+    .from('Coupon')
+    .select('*')
+    .eq('code', cleanCode)
+    .eq('isActive', true)
+    .maybeSingle()
+
+  if (!coupon) {
+    return { error: 'Invalid or inactive coupon code.' }
+  }
+
+  if (coupon.validUntil && new Date(coupon.validUntil) < new Date()) {
+    return { error: 'This coupon code has expired.' }
+  }
+
+  if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses) {
+    return { error: 'This coupon has reached its maximum usage limit.' }
+  }
+
+  const { data: plan } = await admin.from('Plan').select('*').eq('id', planId).maybeSingle()
+  if (!plan) return { error: 'Selected plan not found.' }
+
+  let discountAmount = 0
+  if (coupon.discountType === 'percent') {
+    discountAmount = (Number(plan.priceUsd) * Number(coupon.discountValue)) / 100
+  } else {
+    discountAmount = Number(coupon.discountValue)
+  }
+
+  discountAmount = Math.min(Number(plan.priceUsd), Math.max(0, discountAmount))
+
+  return {
+    success: true,
+    coupon: {
+      id: coupon.id,
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: Number(coupon.discountValue),
+      discountAmount: Number(discountAmount.toFixed(2)),
+    },
+  }
+}
+
+export async function submitPayment(
+  planId: string,
+  method: string,
+  transactionNumber: string,
+  couponCode?: string
+) {
   const user = await getUserSession()
   if (!user) return { error: 'Not authenticated' }
   if (user.role !== 'Super Admin') {
@@ -83,35 +140,70 @@ export async function submitPayment(planId: string, method: string, transactionN
 
   const admin = createAdminClient()
 
-  // Get subscription
+  // Get subscription & current plan details
   const { data: sub } = await admin
     .from('Subscription')
-    .select('id, companyId')
+    .select('*, plan:Plan(*)')
     .eq('companyId', user.companyId)
     .single()
 
   if (!sub) return { error: 'Subscription not found for your company.' }
 
   // Get target plan details
-  const { data: plan } = await admin.from('Plan').select('*').eq('id', planId).single()
-  if (!plan) return { error: 'Selected plan not found.' }
+  const { data: targetPlan } = await admin.from('Plan').select('*').eq('id', planId).single()
+  if (!targetPlan) return { error: 'Selected plan not found.' }
 
-  // Monthly plans include setup fee if not previously paid; yearly waives setup fee
-  const includesSetupFee = plan.billingCycle === 'monthly'
-  const amountUsd = Number(plan.priceUsd) + (includesSetupFee ? Number(plan.setupFeeUsd) : 0)
+  // Logical Setup Fee check:
+  // Customers pay setup fee ONLY if switching to monthly AND setup has never been paid AND they were on free tier
+  const isExistingPaidCustomer = Boolean(sub.setupFeePaid || (sub.plan && sub.plan.billingCycle !== 'free'))
+  const includesSetupFee = targetPlan.billingCycle === 'monthly' && !isExistingPaidCustomer
+  const baseSetupFee = includesSetupFee ? Number(targetPlan.setupFeeUsd || 0) : 0
+  const basePlanPrice = Number(targetPlan.priceUsd || 0)
+
+  let discountAmount = 0
+  let validCoupon: any = null
+
+  if (couponCode && couponCode.trim()) {
+    const cleanCode = couponCode.trim().toUpperCase()
+    const { data: coupon } = await admin
+      .from('Coupon')
+      .select('*')
+      .eq('code', cleanCode)
+      .eq('isActive', true)
+      .maybeSingle()
+
+    if (coupon) {
+      const isValidDate = !coupon.validUntil || new Date(coupon.validUntil) >= new Date()
+      const isUnderLimit = coupon.maxUses === null || coupon.usedCount < coupon.maxUses
+
+      if (isValidDate && isUnderLimit) {
+        validCoupon = coupon
+        if (coupon.discountType === 'percent') {
+          discountAmount = (basePlanPrice * Number(coupon.discountValue)) / 100
+        } else {
+          discountAmount = Number(coupon.discountValue)
+        }
+        discountAmount = Math.min(basePlanPrice, Math.max(0, discountAmount))
+      }
+    }
+  }
+
+  const finalAmountUsd = Math.max(0, basePlanPrice + baseSetupFee - discountAmount)
 
   const { data: payment, error } = await admin
     .from('Payment')
     .insert({
       subscriptionId: sub.id,
       companyId: user.companyId,
-      planId: plan.id,
-      amountUsd,
+      planId: targetPlan.id,
+      amountUsd: Number(finalAmountUsd.toFixed(2)),
       includesSetupFee,
       method,
       transactionNumber: transactionNumber.trim(),
       submittedById: user.id,
       status: 'pending',
+      couponCode: validCoupon ? validCoupon.code : null,
+      discountAmount: Number(discountAmount.toFixed(2)),
     })
     .select()
     .single()
@@ -120,13 +212,28 @@ export async function submitPayment(planId: string, method: string, transactionN
     return { error: 'Failed to submit payment: ' + error.message }
   }
 
+  if (validCoupon) {
+    await admin
+      .from('Coupon')
+      .update({ usedCount: (validCoupon.usedCount || 0) + 1 })
+      .eq('id', validCoupon.id)
+  }
+
   await admin.from('ActivityLog').insert({
     companyId: user.companyId,
     actorId: user.id,
     action: 'payment.submitted',
     entityType: 'Payment',
     entityId: payment.id,
-    metadata: { planName: plan.name, amountUsd, method, transactionNumber },
+    metadata: {
+      planName: targetPlan.name,
+      amountUsd: finalAmountUsd,
+      includesSetupFee,
+      method,
+      transactionNumber,
+      couponCode: validCoupon?.code || null,
+      discountAmount,
+    },
   })
 
   revalidatePath('/dashboard/billing')

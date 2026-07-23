@@ -1,8 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { submitPayment } from '@/app/actions/billing'
-import { CreditCard, Zap, Users, BarChart3, AlertCircle, CheckCircle2, Clock, X, Loader2, ArrowRight, ShieldCheck, Copy, Check } from 'lucide-react'
+import { submitPayment, validateCoupon } from '@/app/actions/billing'
+import {
+  CreditCard,
+  Zap,
+  Users,
+  BarChart3,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  X,
+  Loader2,
+  ArrowRight,
+  ShieldCheck,
+  Copy,
+  Check,
+  Ticket,
+  Scissors,
+} from 'lucide-react'
 
 interface BillingClientProps {
   subscription: any
@@ -28,13 +44,15 @@ export default function BillingClient({
   const status = subscription?.status || 'active'
 
   // Limits (check overrides first, -1 = unlimited)
-  const seatLimit = subscription?.overrideUserLimit !== null && subscription?.overrideUserLimit !== undefined
-    ? subscription.overrideUserLimit
-    : currentPlan.userLimit
+  const seatLimit =
+    subscription?.overrideUserLimit !== null && subscription?.overrideUserLimit !== undefined
+      ? subscription.overrideUserLimit
+      : currentPlan.userLimit
 
-  const leadLimit = subscription?.overrideLeadLimit !== null && subscription?.overrideLeadLimit !== undefined
-    ? subscription.overrideLeadLimit
-    : currentPlan.leadLimitPerMonth
+  const leadLimit =
+    subscription?.overrideLeadLimit !== null && subscription?.overrideLeadLimit !== undefined
+      ? subscription.overrideLeadLimit
+      : currentPlan.leadLimitPerMonth
 
   // Modal State
   const [isPayModalOpen, setIsPayModalOpen] = useState(false)
@@ -47,22 +65,39 @@ export default function BillingClient({
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [copiedNumber, setCopiedNumber] = useState(false)
 
+  // Coupon State
+  const [couponInput, setCouponInput] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [couponError, setCouponError] = useState('')
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false)
+
   // Filter plans based on selected cycle
   const availablePlans = plans.filter((p) => p.billingCycle === cycle)
   const selectedPlanObj = plans.find((p) => p.id === selectedPlanId) || availablePlans[0]
   const selectedMethodObj = paymentMethods.find((m) => m.method === selectedMethod) || paymentMethods[0]
 
-  // Calculate pricing
+  // Setup fee logic:
+  // Customers NEVER pay setup fee if they've already paid it OR if they are an existing paid subscriber
+  const isExistingPaidCustomer = Boolean(
+    subscription?.setupFeePaid || (subscription?.plan && subscription?.plan?.billingCycle !== 'free')
+  )
   const isYearly = selectedPlanObj?.billingCycle === 'yearly'
+  const isMonthly = selectedPlanObj?.billingCycle === 'monthly'
+  const requiresSetupFee = isMonthly && !isExistingPaidCustomer
+
   const planPrice = Number(selectedPlanObj?.priceUsd || 0)
-  const setupFee = isYearly ? 0 : Number(selectedPlanObj?.setupFeeUsd || 0)
-  const totalPrice = planPrice + setupFee
+  const setupFee = requiresSetupFee ? Number(selectedPlanObj?.setupFeeUsd || 0) : 0
+  const discountAmount = appliedCoupon ? Number(appliedCoupon.discountAmount || 0) : 0
+  const totalPrice = Math.max(0, planPrice + setupFee - discountAmount)
 
   const handleOpenPayModal = (plan?: any) => {
     setSubmitError('')
     setSubmitSuccess(false)
     setTransactionNumber('')
-    
+    setCouponInput('')
+    setAppliedCoupon(null)
+    setCouponError('')
+
     if (plan) {
       setCycle(plan.billingCycle === 'yearly' ? 'yearly' : 'monthly')
       setSelectedPlanId(plan.id)
@@ -80,6 +115,29 @@ export default function BillingClient({
     setIsPayModalOpen(true)
   }
 
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim() || !selectedPlanId) return
+    setIsValidatingCoupon(true)
+    setCouponError('')
+
+    const res = await validateCoupon(couponInput.trim(), selectedPlanId)
+    setIsValidatingCoupon(false)
+
+    if (res.error) {
+      setCouponError(res.error)
+      setAppliedCoupon(null)
+    } else {
+      setAppliedCoupon(res.coupon)
+      setCouponError('')
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponInput('')
+    setCouponError('')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPlanId || !selectedMethod || !transactionNumber.trim()) {
@@ -90,7 +148,12 @@ export default function BillingClient({
     setIsSubmitting(true)
     setSubmitError('')
 
-    const res = await submitPayment(selectedPlanId, selectedMethod, transactionNumber.trim())
+    const res = await submitPayment(
+      selectedPlanId,
+      selectedMethod,
+      transactionNumber.trim(),
+      appliedCoupon?.code
+    )
     setIsSubmitting(false)
 
     if (res.error) {
@@ -161,13 +224,15 @@ export default function BillingClient({
         <div className="bg-[#252526] border border-[#3C3C3C] rounded-2xl p-6 shadow-md space-y-4 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Current Plan</span>
-            <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${
-              status === 'active'
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : status === 'grace'
+            <span
+              className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${
+                status === 'active'
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : status === 'grace'
                   ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                   : 'bg-red-500/10 text-red-400 border-red-500/20'
-            }`}>
+              }`}
+            >
               {status.toUpperCase()}
             </span>
           </div>
@@ -183,7 +248,12 @@ export default function BillingClient({
 
           <div className="pt-2 border-t border-[#3C3C3C] text-xs text-gray-300">
             {subscription?.currentPeriodEnd ? (
-              <p>Period End: <span className="font-bold text-white">{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</span></p>
+              <p>
+                Period End:{' '}
+                <span className="font-bold text-white">
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                </span>
+              </p>
             ) : (
               <p className="text-gray-400">Unlimited Duration (Free Plan)</p>
             )}
@@ -270,7 +340,9 @@ export default function BillingClient({
               }`}
             >
               <span>Yearly</span>
-              <span className="px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 text-[9px] font-extrabold rounded-md">Save & Free Setup</span>
+              <span className="px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 text-[9px] font-extrabold rounded-md">
+                Save & Free Setup
+              </span>
             </button>
           </div>
         </div>
@@ -280,6 +352,8 @@ export default function BillingClient({
             .filter((p) => p.billingCycle === cycle || p.billingCycle === 'free')
             .map((plan) => {
               const isCurrent = currentPlan.id === plan.id || currentPlan.name === plan.name
+              const showSetupNotice = plan.billingCycle === 'monthly' && plan.setupFeeUsd > 0 && !isExistingPaidCustomer
+
               return (
                 <div
                   key={plan.id}
@@ -306,9 +380,9 @@ export default function BillingClient({
                           / {plan.billingCycle === 'free' ? 'lifetime' : plan.billingCycle}
                         </span>
                       </div>
-                      {plan.billingCycle === 'monthly' && plan.setupFeeUsd > 0 && (
+                      {showSetupNotice && (
                         <p className="text-[10px] text-amber-400 font-semibold mt-1">
-                          +${plan.setupFeeUsd} one-time setup fee
+                          +${plan.setupFeeUsd} one-time setup fee (new customers only)
                         </p>
                       )}
                     </div>
@@ -320,7 +394,11 @@ export default function BillingClient({
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span>{plan.leadLimitPerMonth === null ? 'Unlimited Leads / month' : `${plan.leadLimitPerMonth} Leads / month`}</span>
+                        <span>
+                          {plan.leadLimitPerMonth === null
+                            ? 'Unlimited Leads / month'
+                            : `${plan.leadLimitPerMonth} Leads / month`}
+                        </span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
@@ -349,9 +427,7 @@ export default function BillingClient({
           <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider">Payment Submissions & Invoices</h3>
         </div>
         {payments.length === 0 ? (
-          <div className="p-8 text-center text-xs text-gray-400">
-            No payment history recorded yet.
-          </div>
+          <div className="p-8 text-center text-xs text-gray-400">No payment history recorded yet.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-[#3C3C3C]">
@@ -361,6 +437,7 @@ export default function BillingClient({
                   <th className="px-6 py-4 text-left">Plan</th>
                   <th className="px-6 py-4 text-left">Method</th>
                   <th className="px-6 py-4 text-left">Trx ID</th>
+                  <th className="px-6 py-4 text-left">Coupon</th>
                   <th className="px-6 py-4 text-left">Amount</th>
                   <th className="px-6 py-4 text-right">Status</th>
                 </tr>
@@ -374,23 +451,24 @@ export default function BillingClient({
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-white">
                       {p.plan?.name || 'Subscription Plan'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-[#007ACC]">
-                      {p.method}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-[#007ACC]">{p.method}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-mono text-gray-300">
                       {p.transactionNumber}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-white">
-                      ${p.amountUsd}
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-mono text-purple-400">
+                      {p.couponCode ? `${p.couponCode} (-$${p.discountAmount})` : '-'}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-white">${p.amountUsd}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-xs font-bold">
-                      <span className={`px-2.5 py-0.5 inline-flex text-[10px] font-bold rounded-full border ${
-                        p.status === 'confirmed'
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          : p.status === 'pending'
+                      <span
+                        className={`px-2.5 py-0.5 inline-flex text-[10px] font-bold rounded-full border ${
+                          p.status === 'confirmed'
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : p.status === 'pending'
                             ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                             : 'bg-red-500/10 text-red-400 border-red-500/20'
-                      }`}>
+                        }`}
+                      >
                         {p.status.toUpperCase()}
                       </span>
                     </td>
@@ -433,7 +511,8 @@ export default function BillingClient({
                 </div>
                 <h4 className="text-xl font-bold text-white">Payment Submitted!</h4>
                 <p className="text-xs text-gray-300 leading-relaxed">
-                  Your transaction number <strong className="text-white font-mono">{transactionNumber}</strong> has been submitted. Our team will verify and activate your subscription shortly.
+                  Your transaction number <strong className="text-white font-mono">{transactionNumber}</strong> has been
+                  submitted. Our team will verify and activate your subscription shortly.
                 </p>
                 <button
                   onClick={() => {
@@ -454,7 +533,10 @@ export default function BillingClient({
                   </label>
                   <select
                     value={selectedPlanId}
-                    onChange={(e) => setSelectedPlanId(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedPlanId(e.target.value)
+                      setAppliedCoupon(null)
+                    }}
                     className="w-full bg-[#1E1E1E] border border-[#3C3C3C] text-xs font-bold text-white rounded-xl py-3 px-3 outline-none focus:border-[#007ACC] transition-all cursor-pointer"
                   >
                     {plans
@@ -467,27 +549,87 @@ export default function BillingClient({
                   </select>
                 </div>
 
+                {/* Coupon Code Section */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Discount Coupon Code
+                  </label>
+
+                  {appliedCoupon ? (
+                    <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-center justify-between text-xs text-purple-300">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="w-4 h-4 text-purple-400" />
+                        <span>
+                          Coupon <strong className="font-mono text-white">{appliedCoupon.code}</strong> Applied (-$
+                          {appliedCoupon.discountAmount})
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="text-gray-400 hover:text-white p-1 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Ticket className="w-4 h-4 text-gray-500 absolute left-3 top-3" />
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code (e.g. SAVE20)"
+                          value={couponInput}
+                          onChange={(e) => {
+                            setCouponInput(e.target.value)
+                            setCouponError('')
+                          }}
+                          className="w-full bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl py-2.5 pl-9 pr-3 text-xs font-mono font-bold text-white uppercase placeholder-gray-500 outline-none focus:border-[#007ACC]"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={isValidatingCoupon || !couponInput.trim()}
+                        className="px-4 py-2.5 bg-[#333333] hover:bg-[#0E639C] text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+                      >
+                        {isValidatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+
+                  {couponError && <p className="text-[11px] text-red-400 font-semibold">{couponError}</p>}
+                </div>
+
                 {/* Pricing Summary */}
                 <div className="p-4 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] space-y-2 text-xs">
                   <div className="flex justify-between text-gray-300">
                     <span>Plan Price:</span>
                     <span className="font-bold text-white">${planPrice}</span>
                   </div>
-                  {setupFee > 0 && (
+
+                  {setupFee > 0 ? (
                     <div className="flex justify-between text-amber-400 font-medium">
-                      <span>One-Time Setup Fee:</span>
+                      <span>One-Time Setup Fee (New Customer):</span>
                       <span>+${setupFee}</span>
                     </div>
-                  )}
-                  {isYearly && (
+                  ) : isMonthly && isExistingPaidCustomer ? (
                     <div className="flex justify-between text-emerald-400 font-medium">
-                      <span>Setup Fee Waiver:</span>
-                      <span>$0 (Waived for Yearly)</span>
+                      <span>Setup Fee:</span>
+                      <span>$0 (Waived for Existing Customer)</span>
+                    </div>
+                  ) : null}
+
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-purple-400 font-medium">
+                      <span>Coupon Discount ({appliedCoupon?.code}):</span>
+                      <span>-${discountAmount.toFixed(2)}</span>
                     </div>
                   )}
+
                   <div className="flex justify-between text-white font-bold border-t border-[#3C3C3C] pt-2 text-sm">
                     <span>Total Payable:</span>
-                    <span className="text-[#007ACC] font-mono">${totalPrice} USD</span>
+                    <span className="text-[#007ACC] font-mono">${totalPrice.toFixed(2)} USD</span>
                   </div>
                 </div>
 
@@ -519,7 +661,9 @@ export default function BillingClient({
                 {selectedMethodObj && (
                   <div className="p-4 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white">Send Money to {selectedMethodObj.method} ({selectedMethodObj.accountType || 'Personal'})</span>
+                      <span className="text-xs font-bold text-white">
+                        Send Money to {selectedMethodObj.method} ({selectedMethodObj.accountType || 'Personal'})
+                      </span>
                       <button
                         type="button"
                         onClick={() => handleCopyNumber(selectedMethodObj.number)}
@@ -529,12 +673,8 @@ export default function BillingClient({
                         <span>{copiedNumber ? 'Copied' : 'Copy'}</span>
                       </button>
                     </div>
-                    <div className="text-base font-mono font-bold text-[#007ACC]">
-                      {selectedMethodObj.number}
-                    </div>
-                    <p className="text-[11px] text-gray-400 leading-relaxed">
-                      {selectedMethodObj.instructions}
-                    </p>
+                    <div className="text-base font-mono font-bold text-[#007ACC]">{selectedMethodObj.number}</div>
+                    <p className="text-[11px] text-gray-400 leading-relaxed">{selectedMethodObj.instructions}</p>
                   </div>
                 )}
 

@@ -21,7 +21,13 @@ import {
   Check 
 } from 'lucide-react'
 
-export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function LandingPageClient({
+  isLoggedIn,
+  plans = [],
+}: {
+  isLoggedIn: boolean
+  plans?: any[]
+}) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [landingCycle, setLandingCycle] = useState<'monthly' | 'yearly'>('monthly')
@@ -694,127 +700,189 @@ export default function LandingPageClient({ isLoggedIn }: { isLoggedIn: boolean 
               </button>
             </div>
           </div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch reveal">
+            {plans && plans.length > 0 ? (
+              plans
+                .filter((p) => p.isPublic && (p.billingCycle === landingCycle || p.billingCycle === 'free'))
+                .map((plan) => {
+                  const isPopular = plan.name.toLowerCase().includes('basic') || plan.name.toLowerCase().includes('pro')
+                  return (
+                    <div
+                      key={plan.id}
+                      className={`neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border ${
+                        isPopular
+                          ? 'border-[#6E79F2]/30 shadow-[14px_14px_30px_#AEB9C9,-12px_-12px_26px_#FFFFFF]'
+                          : 'border-white/40'
+                      }`}
+                    >
+                      {isPopular && (
+                        <div className="absolute top-0 right-0 bg-[#4855E4] text-white text-[9px] font-bold tracking-wider py-1 px-3 rounded-bl-xl">
+                          POPULAR
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-xs font-bold text-[#4855E4] uppercase tracking-wider block mb-2 font-mono">
+                          {plan.billingCycle.toUpperCase()}
+                        </span>
+                        <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">{plan.name}</h3>
+                        <div className="flex items-baseline gap-1 mb-2">
+                          <span className="text-4xl font-black text-[#4855E4] font-display">${plan.priceUsd}</span>
+                          <span className="text-[#5C6478] font-medium text-xs">
+                            / {plan.billingCycle === 'free' ? 'lifetime' : plan.billingCycle}
+                          </span>
+                        </div>
+                        {plan.billingCycle === 'monthly' && plan.setupFeeUsd > 0 ? (
+                          <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">
+                            + ${plan.setupFeeUsd} one-time setup fee (new customers only)
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">No setup fee</p>
+                        )}
+                        <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                          <div className="flex items-center gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                            <span>{plan.userLimit === null ? 'Unlimited seats' : `${plan.userLimit} Team Seats`}</span>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                            <span>
+                              {plan.leadLimitPerMonth === null
+                                ? 'Unlimited Leads / month'
+                                : `${plan.leadLimitPerMonth} Leads / month`}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                            <span>Full CRM & Matrix Features</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Link
+                        href="/signup"
+                        className={`w-full py-3.5 rounded-full font-bold text-center text-xs transition-all ${
+                          isPopular
+                            ? 'bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)]'
+                            : 'bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF]'
+                        }`}
+                      >
+                        Get Started with {plan.name}
+                      </Link>
+                    </div>
+                  )
+                })
+            ) : (
+              /* Fallback Static Cards */
+              <>
+                <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
+                  <div>
+                    <span className="text-xs font-bold text-[#12A8B5] uppercase tracking-wider block mb-2 font-mono">STARTER</span>
+                    <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Free</h3>
+                    <div className="flex items-baseline gap-1 mb-4">
+                      <span className="text-4xl font-black text-[#202638] font-display">$0</span>
+                      <span className="text-[#5C6478] font-medium text-xs">/ lifetime</span>
+                    </div>
+                    <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Perfect for new agencies getting started with student recruitment.</p>
+                    <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>2 Team Seats (1 Manager + 1 Counselor)</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>100 Student Leads / month</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>Full Application & Lead Pipeline</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    href="/signup"
+                    className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
+                  >
+                    Sign Up Free
+                  </Link>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch reveal">
-            {/* Free Tier Card */}
-            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
-              <div>
-                <span className="text-xs font-bold text-[#12A8B5] uppercase tracking-wider block mb-2 font-mono">STARTER</span>
-                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Free</h3>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-black text-[#202638] font-display">$0</span>
-                  <span className="text-[#5C6478] font-medium text-xs">/ lifetime</span>
+                <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-[#6E79F2]/30 shadow-[14px_14px_30px_#AEB9C9,-12px_-12px_26px_#FFFFFF]">
+                  <div className="absolute top-0 right-0 bg-[#4855E4] text-white text-[9px] font-bold tracking-wider py-1 px-3 rounded-bl-xl">
+                    POPULAR
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#4855E4] uppercase tracking-wider block mb-2 font-mono">GROWING AGENCIES</span>
+                    <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Basic</h3>
+                    <div className="flex items-baseline gap-1 mb-2">
+                      <span className="text-4xl font-black text-[#4855E4] font-display">
+                        {landingCycle === 'monthly' ? '$35' : '$399'}
+                      </span>
+                      <span className="text-[#5C6478] font-medium text-xs">
+                        / {landingCycle === 'monthly' ? 'month' : 'year'}
+                      </span>
+                    </div>
+                    {landingCycle === 'monthly' ? (
+                      <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 setup fee (new customers only)</p>
+                    ) : (
+                      <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
+                    )}
+                    <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Ideal for established consultancy teams expanding counselor operations.</p>
+                    <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>20 Team Seats</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>Unlimited Leads</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    href="/signup"
+                    className="w-full py-3.5 rounded-full bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white font-bold text-center text-xs hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)] transition-all"
+                  >
+                    Get Started with Basic
+                  </Link>
                 </div>
-                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Perfect for new agencies getting started with student recruitment.</p>
-                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>2 Team Seats (1 Manager + 1 Counselor)</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>100 Student Leads / month</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>Full Application & Lead Pipeline</span>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
-              >
-                Sign Up Free
-              </Link>
-            </div>
 
-            {/* Basic Plan Card */}
-            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-[#6E79F2]/30 shadow-[14px_14px_30px_#AEB9C9,-12px_-12px_26px_#FFFFFF]">
-              <div className="absolute top-0 right-0 bg-[#4855E4] text-white text-[9px] font-bold tracking-wider py-1 px-3 rounded-bl-xl">
-                POPULAR
-              </div>
-              <div>
-                <span className="text-xs font-bold text-[#4855E4] uppercase tracking-wider block mb-2 font-mono">GROWING AGENCIES</span>
-                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Basic</h3>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-black text-[#4855E4] font-display">
-                    {landingCycle === 'monthly' ? '$35' : '$399'}
-                  </span>
-                  <span className="text-[#5C6478] font-medium text-xs">
-                    / {landingCycle === 'monthly' ? 'month' : 'year'}
-                  </span>
+                <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
+                  <div>
+                    <span className="text-xs font-bold text-[#FF7A52] uppercase tracking-wider block mb-2 font-mono">ENTERPRISE SCALE</span>
+                    <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Pro</h3>
+                    <div className="flex items-baseline gap-1 mb-2">
+                      <span className="text-4xl font-black text-[#202638] font-display">
+                        {landingCycle === 'monthly' ? '$70' : '$799'}
+                      </span>
+                      <span className="text-[#5C6478] font-medium text-xs">
+                        / {landingCycle === 'monthly' ? 'month' : 'year'}
+                      </span>
+                    </div>
+                    {landingCycle === 'monthly' ? (
+                      <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 setup fee (new customers only)</p>
+                    ) : (
+                      <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
+                    )}
+                    <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Built for high-volume consultancies with multi-counselor branches.</p>
+                    <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span>100 Team Seats</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
+                        <span className="font-bold text-[#202638]">Unlimited Leads / month</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    href="/signup"
+                    className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
+                  >
+                    Get Started with Pro
+                  </Link>
                 </div>
-                {landingCycle === 'monthly' ? (
-                  <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 one-time setup fee</p>
-                ) : (
-                  <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
-                )}
-                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Ideal for established consultancy teams expanding counselor operations.</p>
-                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>20 Team Seats</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span className="font-bold text-[#202638]">Unlimited Leads / month</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>bKash / Nagad / Rocket Payment</span>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full py-3.5 rounded-full bg-gradient-to-br from-[#6E79F2] to-[#333FC2] text-white font-bold text-center text-xs hover:shadow-[7px_7px_16px_rgba(51,63,194,0.35)] transition-all"
-              >
-                Get Started with Basic
-              </Link>
-            </div>
-
-            {/* Pro Plan Card */}
-            <div className="neo-raised p-8 rounded-[2rem] flex flex-col justify-between relative border border-white/40">
-              <div>
-                <span className="text-xs font-bold text-[#FF7A52] uppercase tracking-wider block mb-2 font-mono">ENTERPRISE SCALE</span>
-                <h3 className="text-2xl font-bold text-[#202638] mb-2 font-display">Pro</h3>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-black text-[#202638] font-display">
-                    {landingCycle === 'monthly' ? '$70' : '$799'}
-                  </span>
-                  <span className="text-[#5C6478] font-medium text-xs">
-                    / {landingCycle === 'monthly' ? 'month' : 'year'}
-                  </span>
-                </div>
-                {landingCycle === 'monthly' ? (
-                  <p className="text-[10px] text-[#FF7A52] font-semibold mb-4">+ $20 one-time setup fee</p>
-                ) : (
-                  <p className="text-[10px] text-[#12A8B5] font-semibold mb-4">Setup fee waived for yearly</p>
-                )}
-                <p className="text-xs text-[#5C6478] mb-6 leading-relaxed">Built for high-volume consultancies with multi-counselor branches.</p>
-                <div className="space-y-3 pt-4 border-t border-[#AEB9C9]/20 mb-8 text-xs text-[#5C6478]">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>100 Team Seats</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span className="font-bold text-[#202638]">Unlimited Leads / month</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#12A8B5] shrink-0" />
-                    <span>Priority Support & Custom Branch Setup</span>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full py-3.5 rounded-full bg-[#E7ECF3] shadow-[6px_6px_12px_#AEB9C9,-6px_-6px_12px_#FFFFFF] text-[#202638] font-bold text-center text-xs hover:shadow-[8px_8px_16px_#AEB9C9,-8px_-8px_16px_#FFFFFF] transition-all"
-              >
-                Get Started with Pro
-              </Link>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
--- SQL Migration Script for SaaS Admin v2 Features
+-- SQL Migration Script for SaaS Admin v2 Features & Billing Enhancements
 -- Execute in Supabase SQL Editor
 
 -- 1. Create "SaasAdminAuditLog" table
@@ -71,3 +71,7 @@ CREATE TABLE IF NOT EXISTS "CronLog" (
 );
 
 CREATE INDEX IF NOT EXISTS idx_cronlog_job ON "CronLog"("jobName", "executedAt" DESC);
+
+-- 6. Add Coupon columns to "Payment" table
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "couponCode" TEXT;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "discountAmount" NUMERIC(10,2) DEFAULT 0;
