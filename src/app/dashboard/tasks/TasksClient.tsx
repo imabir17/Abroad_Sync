@@ -89,9 +89,10 @@ export default function TasksClient({
     setIsSubmitting(true)
     setErrorMsg('')
     
+    const isoDueDate = formData.dueDate ? new Date(formData.dueDate).toISOString() : ''
     const data = new FormData()
     data.append('description', formData.description)
-    data.append('dueDate', formData.dueDate)
+    data.append('dueDate', isoDueDate)
     data.append('counselorId', formData.counselorId)
 
     try {

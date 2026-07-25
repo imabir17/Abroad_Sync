@@ -125,9 +125,10 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
 
   const handleAddTask = async () => {
     if (!taskDescription || !taskDueDate) return
+    const isoDueDate = new Date(taskDueDate).toISOString()
     const formDataObj = new FormData()
     formDataObj.append('description', taskDescription)
-    formDataObj.append('dueDate', taskDueDate)
+    formDataObj.append('dueDate', isoDueDate)
     formDataObj.append('counselorId', lead.assignedCounselorId || '')
     formDataObj.append('leadId', lead.id)
 
