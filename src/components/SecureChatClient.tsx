@@ -285,11 +285,74 @@ export default function SecureChatClient({
     })} at ${timeStr}`
   }
 
+  const downloadAttachment = (attachmentUrl: string, attachmentName: string) => {
+    try {
+      if (!attachmentUrl) return
+      if (attachmentUrl.startsWith('data:')) {
+        const parts = attachmentUrl.split(',')
+        const mimeMatch = parts[0].match(/:(.*?);/)
+        const mime = mimeMatch ? mimeMatch[1] : 'application/pdf'
+        const base64Str = parts[1] || parts[0]
+        const binaryStr = window.atob(base64Str)
+        const len = binaryStr.length
+        const bytes = new Uint8Array(len)
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryStr.charCodeAt(i)
+        }
+        const blob = new Blob([bytes], { type: mime })
+        const blobUrl = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = attachmentName || 'document.pdf'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 3000)
+      } else {
+        const a = document.createElement('a')
+        a.href = attachmentUrl
+        a.download = attachmentName || 'document.pdf'
+        a.target = '_blank'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    } catch (err) {
+      console.error('Download error:', err)
+      alert('Failed to download attachment. Please try again.')
+    }
+  }
+
+  const openAttachment = (attachmentUrl: string) => {
+    try {
+      if (!attachmentUrl) return
+      if (attachmentUrl.startsWith('data:')) {
+        const parts = attachmentUrl.split(',')
+        const mimeMatch = parts[0].match(/:(.*?);/)
+        const mime = mimeMatch ? mimeMatch[1] : 'application/pdf'
+        const base64Str = parts[1] || parts[0]
+        const binaryStr = window.atob(base64Str)
+        const len = binaryStr.length
+        const bytes = new Uint8Array(len)
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryStr.charCodeAt(i)
+        }
+        const blob = new Blob([bytes], { type: mime })
+        const blobUrl = URL.createObjectURL(blob)
+        window.open(blobUrl, '_blank')
+      } else {
+        window.open(attachmentUrl, '_blank')
+      }
+    } catch (err) {
+      console.error('Open attachment error:', err)
+    }
+  }
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const isImage = file.type.startsWith('image/')
+    const isImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp)$/i.test(file.name)
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
 
     if (!isImage && !isPdf) {
@@ -314,7 +377,6 @@ export default function SecureChatClient({
     }
     reader.readAsDataURL(file)
 
-    // Reset input value so same file can be re-selected if removed
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -716,34 +778,48 @@ export default function SecureChatClient({
                                     src={m.attachmentUrl}
                                     alt={m.attachmentName || 'Image'}
                                     className="max-w-xs max-h-60 rounded-xl object-cover border border-white/10 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
-                                    onClick={() => window.open(m.attachmentUrl, '_blank')}
+                                    onClick={() => openAttachment(m.attachmentUrl)}
                                   />
                                   <div className="flex items-center gap-2">
-                                    <a
-                                      href={m.attachmentUrl}
-                                      download={m.attachmentName || 'chat-image.png'}
-                                      className="px-2 py-1 bg-black/40 hover:bg-black/60 rounded-lg text-[10px] font-bold text-white flex items-center gap-1 border border-white/10 transition-colors"
+                                    <button
+                                      type="button"
+                                      onClick={() => downloadAttachment(m.attachmentUrl, m.attachmentName || 'chat-image.png')}
+                                      className="px-2.5 py-1 bg-black/40 hover:bg-black/60 rounded-lg text-[10px] font-bold text-white flex items-center gap-1 border border-white/10 transition-colors cursor-pointer"
                                     >
                                       <Download className="w-3 h-3 text-emerald-400" /> Download Image
-                                    </a>
+                                    </button>
                                   </div>
                                 </div>
                               ) : (
-                                <div className="p-3 bg-black/30 rounded-xl border border-white/15 shadow-sm space-y-2">
-                                  <div className="flex items-center gap-2.5">
+                                <div className="p-3 bg-black/30 rounded-xl border border-white/15 shadow-sm space-y-2.5">
+                                  <div
+                                    className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() => openAttachment(m.attachmentUrl)}
+                                    title="Click to view PDF in browser"
+                                  >
                                     <FileText className="w-6 h-6 text-red-400 shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <p className="font-bold truncate text-white text-xs">{m.attachmentName || 'Document.pdf'}</p>
-                                      <span className="text-[9px] text-gray-300">PDF Document</span>
+                                      <span className="text-[9px] text-gray-300">PDF Document • Click to preview</span>
                                     </div>
                                   </div>
-                                  <a
-                                    href={m.attachmentUrl}
-                                    download={m.attachmentName || 'Document.pdf'}
-                                    className="w-full py-1.5 px-3 rounded-lg bg-[#007ACC] hover:bg-[#0062A3] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-                                  >
-                                    <Download className="w-3.5 h-3.5" /> Download Document
-                                  </a>
+
+                                  <div className="flex items-center gap-2 pt-1 border-t border-white/10">
+                                    <button
+                                      type="button"
+                                      onClick={() => openAttachment(m.attachmentUrl)}
+                                      className="flex-1 py-1.5 px-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                    >
+                                      Preview PDF
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => downloadAttachment(m.attachmentUrl, m.attachmentName || 'Document.pdf')}
+                                      className="flex-1 py-1.5 px-2 rounded-lg bg-[#007ACC] hover:bg-[#0062A3] text-white font-bold text-[11px] flex items-center justify-center gap-1 transition-colors shadow-sm cursor-pointer"
+                                    >
+                                      <Download className="w-3.5 h-3.5" /> Download
+                                    </button>
+                                  </div>
                                 </div>
                               )}
                             </div>
