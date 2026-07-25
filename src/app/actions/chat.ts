@@ -205,9 +205,11 @@ export async function sendChatMessage({
       return { error: 'Failed to send message: ' + error.message }
     }
 
-    // Trigger System & Push Notification for 1-on-1 direct message
+    // Trigger System & Push Notifications
+    const senderName = user.fullName || user.email || 'A colleague'
+
     if (receiverId && receiverId !== user.id) {
-      const senderName = user.fullName || user.email || 'A colleague'
+      // 1-on-1 Direct Message: Notify ONLY the recipient (no one else)
       await dispatchSystemNotification({
         companyId: user.companyId,
         userIds: [receiverId],
@@ -217,6 +219,32 @@ export async function sendChatMessage({
         type: 'chat_message',
         actorId: user.id,
       })
+    } else if (channelId) {
+      // Channel Message: Notify EVERYONE in the company (excluding the sender)
+      const { data: chan } = await admin
+        .from('ChatChannel')
+        .select('name')
+        .eq('id', channelId)
+        .single()
+
+      const { data: companyUsers } = await admin
+        .from('User')
+        .select('id')
+        .eq('companyId', user.companyId)
+        .neq('id', user.id)
+
+      const recipientIds = (companyUsers || []).map((u: any) => u.id)
+      if (recipientIds.length > 0) {
+        await dispatchSystemNotification({
+          companyId: user.companyId,
+          userIds: recipientIds,
+          title: `💬 #${chan?.name || 'channel'} - Message from ${senderName}`,
+          body: content.trim() ? content.trim().slice(0, 100) : 'Sent an attachment',
+          url: `/dashboard/chat?channel=${channelId}`,
+          type: 'chat_message',
+          actorId: user.id,
+        })
+      }
     }
 
     return { success: true, message }
