@@ -75,6 +75,13 @@ export default function SecureChatClient({
   const [forwardingMessage, setForwardingMessage] = useState<any | null>(null)
   const [forwardSuccessMsg, setForwardSuccessMsg] = useState('')
 
+  // Beautiful Custom Alert Modal State
+  const [chatAlert, setChatAlert] = useState<{
+    title: string
+    message: string
+    icon?: string
+  } | null>(null)
+
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 
   const searchParams = useSearchParams()
@@ -356,12 +363,23 @@ export default function SecureChatClient({
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
 
     if (!isImage && !isPdf) {
-      alert('Only Images (PNG, JPG, WEBP, etc.) and PDF files are allowed.')
+      setChatAlert({
+        title: 'Unsupported File Format',
+        message: 'Only Image files (PNG, JPG, WEBP, GIF) and PDF documents under 5MB are allowed.',
+        icon: '📁',
+      })
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be under 5MB.')
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      setChatAlert({
+        title: 'File Exceeds Size Limit',
+        message: `The selected file "${file.name}" is ${fileSizeMB} MB. Attachments must be strictly under 5 MB.`,
+        icon: '⚠️',
+      })
+      if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
@@ -1104,6 +1122,40 @@ export default function SecureChatClient({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* BEAUTIFUL CUSTOM ALERT MODAL */}
+      {chatAlert && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-[9999] animate-in fade-in duration-200">
+          <div className="bg-[#252526] border border-amber-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center relative overflow-hidden">
+            {/* Top Glowing Accent Line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-red-500 to-amber-500" />
+
+            {/* Animated Icon Badge */}
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mx-auto flex items-center justify-center text-3xl shadow-inner animate-bounce">
+              {chatAlert.icon || '⚠️'}
+            </div>
+
+            {/* Text Area */}
+            <div className="space-y-1.5">
+              <h3 className="font-bold text-white text-base tracking-tight font-display">
+                {chatAlert.title}
+              </h3>
+              <p className="text-xs text-gray-300 leading-relaxed font-medium px-2">
+                {chatAlert.message}
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <div className="pt-2">
+              <button
+                onClick={() => setChatAlert(null)}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#007ACC] to-[#0062A3] text-white text-xs font-bold hover:brightness-110 transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                Got It
+              </button>
+            </div>
           </div>
         </div>
       )}
