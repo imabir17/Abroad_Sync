@@ -107,6 +107,12 @@ export default function NotificationCenter() {
             <UserCheck className="w-4 h-4" />
           </div>
         )
+      case 'task_due':
+        return (
+          <div className="w-7 h-7 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center shrink-0">
+            <Clock className="w-4 h-4" />
+          </div>
+        )
       default:
         return (
           <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">

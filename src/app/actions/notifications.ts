@@ -9,6 +9,13 @@ export async function getUserNotifications() {
   if (!user) return { notifications: [], unreadCount: 0 }
 
   try {
+    // Automatically check due task alerts for the current user
+    try {
+      await checkDueTaskAlerts(user.id)
+    } catch (err) {
+      // Ignore task alert check error
+    }
+
     const admin = createAdminClient()
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
@@ -212,5 +219,70 @@ export async function checkLeadInactivityAlerts() {
   } catch (err) {
     console.error('Error running inactivity alerts:', err)
     return { error: 'Failed to run inactivity alerts' }
+  }
+}
+
+export async function checkDueTaskAlerts(targetUserId?: string) {
+  try {
+    const admin = createAdminClient()
+    const now = new Date()
+    const nowIso = now.toISOString()
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+    // Fetch pending tasks whose dueDate <= NOW and >= 7 days ago
+    let query = admin
+      .from('Task')
+      .select('id, description, dueDate, status, counselorId, leadId, counselor:User(companyId)')
+      .eq('status', 'Pending')
+      .lte('dueDate', nowIso)
+      .gte('dueDate', sevenDaysAgo)
+      .limit(50)
+
+    if (targetUserId) {
+      query = query.eq('counselorId', targetUserId)
+    }
+
+    const { data: tasks, error } = await query
+
+    if (error || !tasks || tasks.length === 0) return { alertsSent: 0 }
+
+    let alertsSent = 0
+
+    for (const task of tasks) {
+      const companyId = (task.counselor as any)?.companyId
+      if (!companyId || !task.counselorId) continue
+
+      const taskUrl = task.leadId ? `/dashboard/leads/${task.leadId}` : '/dashboard/tasks'
+
+      // Check if a task_due notification was already sent for this specific task
+      let existing: any[] = []
+      try {
+        const res = await admin
+          .from('Notification')
+          .select('id')
+          .eq('userId', task.counselorId)
+          .eq('type', 'task_due')
+          .like('body', `%[TaskRef:${task.id}]%`)
+          .limit(1)
+        existing = res.data || []
+      } catch (e) {}
+
+      if (existing.length === 0) {
+        await dispatchSystemNotification({
+          companyId,
+          userIds: [task.counselorId],
+          title: '⏰ Task Due Alert',
+          body: `Task "${task.description.slice(0, 80)}" is due now! [TaskRef:${task.id}]`,
+          url: taskUrl,
+          type: 'task_due',
+        })
+        alertsSent++
+      }
+    }
+
+    return { alertsSent }
+  } catch (err) {
+    console.error('Error checking due task alerts:', err)
+    return { alertsSent: 0 }
   }
 }
