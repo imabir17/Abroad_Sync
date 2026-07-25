@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { getUserSession } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
+import { dispatchSystemNotification } from '@/app/actions/notifications'
 
 export async function createTask(formData: FormData) {
   const user = await getUserSession()
@@ -46,6 +47,18 @@ export async function createTask(formData: FormData) {
 
   if (insertError) {
     return { error: 'Failed to create task: ' + insertError.message }
+  }
+
+  if (counselorId && counselorId !== user.id) {
+    await dispatchSystemNotification({
+      companyId: user.companyId,
+      userIds: [counselorId],
+      title: '📋 New Task Assigned',
+      body: `You have been assigned a new task: "${description.slice(0, 80)}".`,
+      url: leadId ? `/dashboard/leads/${leadId}` : '/dashboard/tasks',
+      type: 'assignment',
+      actorId: user.id,
+    })
   }
 
   revalidatePath('/dashboard/tasks')

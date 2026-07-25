@@ -77,6 +77,7 @@ export async function dispatchSystemNotification({
   body,
   url = '/dashboard',
   type = 'info',
+  actorId,
 }: {
   companyId: string
   userIds: string[]
@@ -84,6 +85,7 @@ export async function dispatchSystemNotification({
   body: string
   url?: string
   type?: string
+  actorId?: string
 }) {
   try {
     const admin = createAdminClient()
@@ -97,7 +99,12 @@ export async function dispatchSystemNotification({
       .eq('status', 'Active')
 
     const superAdminIds = (superAdmins || []).map((sa) => sa.id)
-    const allTargetUserIds = Array.from(new Set([...userIds, ...superAdminIds]))
+    let allTargetUserIds = Array.from(new Set([...userIds, ...superAdminIds]))
+
+    // Exclude the actor from receiving notification about their own action
+    if (actorId) {
+      allTargetUserIds = allTargetUserIds.filter((id) => id !== actorId)
+    }
 
     if (allTargetUserIds.length === 0) return
 

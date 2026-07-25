@@ -152,10 +152,14 @@ export async function createLead(prevState: any, formData: FormData) {
   })
 
   if (assignedCounselorId && assignedCounselorId !== user.id) {
-    await sendPushNotification(assignedCounselorId, {
+    await dispatchSystemNotification({
+      companyId: user.companyId,
+      userIds: [assignedCounselorId],
       title: '🎓 New Lead Assigned',
       body: `You have been assigned student ${fullName}.`,
       url: `/dashboard/leads/${newLead.id}`,
+      type: 'assignment',
+      actorId: user.id,
     })
   }
 
@@ -373,6 +377,7 @@ export async function createInteraction(leadId: string, content: string) {
     body: `${user.fullName || 'A team member'} added a note on student ${lead.fullName || ''}.`,
     url: `/dashboard/leads/${leadId}`,
     type: 'note',
+    actorId: user.id,
   })
 
   revalidatePath(`/dashboard/leads/${leadId}`)
@@ -417,10 +422,14 @@ export async function transferLead(leadId: string, newCounselorId: string) {
   if (updateError) throw new Error('Failed to transfer lead: ' + updateError.message)
 
   if (newCounselorId && newCounselorId !== user.id) {
-    await sendPushNotification(newCounselorId, {
+    await dispatchSystemNotification({
+      companyId: user.companyId,
+      userIds: [newCounselorId],
       title: '🔄 Lead Transferred to You',
       body: `A student lead has been transferred to your account.`,
       url: `/dashboard/leads/${leadId}`,
+      type: 'assignment',
+      actorId: user.id,
     })
   }
 

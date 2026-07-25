@@ -116,11 +116,19 @@ export default function NotificationCenter() {
     }
   }
 
+  const handleToggle = () => {
+    const nextState = !isOpen
+    setIsOpen(nextState)
+    if (nextState) {
+      fetchNotifications()
+    }
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Bell Icon Trigger */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="relative p-2.5 rounded-xl bg-[#252526] border border-[#3C3C3C] hover:bg-[#333333] text-gray-300 hover:text-white transition-all"
         aria-label="Open notifications menu"
       >

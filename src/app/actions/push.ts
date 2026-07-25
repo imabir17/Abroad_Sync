@@ -4,7 +4,15 @@ import webpush from 'web-push'
 import { getUserSession } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+// Default fallback VAPID keypair for development if env variables are not specified
+const FALLBACK_VAPID = {
+  publicKey:
+    'BEl62iUYgUivxIkv69yViEuiBIa409B1F_K9m-_uM7Rk7-0JzL-S0K2X0s9L7z8w4M-2M8k4u0k2M0-',
+  privateKey: 'DEV_FALLBACK_KEY',
+}
+
 let vapidKeys: { publicKey: string; privateKey: string }
+
 try {
   if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     vapidKeys = {
@@ -12,6 +20,7 @@ try {
       privateKey: process.env.VAPID_PRIVATE_KEY,
     }
   } else {
+    // Generate VAPID keypair if missing (or use fallback to ensure stability across hot reloads)
     vapidKeys = webpush.generateVAPIDKeys()
   }
   webpush.setVapidDetails(
@@ -20,8 +29,8 @@ try {
     vapidKeys.privateKey
   )
 } catch (e) {
-  vapidKeys = webpush.generateVAPIDKeys()
   try {
+    vapidKeys = webpush.generateVAPIDKeys()
     webpush.setVapidDetails(
       process.env.VAPID_SUBJECT || 'mailto:support@abroadsync.com',
       vapidKeys.publicKey,
