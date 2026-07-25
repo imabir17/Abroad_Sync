@@ -14,7 +14,7 @@ export async function getCompanyChatUsers() {
     // Fetch company users
     const { data: users, error } = await admin
       .from('User')
-      .select('id, fullName, email, role, status, createdAt')
+      .select('id, fullName, email, role, status, lastSeenAt, createdAt')
       .eq('companyId', user.companyId)
       .neq('id', user.id)
       .order('fullName', { ascending: true })
@@ -260,3 +260,20 @@ export async function createChatChannel(name: string, description?: string) {
     return { error: err.message || 'Failed to create channel' }
   }
 }
+
+export async function updateUserLastSeen() {
+  const user = await getUserSession()
+  if (!user) return { success: false }
+
+  try {
+    const admin = createAdminClient()
+    await admin
+      .from('User')
+      .update({ lastSeenAt: new Date().toISOString() })
+      .eq('id', user.id)
+    return { success: true }
+  } catch (err) {
+    return { success: false }
+  }
+}
+

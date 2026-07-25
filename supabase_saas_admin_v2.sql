@@ -142,5 +142,9 @@ CREATE INDEX IF NOT EXISTS idx_chatmessage_direct ON "ChatMessage"("senderId", "
 CREATE INDEX IF NOT EXISTS idx_chatmessage_channel ON "ChatMessage"("channelId", "createdAt" DESC);
 CREATE INDEX IF NOT EXISTS idx_chatchannel_company ON "ChatChannel"("companyId");
 
+-- 10. Add "lastSeenAt" column to "User" table
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastSeenAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+
 
 

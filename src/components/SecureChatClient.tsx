@@ -28,6 +28,7 @@ import {
   sendChatMessage,
   markChatMessagesAsRead,
   createChatChannel,
+  updateUserLastSeen,
 } from '@/app/actions/chat'
 import { createClient } from '@/utils/supabase/client'
 
@@ -58,6 +59,8 @@ export default function SecureChatClient({
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDesc, setNewChannelDesc] = useState('')
+
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -156,6 +159,79 @@ export default function SecureChatClient({
       clearInterval(interval)
     }
   }, [selectedRecipient?.id, selectedChannel?.id, currentUser.companyId])
+
+  // Track Real-time Presence (Online / Offline status) & Last Seen
+  useEffect(() => {
+    const presenceChannel = supabase.channel(`presence_company_${currentUser.companyId}`, {
+      config: {
+        presence: {
+          key: currentUser.id,
+        },
+      },
+    })
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState()
+        const onlineIds = new Set<string>()
+        Object.keys(state).forEach((key) => {
+          onlineIds.add(key)
+        })
+        setOnlineUserIds(onlineIds)
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            userId: currentUser.id,
+            onlineAt: new Date().toISOString(),
+          })
+          updateUserLastSeen()
+        }
+      })
+
+    const heartbeat = setInterval(() => {
+      updateUserLastSeen()
+    }, 45000)
+
+    return () => {
+      supabase.removeChannel(presenceChannel)
+      clearInterval(heartbeat)
+    }
+  }, [currentUser.companyId, currentUser.id])
+
+  const formatLastSeen = (userItem: any) => {
+    if (onlineUserIds.has(userItem.id)) {
+      return 'Active Now'
+    }
+    if (!userItem.lastSeenAt) {
+      return 'Offline'
+    }
+    const lastSeenDate = new Date(userItem.lastSeenAt)
+    const now = new Date()
+    const diffMs = now.getTime() - lastSeenDate.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+
+    if (diffMins < 2) return 'Active just now'
+    if (diffMins < 60) return `Last seen ${diffMins}m ago`
+
+    const isToday = lastSeenDate.toDateString() === now.toDateString()
+    const yesterday = new Date(now)
+    yesterday.setDate(now.getDate() - 1)
+    const isYesterday = lastSeenDate.toDateString() === yesterday.toDateString()
+
+    const timeStr = lastSeenDate.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+    })
+
+    if (isToday) return `Last seen today at ${timeStr}`
+    if (isYesterday) return `Last seen yesterday at ${timeStr}`
+
+    return `Last seen ${lastSeenDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    })} at ${timeStr}`
+  }
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -337,7 +413,12 @@ export default function SecureChatClient({
                       <div className="w-10 h-10 rounded-xl bg-[#333333] border border-[#3C3C3C] text-white font-bold flex items-center justify-center text-sm shadow-sm">
                         {(u.fullName || u.email || '?').charAt(0).toUpperCase()}
                       </div>
-                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#252526]" title="Active Employee" />
+                      <span
+                        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#252526] ${
+                          onlineUserIds.has(u.id) ? 'bg-emerald-500 shadow-sm' : 'bg-gray-500'
+                        }`}
+                        title={formatLastSeen(u)}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -425,9 +506,15 @@ export default function SecureChatClient({
                           {selectedRecipient.role || 'Staff'}
                         </span>
                       </div>
-                      <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Active Employee
-                      </p>
+                      {onlineUserIds.has(selectedRecipient.id) ? (
+                        <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Active Now
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-gray-400 font-semibold flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-gray-400" /> {formatLastSeen(selectedRecipient)}
+                        </p>
+                      )}
                     </div>
                   </>
                 ) : (

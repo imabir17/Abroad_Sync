@@ -40,3 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_chatmessage_company ON "ChatMessage"("companyId")
 CREATE INDEX IF NOT EXISTS idx_chatmessage_direct ON "ChatMessage"("senderId", "receiverId", "createdAt" DESC);
 CREATE INDEX IF NOT EXISTS idx_chatmessage_channel ON "ChatMessage"("channelId", "createdAt" DESC);
 CREATE INDEX IF NOT EXISTS idx_chatchannel_company ON "ChatChannel"("companyId");
+
+-- 4. Add "lastSeenAt" column to "User" table for WhatsApp-style presence
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastSeenAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
