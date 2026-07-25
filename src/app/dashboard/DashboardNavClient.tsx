@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationCenter from '@/components/NotificationCenter'
@@ -38,6 +38,12 @@ export default function DashboardNavClient({
       href: '/dashboard/leads',
       label: 'Leads',
       icon: Users,
+      show: true,
+    },
+    {
+      href: '/dashboard/chat',
+      label: 'SecureChat',
+      icon: MessageSquare,
       show: true,
     },
     {
