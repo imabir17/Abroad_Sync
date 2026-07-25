@@ -14,8 +14,8 @@ export async function createTask(formData: FormData) {
   let counselorId = formData.get('counselorId') as string
   const leadId = formData.get('leadId') as string | null
 
-  // Restrict counselors to self-assignment
-  if (user.role === 'Counselor') {
+  // Restrict counselors to self-assignment, or fallback to current user if counselorId is missing/empty
+  if (user.role === 'Counselor' || !counselorId) {
     counselorId = user.id
   }
 

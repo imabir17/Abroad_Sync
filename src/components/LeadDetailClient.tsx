@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { GraduationCap, Globe, CheckCircle2, MessageSquare, Clock, Building, Save, X, Wallet, FolderOpen, Send, Plus, Check, UserPlus, UserCheck } from 'lucide-react'
 import { updateLeadDetails, createInteraction, createApplication, toggleFileOpened } from '@/app/actions/leads'
 import { createTask, updateTaskStatus } from '@/app/actions/tasks'
 
 export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, canEdit?: boolean }) {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     sscGroup: lead.sscGroup || '',
@@ -62,6 +64,11 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
   const [isAddingTask, setIsAddingTask] = useState(false)
   const [taskDescription, setTaskDescription] = useState('')
   const [taskDueDate, setTaskDueDate] = useState('')
+  const [localTasks, setLocalTasks] = useState<any[]>(lead.tasks || [])
+
+  useEffect(() => {
+    setLocalTasks(lead.tasks || [])
+  }, [lead.tasks])
 
   // App State
   const [isAddingApp, setIsAddingApp] = useState(false)
@@ -125,19 +132,27 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
     formDataObj.append('leadId', lead.id)
 
     try {
-      await createTask(formDataObj)
+      const res = await createTask(formDataObj)
+      if (res && 'error' in res) {
+        alert(res.error)
+        return
+      }
       setTaskDescription('')
       setTaskDueDate('')
       setIsAddingTask(false)
-    } catch (err) {
+      router.refresh()
+    } catch (err: any) {
       console.error(err)
+      alert(err?.message || 'Failed to create task')
     }
   }
 
   const handleTaskStatus = async (taskId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'Pending' ? 'Completed' : 'Pending'
+    setLocalTasks((prev: any[]) => prev.map((t: any) => t.id === taskId ? { ...t, status: newStatus } : t))
     try {
       await updateTaskStatus(taskId, newStatus)
+      router.refresh()
     } catch (err) {
       console.error(err)
     }
@@ -714,12 +729,12 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
               )}
               
               <div className="space-y-4">
-                {lead.tasks?.length === 0 ? (
+                {localTasks.length === 0 ? (
                   <div className="text-center text-gray-500 py-8 border border-dashed border-[#3C3C3C] rounded-xl font-bold text-xs">
                     No upcoming tasks.
                   </div>
                 ) : (
-                  lead.tasks?.map((task: any) => (
+                  localTasks.map((task: any) => (
                     <div key={task.id} className={`flex items-start gap-3 bg-[#1E1E1E] p-4 rounded-xl border border-[#3C3C3C] transition-all ${task.status === 'Completed' ? 'opacity-50' : 'group hover:border-[#555555]'}`}>
                       <input 
                         type="checkbox" 
