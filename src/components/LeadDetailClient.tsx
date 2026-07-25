@@ -623,7 +623,9 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
                 </div>
               )}
               
-              {localInteractions.map((interaction: any) => (
+              {localInteractions
+                .filter((interaction: any) => !interaction.content?.startsWith('📌 Student lead added to system by'))
+                .map((interaction: any) => (
                 <div key={interaction.id} className="flex gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <div className="h-8 w-8 rounded-xl bg-[#333333] border border-[#3C3C3C] flex items-center justify-center text-[#0E639C]">
