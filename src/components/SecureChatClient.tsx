@@ -20,6 +20,8 @@ import {
   Loader2,
   Users,
   Lock,
+  Share2,
+  Download,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -60,6 +62,18 @@ export default function SecureChatClient({
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDesc, setNewChannelDesc] = useState('')
+
+  // Attachment state (Image & PDF under 5MB)
+  const [selectedAttachment, setSelectedAttachment] = useState<{
+    base64: string
+    name: string
+    type: 'image' | 'pdf'
+    size: number
+  } | null>(null)
+
+  // Message Forwarding state
+  const [forwardingMessage, setForwardingMessage] = useState<any | null>(null)
+  const [forwardSuccessMsg, setForwardSuccessMsg] = useState('')
 
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 
@@ -271,12 +285,47 @@ export default function SecureChatClient({
     })} at ${timeStr}`
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const isImage = file.type.startsWith('image/')
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+
+    if (!isImage && !isPdf) {
+      alert('Only Images (PNG, JPG, WEBP, etc.) and PDF files are allowed.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be under 5MB.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string
+      setSelectedAttachment({
+        base64,
+        name: file.name,
+        type: isImage ? 'image' : 'pdf',
+        size: file.size,
+      })
+    }
+    reader.readAsDataURL(file)
+
+    // Reset input value so same file can be re-selected if removed
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
-    if (!messageText.trim() || sending) return
+    if ((!messageText.trim() && !selectedAttachment) || sending) return
 
     const textToSend = messageText.trim()
+    const attachmentToSend = selectedAttachment
     setMessageText('')
+    setSelectedAttachment(null)
     setShowEmojiPicker(false)
     setSending(true)
 
@@ -287,6 +336,9 @@ export default function SecureChatClient({
       receiverId: selectedRecipient?.id || null,
       channelId: selectedChannel?.id || null,
       content: textToSend,
+      attachmentUrl: attachmentToSend?.base64 || null,
+      attachmentName: attachmentToSend?.name || null,
+      attachmentType: attachmentToSend?.type || null,
       isRead: false,
       createdAt: new Date().toISOString(),
       sender: {
@@ -303,6 +355,9 @@ export default function SecureChatClient({
         receiverId: selectedRecipient?.id,
         channelId: selectedChannel?.id,
         content: textToSend,
+        attachmentUrl: attachmentToSend?.base64,
+        attachmentName: attachmentToSend?.name,
+        attachmentType: attachmentToSend?.type,
       })
 
       if (res.error) {
@@ -313,6 +368,36 @@ export default function SecureChatClient({
       }
     } catch (err) {
       console.error('Failed to send chat message:', err)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const handleForwardMessage = async (target: { userId?: string; channelId?: string }) => {
+    if (!forwardingMessage) return
+    setSending(true)
+
+    try {
+      const res = await sendChatMessage({
+        receiverId: target.userId,
+        channelId: target.channelId,
+        content: forwardingMessage.content,
+        attachmentUrl: forwardingMessage.attachmentUrl,
+        attachmentName: forwardingMessage.attachmentName,
+        attachmentType: forwardingMessage.attachmentType,
+      })
+
+      if (res.error) {
+        alert(res.error)
+      } else {
+        setForwardSuccessMsg('Message forwarded successfully!')
+        setTimeout(() => {
+          setForwardingMessage(null)
+          setForwardSuccessMsg('')
+        }, 1200)
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to forward message')
     } finally {
       setSending(false)
     }
@@ -605,13 +690,51 @@ export default function SecureChatClient({
                         )}
 
                         <div
-                          className={`p-3 rounded-2xl text-xs leading-relaxed shadow-md whitespace-pre-wrap break-words ${
+                          className={`group relative p-3 rounded-2xl text-xs leading-relaxed shadow-md whitespace-pre-wrap break-words ${
                             isOwn
                               ? 'bg-[#007ACC] text-white rounded-tr-none'
                               : 'bg-[#252526] border border-[#3C3C3C] text-gray-200 rounded-tl-none'
                           }`}
                         >
-                          <p>{m.content}</p>
+                          {/* Forward Quick Action */}
+                          <button
+                            onClick={() => setForwardingMessage(m)}
+                            className={`absolute top-2 ${
+                              isOwn ? '-left-7 text-gray-400 hover:text-white' : '-right-7 text-gray-400 hover:text-white'
+                            } opacity-0 group-hover:opacity-100 transition-opacity p-1`}
+                            title="Forward message"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* Attachment Display */}
+                          {m.attachmentUrl && (
+                            <div className="mb-2">
+                              {m.attachmentType === 'image' || m.attachmentUrl.startsWith('data:image/') ? (
+                                <img
+                                  src={m.attachmentUrl}
+                                  alt={m.attachmentName || 'Image'}
+                                  className="max-w-xs max-h-60 rounded-xl object-cover border border-white/10 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => window.open(m.attachmentUrl, '_blank')}
+                                />
+                              ) : (
+                                <a
+                                  href={m.attachmentUrl}
+                                  download={m.attachmentName || 'document.pdf'}
+                                  className="flex items-center gap-2.5 p-2.5 bg-black/25 rounded-xl border border-white/10 hover:bg-black/40 transition-all text-xs font-semibold text-white"
+                                >
+                                  <FileText className="w-5 h-5 text-red-400 shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-bold truncate">{m.attachmentName || 'Document.pdf'}</p>
+                                    <span className="text-[9px] text-gray-300">PDF Document</span>
+                                  </div>
+                                  <Download className="w-4 h-4 text-gray-300 hover:text-white shrink-0" />
+                                </a>
+                              )}
+                            </div>
+                          )}
+
+                          {m.content && <p>{m.content}</p>}
 
                           <div
                             className={`text-[9px] font-mono flex items-center justify-end gap-1 pt-1.5 ${
@@ -642,6 +765,36 @@ export default function SecureChatClient({
 
             {/* Input Footer */}
             <div className="p-3 border-t border-[#3C3C3C] bg-[#252526] shrink-0 relative">
+              {/* Selected Attachment Preview Bar */}
+              {selectedAttachment && (
+                <div className="mb-2 p-2.5 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl flex items-center justify-between text-xs text-gray-200">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {selectedAttachment.type === 'image' ? (
+                      <img
+                        src={selectedAttachment.base64}
+                        alt="Preview"
+                        className="w-8 h-8 rounded-lg object-cover border border-[#3C3C3C]"
+                      />
+                    ) : (
+                      <FileText className="w-6 h-6 text-red-400 shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold truncate text-white">{selectedAttachment.name}</p>
+                      <span className="text-[10px] text-gray-400">
+                        {(selectedAttachment.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedAttachment(null)}
+                    className="p-1 rounded-lg hover:bg-[#333333] text-gray-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
               {showEmojiPicker && (
                 <div className="absolute bottom-16 left-4 bg-[#1E1E1E] border border-[#3C3C3C] p-3 rounded-xl shadow-xl flex flex-wrap gap-2 max-w-xs z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
                   {commonEmojis.map((emoji) => (
@@ -660,6 +813,23 @@ export default function SecureChatClient({
               )}
 
               <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*,application/pdf"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2.5 rounded-xl bg-[#1E1E1E] border border-[#3C3C3C] hover:bg-[#333333] text-gray-400 hover:text-white transition-all shrink-0"
+                  title="Attach Image or PDF (<5MB)"
+                >
+                  <Paperclip className="w-4 h-4 text-[#007ACC]" />
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -683,7 +853,7 @@ export default function SecureChatClient({
 
                 <button
                   type="submit"
-                  disabled={!messageText.trim() || sending}
+                  disabled={(!messageText.trim() && !selectedAttachment) || sending}
                   className="px-4 py-2.5 rounded-xl bg-[#007ACC] text-white hover:bg-[#0062A3] font-bold text-xs transition-all flex items-center gap-1.5 shadow-md disabled:opacity-50 shrink-0"
                 >
                   {sending ? (
@@ -770,6 +940,79 @@ export default function SecureChatClient({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* FORWARD MESSAGE MODAL */}
+      {forwardingMessage && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[#252526] border border-[#3C3C3C] w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-[#3C3C3C] pb-3">
+              <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-[#007ACC]" /> Forward Message
+              </h3>
+              <button
+                onClick={() => setForwardingMessage(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Snippet Preview */}
+            <div className="p-3 bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl text-xs text-gray-300 font-medium">
+              <p className="line-clamp-2">{forwardingMessage.content || '[Attachment]'}</p>
+            </div>
+
+            {forwardSuccessMsg ? (
+              <div className="p-4 text-center text-xs font-bold text-emerald-400 flex items-center justify-center gap-2">
+                <Check className="w-4 h-4" /> {forwardSuccessMsg}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-gray-400">Select Recipient or Channel:</p>
+                <div className="max-h-60 overflow-y-auto space-y-1 divide-y divide-[#3C3C3C]">
+                  {users.map((u) => (
+                    <div
+                      key={u.id}
+                      onClick={() => handleForwardMessage({ userId: u.id })}
+                      className="p-2.5 flex items-center justify-between hover:bg-[#1E1E1E] rounded-xl cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#333333] text-white font-bold text-xs flex items-center justify-center">
+                          {(u.fullName || u.email || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-xs font-bold text-white">
+                          {u.fullName || u.email}
+                        </span>
+                      </div>
+                      <button className="px-3 py-1 rounded-lg bg-[#007ACC] text-white text-[10px] font-bold hover:bg-[#0062A3]">
+                        Forward
+                      </button>
+                    </div>
+                  ))}
+
+                  {channels.map((c) => (
+                    <div
+                      key={c.id}
+                      onClick={() => handleForwardMessage({ channelId: c.id })}
+                      className="p-2.5 flex items-center justify-between hover:bg-[#1E1E1E] rounded-xl cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#007ACC]/15 text-[#007ACC] font-bold text-xs flex items-center justify-center">
+                          #
+                        </div>
+                        <span className="text-xs font-bold text-white">#{c.name}</span>
+                      </div>
+                      <button className="px-3 py-1 rounded-lg bg-[#007ACC] text-white text-[10px] font-bold hover:bg-[#0062A3]">
+                        Forward
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
