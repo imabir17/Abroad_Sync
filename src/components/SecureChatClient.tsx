@@ -709,27 +709,42 @@ export default function SecureChatClient({
 
                           {/* Attachment Display */}
                           {m.attachmentUrl && (
-                            <div className="mb-2">
+                            <div className="mb-2 space-y-1.5">
                               {m.attachmentType === 'image' || m.attachmentUrl.startsWith('data:image/') ? (
-                                <img
-                                  src={m.attachmentUrl}
-                                  alt={m.attachmentName || 'Image'}
-                                  className="max-w-xs max-h-60 rounded-xl object-cover border border-white/10 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
-                                  onClick={() => window.open(m.attachmentUrl, '_blank')}
-                                />
-                              ) : (
-                                <a
-                                  href={m.attachmentUrl}
-                                  download={m.attachmentName || 'document.pdf'}
-                                  className="flex items-center gap-2.5 p-2.5 bg-black/25 rounded-xl border border-white/10 hover:bg-black/40 transition-all text-xs font-semibold text-white"
-                                >
-                                  <FileText className="w-5 h-5 text-red-400 shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-bold truncate">{m.attachmentName || 'Document.pdf'}</p>
-                                    <span className="text-[9px] text-gray-300">PDF Document</span>
+                                <div className="space-y-1">
+                                  <img
+                                    src={m.attachmentUrl}
+                                    alt={m.attachmentName || 'Image'}
+                                    className="max-w-xs max-h-60 rounded-xl object-cover border border-white/10 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() => window.open(m.attachmentUrl, '_blank')}
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <a
+                                      href={m.attachmentUrl}
+                                      download={m.attachmentName || 'chat-image.png'}
+                                      className="px-2 py-1 bg-black/40 hover:bg-black/60 rounded-lg text-[10px] font-bold text-white flex items-center gap-1 border border-white/10 transition-colors"
+                                    >
+                                      <Download className="w-3 h-3 text-emerald-400" /> Download Image
+                                    </a>
                                   </div>
-                                  <Download className="w-4 h-4 text-gray-300 hover:text-white shrink-0" />
-                                </a>
+                                </div>
+                              ) : (
+                                <div className="p-3 bg-black/30 rounded-xl border border-white/15 shadow-sm space-y-2">
+                                  <div className="flex items-center gap-2.5">
+                                    <FileText className="w-6 h-6 text-red-400 shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-bold truncate text-white text-xs">{m.attachmentName || 'Document.pdf'}</p>
+                                      <span className="text-[9px] text-gray-300">PDF Document</span>
+                                    </div>
+                                  </div>
+                                  <a
+                                    href={m.attachmentUrl}
+                                    download={m.attachmentName || 'Document.pdf'}
+                                    className="w-full py-1.5 px-3 rounded-lg bg-[#007ACC] hover:bg-[#0062A3] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                                  >
+                                    <Download className="w-3.5 h-3.5" /> Download Document
+                                  </a>
+                                </div>
                               )}
                             </div>
                           )}
