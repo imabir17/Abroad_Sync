@@ -8,6 +8,8 @@ import LeadDetailClient from '@/components/LeadDetailClient'
 import TransferLeadButton from '@/components/TransferLeadButton'
 import { getStagesAction } from '@/app/actions/stages'
 
+import FormattedDate from '@/components/FormattedDate'
+
 export const dynamic = 'force-dynamic'
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
@@ -76,9 +78,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
               <span className="px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center gap-1.5 shadow-sm">
                 <Clock className="h-3.5 w-3.5 text-amber-400" />
                 Last Contacted: <span className="text-white font-bold">
-                  {lead.contactedAt
-                    ? new Date(lead.contactedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
-                    : 'Not Contacted Yet'}
+                  <FormattedDate date={lead.contactedAt} fallback="Not Contacted Yet" />
                 </span>
               </span>
             </div>
