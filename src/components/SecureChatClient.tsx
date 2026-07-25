@@ -21,6 +21,7 @@ import {
   Users,
   Lock,
 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import {
   getCompanyChatUsers,
   getCompanyChannels,
@@ -62,6 +63,10 @@ export default function SecureChatClient({
 
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 
+  const searchParams = useSearchParams()
+  const targetUserId = searchParams ? searchParams.get('user') : null
+  const targetChannelId = searchParams ? searchParams.get('channel') : null
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -95,9 +100,24 @@ export default function SecureChatClient({
     fetchMessages()
   }, [selectedRecipient?.id, selectedChannel?.id])
 
+  // Auto-select contact or channel from URL search params (e.g. from notification click)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (targetUserId && users.length > 0) {
+      const foundUser = users.find((u) => u.id === targetUserId)
+      if (foundUser) {
+        setSelectedRecipient(foundUser)
+        setSelectedChannel(null)
+        setActiveTab('direct')
+      }
+    } else if (targetChannelId && channels.length > 0) {
+      const foundChan = channels.find((c) => c.id === targetChannelId)
+      if (foundChan) {
+        setSelectedChannel(foundChan)
+        setSelectedRecipient(null)
+        setActiveTab('channels')
+      }
+    }
+  }, [targetUserId, targetChannelId, users, channels])
 
   // Setup Real-time Chat listener via Supabase Broadcast / Postgres Changes
   useEffect(() => {
@@ -113,6 +133,33 @@ export default function SecureChatClient({
         },
         (payload) => {
           const newMsg = payload.new
+
+          // Dynamically update and re-sort contact list (WhatsApp order)
+          const otherUserId = newMsg.senderId === currentUser.id ? newMsg.receiverId : newMsg.senderId
+          if (otherUserId) {
+            setUsers((prev) => {
+              const updated = prev.map((u) => {
+                if (u.id === otherUserId) {
+                  const isCurrentActive = selectedRecipient && selectedRecipient.id === otherUserId
+                  return {
+                    ...u,
+                    lastMessage: newMsg.content,
+                    lastMessageAt: newMsg.createdAt,
+                    unreadCount:
+                      newMsg.senderId !== currentUser.id && !isCurrentActive
+                        ? (u.unreadCount || 0) + 1
+                        : u.unreadCount,
+                  }
+                }
+                return u
+              })
+              // Sort contacts by latest message timestamp descending
+              return [...updated].sort(
+                (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+              )
+            })
+          }
+
           // Check if message belongs to active conversation
           if (
             (selectedRecipient &&
@@ -126,15 +173,6 @@ export default function SecureChatClient({
             })
             if (selectedRecipient && newMsg.senderId === selectedRecipient.id) {
               markChatMessagesAsRead({ senderId: selectedRecipient.id })
-            }
-          } else {
-            // Update unread count for background user
-            if (newMsg.senderId !== currentUser.id && newMsg.receiverId === currentUser.id) {
-              setUsers((prev) =>
-                prev.map((u) =>
-                  u.id === newMsg.senderId ? { ...u, unreadCount: (u.unreadCount || 0) + 1 } : u
-                )
-              )
             }
           }
         }
@@ -432,15 +470,17 @@ export default function SecureChatClient({
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 mt-0.5">
                         <span
-                          className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border ${renderRoleBadge(
+                          className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border shrink-0 ${renderRoleBadge(
                             u.role
                           )}`}
                         >
                           {u.role || 'Staff'}
                         </span>
-                        <span className="text-[10px] text-gray-500 truncate">{u.email}</span>
+                        <span className="text-[10px] text-gray-400 truncate">
+                          {u.lastMessage || u.email}
+                        </span>
                       </div>
                     </div>
                   </div>

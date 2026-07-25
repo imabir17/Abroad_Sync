@@ -21,25 +21,48 @@ export async function getCompanyChatUsers() {
 
     if (error || !users) return { users: [], currentUser: user }
 
-    // Fetch unread message counts for each colleague
-    const { data: unreadMessages } = await admin
+    // Fetch latest messages & unread counts for 1-on-1 chats involving current user
+    const { data: allMessages } = await admin
       .from('ChatMessage')
-      .select('senderId')
+      .select('id, senderId, receiverId, content, isRead, createdAt')
       .eq('companyId', user.companyId)
-      .eq('receiverId', user.id)
-      .eq('isRead', false)
+      .or(`senderId.eq.${user.id},receiverId.eq.${user.id}`)
+      .order('createdAt', { ascending: false })
+      .limit(500)
 
+    const lastMessageMap: Record<string, { content: string; createdAt: string }> = {}
     const unreadMap: Record<string, number> = {}
-    ;(unreadMessages || []).forEach((m: any) => {
-      unreadMap[m.senderId] = (unreadMap[m.senderId] || 0) + 1
+
+    ;(allMessages || []).forEach((m: any) => {
+      const otherId = m.senderId === user.id ? m.receiverId : m.senderId
+      if (!otherId) return
+
+      if (m.receiverId === user.id && !m.isRead) {
+        unreadMap[otherId] = (unreadMap[otherId] || 0) + 1
+      }
+
+      if (!lastMessageMap[otherId]) {
+        lastMessageMap[otherId] = {
+          content: m.content,
+          createdAt: m.createdAt,
+        }
+      }
     })
 
-    const usersWithUnread = users.map((u: any) => ({
+    const usersWithMetadata = users.map((u: any) => ({
       ...u,
       unreadCount: unreadMap[u.id] || 0,
+      lastMessage: lastMessageMap[u.id]?.content || '',
+      lastMessageAt: lastMessageMap[u.id]?.createdAt || u.createdAt,
     }))
 
-    return { users: usersWithUnread, currentUser: user }
+    // Sort contacts by latest message timestamp descending (WhatsApp style)
+    usersWithMetadata.sort(
+      (a: any, b: any) =>
+        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+    )
+
+    return { users: usersWithMetadata, currentUser: user }
   } catch (err) {
     console.error('Error fetching chat users:', err)
     return { users: [], currentUser: user }
@@ -190,7 +213,7 @@ export async function sendChatMessage({
         userIds: [receiverId],
         title: `💬 New Message from ${senderName}`,
         body: content.trim() ? content.trim().slice(0, 100) : 'Sent an attachment',
-        url: '/dashboard/chat',
+        url: `/dashboard/chat?user=${user.id}`,
         type: 'chat_message',
         actorId: user.id,
       })
@@ -274,6 +297,26 @@ export async function updateUserLastSeen() {
     return { success: true }
   } catch (err) {
     return { success: false }
+  }
+}
+
+export async function getUnreadChatCount() {
+  const user = await getUserSession()
+  if (!user) return { unreadChatCount: 0 }
+
+  try {
+    const admin = createAdminClient()
+    const { count, error } = await admin
+      .from('ChatMessage')
+      .select('id', { count: 'exact', head: true })
+      .eq('companyId', user.companyId)
+      .eq('receiverId', user.id)
+      .eq('isRead', false)
+
+    if (error) return { unreadChatCount: 0 }
+    return { unreadChatCount: count || 0 }
+  } catch (err) {
+    return { unreadChatCount: 0 }
   }
 }
 

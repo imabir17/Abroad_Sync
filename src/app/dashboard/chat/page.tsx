@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { getUserSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { getCompanyChatUsers, getCompanyChannels } from '@/app/actions/chat'
@@ -14,11 +15,13 @@ export default async function SecureChatPage() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <SecureChatClient
-        initialUsers={users || []}
-        initialChannels={channels || []}
-        currentUser={user}
-      />
+      <Suspense fallback={<div className="p-8 text-center text-gray-400 text-xs">Loading SecureChat...</div>}>
+        <SecureChatClient
+          initialUsers={users || []}
+          initialChannels={channels || []}
+          currentUser={user}
+        />
+      </Suspense>
     </div>
   )
 }

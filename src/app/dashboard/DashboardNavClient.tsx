@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationCenter from '@/components/NotificationCenter'
+import { getUnreadChatCount } from '@/app/actions/chat'
 
 interface User {
   fullName: string
@@ -25,7 +26,21 @@ export default function DashboardNavClient({
   logoutAction,
 }: DashboardNavClientProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [unreadChatCount, setUnreadChatCount] = useState(0)
   const pathname = usePathname()
+
+  const fetchUnreadChat = async () => {
+    try {
+      const res = await getUnreadChatCount()
+      setUnreadChatCount(res.unreadChatCount || 0)
+    } catch (e) {}
+  }
+
+  useEffect(() => {
+    fetchUnreadChat()
+    const interval = setInterval(fetchUnreadChat, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const navItems = [
     {
@@ -142,7 +157,12 @@ export default function DashboardNavClient({
                       isActive ? 'text-[#007ACC]' : 'text-gray-500 group-hover:text-[#007ACC]'
                     }`}
                   />
-                  {item.label}
+                  <span>{item.label}</span>
+                  {item.href === '/dashboard/chat' && unreadChatCount > 0 && (
+                    <span className="ml-auto px-2 py-0.5 text-[10px] font-extrabold bg-red-500 text-white rounded-full animate-pulse shadow-sm">
+                      {unreadChatCount > 99 ? '99+' : unreadChatCount}
+                    </span>
+                  )}
                 </Link>
               )
             })}
