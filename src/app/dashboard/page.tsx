@@ -87,6 +87,7 @@ export default async function DashboardPage() {
   }
 
   const ratingsCards = ['5', '4', '3', '2', '1', 'Unrated'].map(ratingKey => ({
+    ratingKey,
     name: RATING_LABELS[ratingKey],
     count: ratingsCounts[ratingKey] || 0,
     color: RATING_COLORS_NEW[ratingKey] || '#737373'
@@ -177,7 +178,7 @@ export default async function DashboardPage() {
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {ratingsCards.map(rating => (
-            <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.name)}`}>
+            <Link key={rating.name} href={`/dashboard/leads?rating=${encodeURIComponent(rating.ratingKey)}`}>
               <div className="bg-[#252526] border border-[#3C3C3C] rounded-xl shadow-md p-5 hover:border-[#555555] transition-all flex flex-col justify-between h-28">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-400">{rating.name}</span>

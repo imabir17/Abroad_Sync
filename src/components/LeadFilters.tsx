@@ -149,6 +149,7 @@ export function LeadFilters({
             <option value="3">⭐⭐⭐ (3 Stars)</option>
             <option value="2">⭐⭐ (2 Stars)</option>
             <option value="1">⭐ (1 Star)</option>
+            <option value="Unrated">Unrated</option>
           </select>
 
           <select 

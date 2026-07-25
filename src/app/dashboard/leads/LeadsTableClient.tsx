@@ -49,7 +49,21 @@ const leadsFetcher = async ([, paramsString]: [string, string]) => {
     query = query.eq('stage', stage)
   }
   if (rating) {
-    query = query.eq('rating', rating)
+    if (rating === '5' || rating === '5 Stars' || rating === 'Very Good') {
+      query = query.in('rating', ['5', 'Very Good'])
+    } else if (rating === '4' || rating === '4 Stars' || rating === 'Good') {
+      query = query.in('rating', ['4', 'Good'])
+    } else if (rating === '3' || rating === '3 Stars' || rating === 'Moderate') {
+      query = query.in('rating', ['3', 'Moderate'])
+    } else if (rating === '2' || rating === '2 Stars' || rating === 'Bad') {
+      query = query.in('rating', ['2', 'Bad'])
+    } else if (rating === '1' || rating === '1 Star') {
+      query = query.in('rating', ['1'])
+    } else if (rating === 'Unrated') {
+      query = query.or('rating.eq.Unrated,rating.is.null,rating.eq.""')
+    } else {
+      query = query.eq('rating', rating)
+    }
   }
   if (country) {
     query = query.eq('preferredCountry', country)
