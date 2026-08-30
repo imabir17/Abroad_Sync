@@ -45,7 +45,11 @@ const leadsFetcher = async ([, paramsString, pageIndex]: [string, string, number
     .range(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE - 1)
 
   if (counselorId) {
-    query = query.eq('assignedCounselorId', counselorId)
+    if (counselorId === 'unassigned') {
+      query = query.is('assignedCounselorId', null)
+    } else {
+      query = query.eq('assignedCounselorId', counselorId)
+    }
   }
   if (stage) {
     query = query.eq('stage', stage)

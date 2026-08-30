@@ -54,7 +54,11 @@ export default async function LeadsPage({
     .range(0, 99)
   
   if (counselorId) {
-    query = query.eq('assignedCounselorId', counselorId)
+    if (counselorId === 'unassigned') {
+      query = query.is('assignedCounselorId', null)
+    } else {
+      query = query.eq('assignedCounselorId', counselorId)
+    }
   }
 
   if (q) {

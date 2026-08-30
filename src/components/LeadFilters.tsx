@@ -100,6 +100,7 @@ export function LeadFilters({
                 className={selectClass}
               >
                 <option value="">All Counselors</option>
+                <option value="unassigned">Unassigned</option>
                 {counselors.map(c => (
                   <option key={c.id} value={c.id}>{c.fullName}</option>
                 ))}
