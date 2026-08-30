@@ -48,10 +48,10 @@ export default async function LeadsPage({
   // 3. Build the Supabase query based on search and filters
   let query = supabase
     .from('Lead')
-    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
+    .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)', { count: 'exact' })
     .eq('companyId', user.companyId)
     .order('createdAt', { ascending: false })
-    .limit(10000)
+    .range(0, 99)
   
   if (counselorId) {
     query = query.eq('assignedCounselorId', counselorId)
@@ -95,12 +95,13 @@ export default async function LeadsPage({
     query = query.eq('source', source)
   }
 
-  const { data: leadsData, error: queryError } = await query
+  const { data: leadsData, count, error: queryError } = await query
   console.log('Leads Page Debug:', {
     userId: user.id,
     userRole: user.role,
     userCompanyId: user.companyId,
     leadsCount: leadsData ? leadsData.length : null,
+    totalCount: count,
     searchParams: resolvedSearchParams
   })
   if (queryError) {
@@ -134,7 +135,7 @@ export default async function LeadsPage({
 
       <div className="space-y-6">
         <LeadFilters isAdminOrManager={true} counselors={counselors} sources={allSources} stages={stages} />
-        <LeadsTableClient leads={leads} isAdminOrManager={isAdminOrManager} counselors={counselors} />
+        <LeadsTableClient leads={leads} totalCount={count || 0} isAdminOrManager={isAdminOrManager} counselors={counselors} />
       </div>
     </div>
   )

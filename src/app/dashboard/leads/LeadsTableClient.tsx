@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import useSWR from 'swr'
+import useSWRInfinite from 'swr/infinite'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
 import { Users, ExternalLink, Phone, Mail, FileSpreadsheet, Plus } from 'lucide-react'
@@ -11,7 +11,7 @@ import { StarRating } from '@/components/StarRating'
 import { BulkImportModal } from '@/components/BulkImportModal'
 
 // SWR Client Fetcher
-const leadsFetcher = async ([, paramsString]: [string, string]) => {
+const leadsFetcher = async ([, paramsString, pageIndex]: [string, string, number]) => {
   const params = new URLSearchParams(paramsString)
   const q = params.get('q') || ''
   const stage = params.get('stage') || ''
@@ -36,12 +36,13 @@ const leadsFetcher = async ([, paramsString]: [string, string]) => {
 
   if (!userProfile) return []
 
+  const PAGE_SIZE = 100
   let query = supabase
     .from('Lead')
     .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
     .eq('companyId', userProfile.companyId)
     .order('createdAt', { ascending: false })
-    .limit(10000)
+    .range(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE - 1)
 
   if (counselorId) {
     query = query.eq('assignedCounselorId', counselorId)
@@ -90,10 +91,12 @@ const leadsFetcher = async ([, paramsString]: [string, string]) => {
 
 export default function LeadsTableClient({ 
   leads, 
+  totalCount,
   isAdminOrManager, 
   counselors 
 }: { 
   leads: any[]
+  totalCount: number
   isAdminOrManager: boolean
   counselors: any[] 
 }) {
@@ -122,18 +125,37 @@ export default function LeadsTableClient({
   const searchParams = useSearchParams()
   const paramsString = searchParams.toString()
 
-  const { data: clientLeads, mutate } = useSWR(
-    ['leads', paramsString],
+  const getKey = useCallback((pageIndex: number, previousPageData: any) => {
+    if (previousPageData && !previousPageData.length) return null // reached the end
+    return ['leads', paramsString, pageIndex] // SWR key
+  }, [paramsString])
+
+  const { data, mutate, size, setSize, isValidating } = useSWRInfinite(
+    getKey,
     leadsFetcher,
     {
-      fallbackData: leads,
+      fallbackData: [leads],
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
       dedupingInterval: 5000
     }
   )
 
-  const activeLeads = clientLeads || leads
+  const activeLeads = data ? data.flat() : leads
+
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isValidating) return
+    if (observerRef.current) observerRef.current.disconnect()
+    
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && activeLeads.length < totalCount) {
+        setSize(size + 1)
+      }
+    })
+    
+    if (node) observerRef.current.observe(node)
+  }, [isValidating, activeLeads.length, totalCount, size, setSize])
 
   const toggleLead = (id: string) => {
     setSelectedLeadIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -167,7 +189,7 @@ export default function LeadsTableClient({
       {/* Top Action Toolbar: Bulk Import Button */}
       <div className="bg-[#1E1E1E] px-6 py-3.5 flex items-center justify-between border-b border-[#3C3C3C]">
         <div className="text-xs text-gray-400 font-medium">
-          Showing <span className="text-white font-bold">{activeLeads.length}</span> leads
+          Showing <span className="text-white font-bold">{activeLeads.length}</span> of <span className="text-white font-bold">{totalCount}</span> leads
         </div>
 
         <button
@@ -383,6 +405,15 @@ export default function LeadsTableClient({
           </div>
         )}
       </div>
+      
+      {activeLeads.length > 0 && activeLeads.length < totalCount && (
+        <div ref={lastElementRef} className="py-6 flex justify-center items-center">
+          <div className="animate-pulse flex items-center gap-2 text-gray-400 text-xs font-bold">
+            <div className="w-4 h-4 rounded-full border-2 border-gray-400 border-t-transparent animate-spin"></div>
+            Loading more leads...
+          </div>
+        </div>
+      )}
 
       <BulkImportModal
         isOpen={isImportModalOpen}
