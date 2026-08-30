@@ -45,6 +45,7 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
     .from('Lead')
     .select('id, stage, rating, isFileOpened, fileOpenedAt, contactedAt, assignedAt, createdAt, createdById, assignedCounselorId')
     .eq('companyId', user.companyId)
+    .limit(10000)
 
   if (leadsError || !allLeads) {
     throw new Error('Failed to fetch leads: ' + (leadsError?.message || 'Unknown error'))

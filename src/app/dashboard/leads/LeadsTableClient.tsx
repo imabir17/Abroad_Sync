@@ -41,6 +41,7 @@ const leadsFetcher = async ([, paramsString]: [string, string]) => {
     .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
     .eq('companyId', userProfile.companyId)
     .order('createdAt', { ascending: false })
+    .limit(10000)
 
   if (counselorId) {
     query = query.eq('assignedCounselorId', counselorId)

@@ -28,6 +28,7 @@ export default async function PipelinePage() {
       assignedCounselor:User!Lead_assignedCounselorId_fkey(fullName)
     `)
     .eq('companyId', user.companyId)
+    .limit(10000)
 
   // Scope to counselor leads if Counselor role
   if (isCounselor) {

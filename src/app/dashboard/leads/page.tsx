@@ -51,6 +51,7 @@ export default async function LeadsPage({
     .select('*, assignedCounselor:User!Lead_assignedCounselorId_fkey(*)')
     .eq('companyId', user.companyId)
     .order('createdAt', { ascending: false })
+    .limit(10000)
   
   if (counselorId) {
     query = query.eq('assignedCounselorId', counselorId)

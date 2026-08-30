@@ -33,12 +33,14 @@ export default async function DashboardPage() {
     .from('Lead')
     .select('rating, stage')
     .eq('companyId', user.companyId)
+    .limit(10000)
 
   // 2. Fetch tasks concurrently
   let tasksQuery = supabase
     .from('Task')
     .select('*, lead:Lead(fullName), counselor:User!inner(companyId)')
     .order('dueDate', { ascending: false })
+    .limit(10000)
 
   if (!isAdminOrManager) {
     tasksQuery = tasksQuery.eq('counselorId', user.id)
