@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { createPortal } from 'react-dom'
 import { createClient } from '@/utils/supabase/client'
 import { createTask, updateTaskStatus, deleteTask } from '@/app/actions/tasks'
-import { CheckSquare, Clock, Plus, Trash2, X, AlertTriangle, Calendar, User, Loader2 } from 'lucide-react'
+import { CheckSquare, Clock, Plus, Trash2, X, AlertTriangle, Calendar, User, Loader2, ChevronDown, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 // SWR Tasks Fetcher
@@ -56,6 +56,7 @@ export default function TasksClient({
   currentUser: any 
 }) {
   const [mounted, setMounted] = useState(false)
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({ 
     description: '', 
@@ -282,15 +283,26 @@ export default function TasksClient({
 
           return (
             <div key={counselorName} className="space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#0E639C] px-1">
-                <span className="w-2 h-2 rounded-full bg-[#0E639C]"></span>
+              <button 
+                onClick={() => setExpandedGroups(prev => ({ ...prev, [counselorName]: !prev[counselorName] }))}
+                className="flex items-center gap-2 text-xs font-bold text-[#0E639C] px-1 py-1 rounded hover:bg-[#0E639C]/10 transition-colors w-full text-left"
+              >
+                {expandedGroups[counselorName] ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
                 <span>{counselorName}</span>
                 <span className="text-[10px] bg-[#0E639C]/10 px-2 py-0.5 rounded-full">{counselorTasks.length}</span>
                 {pendingCount > 0 && (
                   <span className="text-[10px] text-gray-400 font-semibold ml-2">{pendingCount} pending</span>
                 )}
-              </div>
-              <div>{counselorTasks.map(renderTaskRow)}</div>
+              </button>
+              {expandedGroups[counselorName] && (
+                <div className="pl-2">
+                  {counselorTasks.map(renderTaskRow)}
+                </div>
+              )}
             </div>
           )
         })}
