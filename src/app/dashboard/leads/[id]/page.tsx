@@ -7,7 +7,7 @@ import { LeadStatusDropdowns } from '@/components/LeadStatusDropdowns'
 import LeadDetailClient from '@/components/LeadDetailClient'
 import TransferLeadButton from '@/components/TransferLeadButton'
 import { getStagesAction } from '@/app/actions/stages'
-
+import EditableLeadName from '@/components/EditableLeadName'
 import FormattedDate from '@/components/FormattedDate'
 
 export const dynamic = 'force-dynamic'
@@ -70,7 +70,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
           </Link>
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
-              <h2 className="text-2xl font-bold text-white font-display">{lead.fullName}</h2>
+              <EditableLeadName leadId={lead.id} initialName={lead.fullName} canEdit={canEdit} />
               <span className="px-3 py-1 rounded-xl bg-[#007ACC]/15 border border-[#007ACC]/40 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
                 <UserCheck className="h-3.5 w-3.5 text-[#007ACC]" />
                 Assigned Counselor: <span className="text-[#007ACC] font-extrabold">{lead.assignedCounselor?.fullName || 'Unassigned'}</span>

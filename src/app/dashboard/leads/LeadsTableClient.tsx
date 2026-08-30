@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import useSWRInfinite from 'swr/infinite'
+import useSWR from 'swr'
 import { createClient } from '@/utils/supabase/client'
 import { bulkTransferLeads } from '@/app/actions/leads'
 import { Users, ExternalLink, Phone, Mail, FileSpreadsheet, Plus } from 'lucide-react'
@@ -125,37 +125,25 @@ export default function LeadsTableClient({
   const searchParams = useSearchParams()
   const paramsString = searchParams.toString()
 
-  const getKey = useCallback((pageIndex: number, previousPageData: any) => {
-    if (previousPageData && !previousPageData.length) return null // reached the end
-    return ['leads', paramsString, pageIndex] // SWR key
+  const [pageIndex, setPageIndex] = useState(0)
+
+  useEffect(() => {
+    setPageIndex(0)
   }, [paramsString])
 
-  const { data, mutate, size, setSize, isValidating } = useSWRInfinite(
-    getKey,
+  const { data: clientLeads, mutate, isValidating } = useSWR(
+    ['leads', paramsString, pageIndex],
     leadsFetcher,
     {
-      fallbackData: [leads],
+      fallbackData: pageIndex === 0 ? leads : undefined,
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      dedupingInterval: 5000
+      dedupingInterval: 5000,
+      keepPreviousData: true
     }
   )
 
-  const activeLeads = data ? data.flat() : leads
-
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (isValidating) return
-    if (observerRef.current) observerRef.current.disconnect()
-    
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && activeLeads.length < totalCount) {
-        setSize(size + 1)
-      }
-    })
-    
-    if (node) observerRef.current.observe(node)
-  }, [isValidating, activeLeads.length, totalCount, size, setSize])
+  const activeLeads = clientLeads || []
 
   const toggleLead = (id: string) => {
     setSelectedLeadIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -405,15 +393,25 @@ export default function LeadsTableClient({
           </div>
         )}
       </div>
-      
-      {activeLeads.length > 0 && activeLeads.length < totalCount && (
-        <div ref={lastElementRef} className="py-6 flex justify-center items-center">
-          <div className="animate-pulse flex items-center gap-2 text-gray-400 text-xs font-bold">
-            <div className="w-4 h-4 rounded-full border-2 border-gray-400 border-t-transparent animate-spin"></div>
-            Loading more leads...
-          </div>
-        </div>
-      )}
+      <div className="bg-[#1E1E1E] px-6 py-4 border-t border-[#3C3C3C] flex items-center justify-between">
+        <button
+          disabled={pageIndex === 0}
+          onClick={() => setPageIndex(p => Math.max(0, p - 1))}
+          className="px-4 py-2 bg-[#252526] hover:bg-[#333333] disabled:opacity-50 text-white text-xs font-bold rounded-xl border border-[#3C3C3C] transition-all"
+        >
+          Previous
+        </button>
+        <span className="text-xs font-bold text-gray-400">
+          Page {pageIndex + 1} of {Math.ceil(totalCount / 100) || 1}
+        </span>
+        <button
+          disabled={(pageIndex + 1) * 100 >= totalCount}
+          onClick={() => setPageIndex(p => p + 1)}
+          className="px-4 py-2 bg-[#252526] hover:bg-[#333333] disabled:opacity-50 text-white text-xs font-bold rounded-xl border border-[#3C3C3C] transition-all"
+        >
+          Next
+        </button>
+      </div>
 
       <BulkImportModal
         isOpen={isImportModalOpen}

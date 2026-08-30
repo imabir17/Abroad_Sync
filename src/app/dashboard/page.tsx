@@ -27,15 +27,16 @@ export default async function DashboardPage() {
 
   const isAdminOrManager = user.role === 'Super Admin' || user.role === 'Manager'
   const supabase = await createClient()
+  // 1. Fetch custom stages first to build count queries
+  const stages = await getStagesAction()
+  const stageListNames = stages.length > 0 ? stages.map(s => s.name) : LEAD_STAGES
 
-  // 1. Fetch leads for statistics (calculating count and groupings in memory to save network overhead)
-  const leadsQuery = supabase
+  // 2. Build concurrent count queries for precise dashboard stats without hitting data limits
+  const leadsCountQuery = supabase
     .from('Lead')
-    .select('rating, stage', { count: 'exact' })
+    .select('id', { count: 'exact', head: true })
     .eq('companyId', user.companyId)
-    .limit(10000)
 
-  // 2. Fetch tasks concurrently
   let tasksQuery = supabase
     .from('Task')
     .select('*, lead:Lead(fullName), counselor:User!inner(companyId)')
@@ -48,26 +49,49 @@ export default async function DashboardPage() {
     tasksQuery = tasksQuery.eq('counselor.companyId', user.companyId)
   }
 
-  const [leadsRes, tasksRes] = await Promise.all([leadsQuery, tasksQuery])
+  const ratingKeys = ['5', '4', '3', '2', '1', 'Unrated']
+  const ratingQueries = ratingKeys.map(rating => {
+    let q = supabase.from('Lead').select('id', { count: 'exact', head: true }).eq('companyId', user.companyId)
+    if (rating === '5') q = q.in('rating', ['5', 'Very Good'])
+    else if (rating === '4') q = q.in('rating', ['4', 'Good'])
+    else if (rating === '3') q = q.in('rating', ['3', 'Moderate'])
+    else if (rating === '2') q = q.in('rating', ['2', 'Bad'])
+    else if (rating === '1') q = q.in('rating', ['1', '1 Star'])
+    else if (rating === 'Unrated') q = q.or('rating.eq.Unrated,rating.is.null,rating.eq.""')
+    return q
+  })
 
-  const leadsForStats = leadsRes.data || []
-  const allTasks = tasksRes.data || []
+  const stageQueries = stageListNames.map(stage => {
+    let q = supabase.from('Lead').select('id', { count: 'exact', head: true }).eq('companyId', user.companyId)
+    if (stage === 'New') {
+      q = q.or('stage.eq.New,stage.is.null,stage.eq.""')
+    } else {
+      q = q.eq('stage', stage)
+    }
+    return q
+  })
+
+  // Execute all queries in parallel
+  const allQueries = [leadsCountQuery, tasksQuery, ...ratingQueries, ...stageQueries]
+  const results = await Promise.all(allQueries)
+
+  const leadsRes = results[0]
+  const tasksRes = results[1]
+  const ratingsResults = results.slice(2, 2 + ratingKeys.length)
+  const stagesResults = results.slice(2 + ratingKeys.length)
 
   const totalLeads = leadsRes.count || 0
+  const allTasks = tasksRes.data || []
   const pendingCount = allTasks.filter(t => t.status === 'Pending').length
 
-  // 3. Process Ratings Data in memory (handling legacy and star ratings)
   const ratingsCounts: Record<string, number> = {}
-  leadsForStats.forEach(lead => {
-    const ratingStr = lead.rating || 'Unrated'
-    let ratingVal = 'Unrated'
-    if (ratingStr === 'Very Good') ratingVal = '5'
-    else if (ratingStr === 'Good') ratingVal = '4'
-    else if (ratingStr === 'Moderate') ratingVal = '3'
-    else if (ratingStr === 'Bad') ratingVal = '2'
-    else if (['1', '2', '3', '4', '5'].includes(ratingStr)) ratingVal = ratingStr
-    
-    ratingsCounts[ratingVal] = (ratingsCounts[ratingVal] || 0) + 1
+  ratingKeys.forEach((key, idx) => {
+    ratingsCounts[key] = ratingsResults[idx].count || 0
+  })
+
+  const stagesCounts: Record<string, number> = {}
+  stageListNames.forEach((stage, idx) => {
+    stagesCounts[stage] = stagesResults[idx].count || 0
   })
 
   const RATING_LABELS: Record<string, string> = {
@@ -104,16 +128,6 @@ export default async function DashboardPage() {
   const veryGoodCount = ratingsCounts['5'] || 0
   const goodCount = ratingsCounts['4'] || 0
   const conversionRate = totalLeads > 0 ? Math.round(((veryGoodCount + goodCount) / totalLeads) * 100) : 0
-
-  // 4. Fetch custom stages and process in memory
-  const stages = await getStagesAction()
-  const stageListNames = stages.length > 0 ? stages.map(s => s.name) : LEAD_STAGES
-
-  const stagesCounts: Record<string, number> = {}
-  leadsForStats.forEach(lead => {
-    const stage = lead.stage || 'New'
-    stagesCounts[stage] = (stagesCounts[stage] || 0) + 1
-  })
 
   const stagesCards = stageListNames.map((stage, i) => ({
     name: stage,

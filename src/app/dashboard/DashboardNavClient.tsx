@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, Users, UserSquare, LogOut, CheckSquare, BarChart, Menu, X, Settings, Kanban, Globe, CreditCard, QrCode, MessageSquare, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NotificationCenter from '@/components/NotificationCenter'
+import GlobalSearchClient from '@/components/GlobalSearchClient'
 import { getUnreadChatCount } from '@/app/actions/chat'
 
 interface User {
@@ -234,7 +235,17 @@ export default function DashboardNavClient({
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center flex-1 ml-4 justify-end gap-3">
+            <GlobalSearchClient />
+            
+            <Link 
+              href="/dashboard/leads/new" 
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#007ACC] text-white text-xs font-bold rounded-lg hover:bg-[#1177BB] transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Lead
+            </Link>
+
             <NotificationCenter />
           </div>
         </header>
