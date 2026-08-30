@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   // 1. Fetch leads for statistics (calculating count and groupings in memory to save network overhead)
   const leadsQuery = supabase
     .from('Lead')
-    .select('rating, stage')
+    .select('rating, stage', { count: 'exact' })
     .eq('companyId', user.companyId)
     .limit(10000)
 
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
   const leadsForStats = leadsRes.data || []
   const allTasks = tasksRes.data || []
 
-  const totalLeads = leadsForStats.length
+  const totalLeads = leadsRes.count || 0
   const pendingCount = allTasks.filter(t => t.status === 'Pending').length
 
   // 3. Process Ratings Data in memory (handling legacy and star ratings)
