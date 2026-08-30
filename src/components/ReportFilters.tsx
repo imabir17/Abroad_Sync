@@ -47,6 +47,7 @@ export function ReportFilters({
           onChange={(e) => setDateRange(e.target.value)}
           className={selectClass}
         >
+          <option value="today">Today</option>
           <option value="thisWeek">This Week</option>
           <option value="thisMonth">This Month</option>
           <option value="lastMonth">Last Month</option>

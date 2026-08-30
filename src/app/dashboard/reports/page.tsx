@@ -5,6 +5,7 @@ import { generateReports, getAllCounselors } from '@/app/actions/reports'
 import { ReportFilters } from '@/components/ReportFilters'
 import { ReportCharts } from '@/components/ReportCharts'
 import { DownloadPDFButton } from '@/components/DownloadPDFButton'
+import { DownloadMasterReportButton } from '@/components/DownloadMasterReportButton'
 
 // In Next.js 15+, searchParams is a promise
 export default async function ReportsPage({
@@ -29,7 +30,11 @@ export default async function ReportsPage({
   let startDate = new Date()
   let endDate = new Date()
 
-  if (range === 'thisWeek') {
+  if (range === 'today') {
+    startDate.setHours(0, 0, 0, 0)
+    endDate = new Date(startDate)
+    endDate.setHours(23, 59, 59, 999)
+  } else if (range === 'thisWeek') {
     const day = startDate.getDay()
     startDate.setDate(startDate.getDate() - day)
     startDate.setHours(0, 0, 0, 0)
@@ -61,11 +66,20 @@ export default async function ReportsPage({
 
   return (
     <div className="space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white font-display">Counselor Performance Reports</h2>
           <p className="text-xs text-gray-400">Detailed metrics tracking counselor application progress and timelines.</p>
         </div>
+        {isAdmin && reports.length > 0 && (
+          <DownloadMasterReportButton 
+            reports={reports}
+            dateRange={`${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`}
+            filename={`Master-Performance-Report-${startDate.toISOString().split('T')[0]}.pdf`}
+            companyName={company?.name}
+            companyLogoUrl={company?.logoUrl}
+          />
+        )}
       </div>
 
       <ReportFilters counselors={counselors} isAdmin={isAdmin} />
@@ -101,35 +115,47 @@ export default async function ReportsPage({
 
               <div className="p-6 space-y-8">
                 {/* Metrics Breakdown Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-5 flex flex-col justify-center items-center text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
                     <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Leads Handed</span>
                     <span className="text-2xl font-black text-[#007ACC] font-display">{report.leadsHanded}</span>
                     <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Assigned in period</span>
                   </div>
                   
-                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-5 flex flex-col justify-center items-center text-center">
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
                     <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Leads Contacted</span>
                     <span className="text-2xl font-black text-[#FF7A52] font-display">{report.leadsContacted}</span>
                     <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">First touch in period</span>
                   </div>
 
-                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-5 flex flex-col justify-center items-center text-center">
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
                     <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Files Opened</span>
                     <span className="text-2xl font-black text-[#21C285] font-display">{report.filesOpened}</span>
                     <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Opened in period</span>
                   </div>
                   
-                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-5 flex flex-col justify-center items-center text-center">
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
                     <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Leads Created</span>
                     <span className="text-2xl font-black text-[#12A8B5] font-display">{report.leadsCreated}</span>
                     <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Generated by counselor</span>
                   </div>
 
-                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-5 flex flex-col justify-center items-center text-center">
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
                     <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Active Pipeline</span>
                     <span className="text-2xl font-black text-white font-display">{report.activePipeline}</span>
                     <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Total currently assigned</span>
+                  </div>
+
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
+                    <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Tasks Due</span>
+                    <span className="text-2xl font-black text-[#E5484D] font-display">{report.tasksDue}</span>
+                    <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Due in period</span>
+                  </div>
+
+                  <div className="bg-[#1E1E1E] shadow-sm border border-[#3C3C3C] rounded-xl p-4 flex flex-col justify-center items-center text-center">
+                    <span className="text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-wider">Tasks Done</span>
+                    <span className="text-2xl font-black text-[#1FAE73] font-display">{report.tasksCompleted}</span>
+                    <span className="text-[9px] text-gray-400 font-semibold mt-1.5 leading-tight">Completed in period</span>
                   </div>
                 </div>
 

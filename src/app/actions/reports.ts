@@ -11,6 +11,8 @@ export interface CounselorReport {
   filesOpened: number;
   leadsCreated: number;
   activePipeline: number;
+  tasksDue: number;
+  tasksCompleted: number;
   stageBreakdown: { stage: string; count: number }[];
 }
 
@@ -50,6 +52,11 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
   if (leadsError || !allLeads) {
     throw new Error('Failed to fetch leads: ' + (leadsError?.message || 'Unknown error'))
   }
+
+  const { data: allTasks } = await supabase
+    .from('Task')
+    .select('id, counselorId, dueDate, status')
+    .in('counselorId', counselors.map(c => c.id))
 
   const startMs = new Date(startDate).getTime()
   const endMs = new Date(endDate).getTime()
@@ -109,8 +116,21 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
     const leadsCreated = counselorLeadsCreated.length
     const activePipeline = counselorActivePipeline.length
 
-    // Only add to report if they actually had activity or if we are filtering for a specific counselor
-    if (leadsHanded > 0 || activePipeline > 0 || leadsCreated > 0 || filesOpened > 0 || targetCounselorId) {
+    const counselorTasks = (allTasks || []).filter(t => t.counselorId === counselor.id)
+    let tasksDue = 0
+    let tasksCompleted = 0
+
+    counselorTasks.forEach(task => {
+      const dueTime = new Date(task.dueDate).getTime()
+      if (dueTime >= startMs && dueTime <= endMs) {
+        tasksDue++
+        if (task.status === 'Completed') {
+          tasksCompleted++
+        }
+      }
+    })
+
+    if (leadsHanded > 0 || activePipeline > 0 || leadsCreated > 0 || filesOpened > 0 || tasksDue > 0 || targetCounselorId) {
       reports.push({
         counselorId: counselor.id,
         counselorName: counselor.fullName,
@@ -119,6 +139,8 @@ export async function generateReports(startDate: Date, endDate: Date, counselorI
         filesOpened,
         leadsCreated,
         activePipeline,
+        tasksDue,
+        tasksCompleted,
         stageBreakdown
       })
     }
