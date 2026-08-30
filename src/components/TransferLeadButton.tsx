@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { transferLead } from '@/app/actions/leads'
 import { ArrowRightLeft } from 'lucide-react'
 
-export default function TransferLeadButton({ leadId, currentCounselorId, counselors }: { leadId: string, currentCounselorId: string, counselors: any[] }) {
+export default function TransferLeadButton({ leadId, currentCounselorId, counselors }: { leadId: string, currentCounselorId: string | null, counselors: any[] }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState(currentCounselorId)
+  const currentIdResolved = currentCounselorId || 'unassigned'
+  const [selectedId, setSelectedId] = useState(currentIdResolved)
   const [isTransferring, setIsTransferring] = useState(false)
 
   const handleTransfer = async () => {
-    if (!selectedId || selectedId === currentCounselorId) {
+    if (!selectedId || selectedId === currentIdResolved) {
       setIsOpen(false)
       return
     }
@@ -40,6 +41,7 @@ export default function TransferLeadButton({ leadId, currentCounselorId, counsel
             className="w-full bg-neutral-950 border border-neutral-700 rounded-lg p-2 text-sm text-white mb-3 focus:ring-1 focus:ring-blue-500"
           >
             <option value="">Select Counselor</option>
+            <option value="unassigned">Unassigned</option>
             {counselors.map(c => (
               <option key={c.id} value={c.id}>{c.fullName}</option>
             ))}
@@ -48,7 +50,7 @@ export default function TransferLeadButton({ leadId, currentCounselorId, counsel
             <button onClick={() => setIsOpen(false)} className="px-3 py-1.5 text-xs text-neutral-400 hover:text-white">Cancel</button>
             <button 
               onClick={handleTransfer} 
-              disabled={isTransferring || !selectedId || selectedId === currentCounselorId}
+              disabled={isTransferring || !selectedId || selectedId === currentIdResolved}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium disabled:opacity-50"
             >
               {isTransferring ? 'Saving...' : 'Confirm'}

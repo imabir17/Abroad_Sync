@@ -10,6 +10,8 @@ export default function LeadDetailClient({ lead, canEdit = true }: { lead: any, 
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
+    email: lead.email || '',
+    phone: lead.phone || '',
     sscGroup: lead.sscGroup || '',
     sscYear: lead.sscYear || '',
     sscResult: lead.sscResult || '',

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Eraser } from 'lucide-react'
 
 // Translation utility for legacy text ratings to star ratings
 export function getStarCount(rating: string | null | undefined): number {
@@ -65,6 +65,18 @@ export function StarRating({ rating, onChange, editable = true, size = 16 }: Sta
           </button>
         )
       })}
+      
+      {editable && currentStars > 0 && (
+        <button
+          type="button"
+          onClick={() => onChange && onChange('Unrated')}
+          className="ml-1.5 p-1 rounded-md text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition-all cursor-pointer"
+          title="Clear Rating"
+          aria-label="Clear Rating"
+        >
+          <Eraser style={{ width: size * 0.9, height: size * 0.9 }} />
+        </button>
+      )}
     </div>
   )
 }

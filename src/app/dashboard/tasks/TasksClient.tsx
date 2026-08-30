@@ -158,32 +158,20 @@ export default function TasksClient({
       .toUpperCase()
   }
 
-  // Group tasks by urgency/date
-  const now = new Date()
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)
-
-  const overdueTasks: any[] = []
-  const todayTasks: any[] = []
-  const upcomingTasks: any[] = []
-  const completedTasks: any[] = []
-
+  const groupedTasks: Record<string, any[]> = {}
+  
   activeTasks.forEach(task => {
-    if (task.status === 'Completed') {
-      completedTasks.push(task)
-      return
+    const name = task.counselor?.fullName || 'Unassigned'
+    if (!groupedTasks[name]) {
+      groupedTasks[name] = []
     }
+    groupedTasks[name].push(task)
+  })
 
-    const due = new Date(task.dueDate)
-    const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate())
-
-    if (dueDay < todayStart) {
-      overdueTasks.push(task)
-    } else if (dueDay.getTime() === todayStart.getTime()) {
-      todayTasks.push(task)
-    } else {
-      upcomingTasks.push(task)
-    }
+  const sortedNames = Object.keys(groupedTasks).sort((a, b) => {
+    if (a === 'Unassigned') return 1
+    if (b === 'Unassigned') return -1
+    return a.localeCompare(b)
   })
 
   const inputClass = "w-full bg-[#1E1E1E] border border-[#3C3C3C] rounded-xl py-2.5 px-4 text-xs font-semibold text-white placeholder-gray-500 focus:outline-none focus:border-[#007ACC] shadow-sm transition-all"
@@ -287,57 +275,25 @@ export default function TasksClient({
       {/* Main groupings */}
       <div className="space-y-8">
         
-        {/* 1. Overdue Section */}
-        {overdueTasks.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#E5484D] px-1">
-              <span className="w-2 h-2 rounded-full bg-[#E5484D]"></span>
-              <span>Overdue</span>
-              <span className="text-[10px] bg-[#E5484D]/10 px-2 py-0.5 rounded-full">{overdueTasks.length}</span>
-            </div>
-            <div>{overdueTasks.map(renderTaskRow)}</div>
-          </div>
-        )}
+        {sortedNames.map(counselorName => {
+          const counselorTasks = groupedTasks[counselorName]
+          const completedCount = counselorTasks.filter(t => t.status === 'Completed').length
+          const pendingCount = counselorTasks.length - completedCount
 
-        {/* 2. Today Section */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#4855E4] px-1">
-            <span className="w-2 h-2 rounded-full bg-[#4855E4]"></span>
-            <span>Today</span>
-            <span className="text-[10px] bg-[#4855E4]/10 px-2 py-0.5 rounded-full">{todayTasks.length}</span>
-          </div>
-          {todayTasks.length === 0 ? (
-            <div className="bg-[#252526] rounded-2xl border border-[#3C3C3C] shadow-md p-6 text-center text-xs font-bold text-gray-500">
-              No tasks scheduled for today.
+          return (
+            <div key={counselorName} className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#0E639C] px-1">
+                <span className="w-2 h-2 rounded-full bg-[#0E639C]"></span>
+                <span>{counselorName}</span>
+                <span className="text-[10px] bg-[#0E639C]/10 px-2 py-0.5 rounded-full">{counselorTasks.length}</span>
+                {pendingCount > 0 && (
+                  <span className="text-[10px] text-gray-400 font-semibold ml-2">{pendingCount} pending</span>
+                )}
+              </div>
+              <div>{counselorTasks.map(renderTaskRow)}</div>
             </div>
-          ) : (
-            <div>{todayTasks.map(renderTaskRow)}</div>
-          )}
-        </div>
-
-        {/* 3. Upcoming Section */}
-        {upcomingTasks.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#12A8B5] px-1">
-              <span className="w-2 h-2 rounded-full bg-[#12A8B5]"></span>
-              <span>Upcoming</span>
-              <span className="text-[10px] bg-[#12A8B5]/10 px-2 py-0.5 rounded-full">{upcomingTasks.length}</span>
-            </div>
-            <div>{upcomingTasks.map(renderTaskRow)}</div>
-          </div>
-        )}
-
-        {/* 4. Completed Section */}
-        {completedTasks.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#1FAE73] px-1">
-              <span className="w-2 h-2 rounded-full bg-[#1FAE73]"></span>
-              <span>Completed</span>
-              <span className="text-[10px] bg-[#1FAE73]/10 px-2 py-0.5 rounded-full">{completedTasks.length}</span>
-            </div>
-            <div>{completedTasks.map(renderTaskRow)}</div>
-          </div>
-        )}
+          )
+        })}
 
         {activeTasks.length === 0 && (
           <div className="bg-[#252526] rounded-2xl border border-[#3C3C3C] shadow-md p-12 text-center text-xs font-bold text-gray-500">

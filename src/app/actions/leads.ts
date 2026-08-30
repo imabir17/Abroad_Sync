@@ -389,20 +389,22 @@ export async function transferLead(leadId: string, newCounselorId: string) {
     throw new Error('Unauthorized to transfer this lead')
   }
 
-  const { data: counselor } = await supabase
-    .from('User')
-    .select('id')
-    .eq('id', newCounselorId)
-    .eq('companyId', user.companyId)
-    .single()
+  if (newCounselorId && newCounselorId !== 'unassigned') {
+    const { data: counselor } = await supabase
+      .from('User')
+      .select('id')
+      .eq('id', newCounselorId)
+      .eq('companyId', user.companyId)
+      .single()
 
-  if (!counselor) throw new Error('Counselor not found in your company')
+    if (!counselor) throw new Error('Counselor not found in your company')
+  }
 
   const { error: updateError } = await supabase
     .from('Lead')
     .update({ 
-      assignedCounselorId: newCounselorId,
-      assignedAt: new Date().toISOString()
+      assignedCounselorId: newCounselorId === 'unassigned' ? null : newCounselorId,
+      assignedAt: newCounselorId === 'unassigned' ? null : new Date().toISOString()
     })
     .eq('id', leadId)
 
@@ -434,20 +436,22 @@ export async function bulkTransferLeads(leadIds: string[], newCounselorId: strin
   }
 
   const supabase = await createClient()
-  const { data: counselor } = await supabase
-    .from('User')
-    .select('id')
-    .eq('id', newCounselorId)
-    .eq('companyId', user.companyId)
-    .single()
+  if (newCounselorId && newCounselorId !== 'unassigned') {
+    const { data: counselor } = await supabase
+      .from('User')
+      .select('id')
+      .eq('id', newCounselorId)
+      .eq('companyId', user.companyId)
+      .single()
 
-  if (!counselor) throw new Error('Counselor not found in your company')
+    if (!counselor) throw new Error('Counselor not found in your company')
+  }
 
   const { error: updateError } = await supabase
     .from('Lead')
     .update({ 
-      assignedCounselorId: newCounselorId,
-      assignedAt: new Date().toISOString()
+      assignedCounselorId: newCounselorId === 'unassigned' ? null : newCounselorId,
+      assignedAt: newCounselorId === 'unassigned' ? null : new Date().toISOString()
     })
     .in('id', leadIds)
     .eq('companyId', user.companyId)
